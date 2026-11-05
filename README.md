@@ -46,8 +46,9 @@ npm start
 ```
 
 `npm run pack:win`, `pack:mac` and `pack:linux` write a ready-to-run folder to `dist/`.
-Pushing a tag like `v1.0.1` makes the `release` workflow build all three on GitHub and
-publish them as a GitHub Release, which is the easiest link to send to testers. The apps are
+Bumping `version` in `package.json` and pushing to `main` makes the `release` workflow build
+all three on GitHub and publish them as the GitHub Release `v<version>`, which is the
+easiest link to send to testers. The apps are
 not code-signed, so Windows SmartScreen and macOS Gatekeeper ask for a confirmation the first
 time (the release notes explain the clicks).
 
