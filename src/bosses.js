@@ -65,7 +65,7 @@
   const BUZZ = ['SYNERGY', 'PIVOT', 'DISRUPT', 'LEVERAGE', 'ROCKSTAR', 'BANDWIDTH', 'KPI', 'OKR', 'SCALE IT', 'ALIGN'];
   class Chad extends Boss {
     constructor(x, y) {
-      super(x, y, { hp: 170, name: 'CHAD BROCKMAN, VP', style: 'chad', w: 28, h: 76, score: 5000, kbMul: 0.5 });
+      super(x, y, { hp: 170, name: 'CHAD BROCKMAN, VP', style: 'chad', w: 20, h: 52, score: 5000, kbMul: 0.5 });
       this.poses = {
         intro: () => 'walk' + (Math.floor(G.frame / 6) % 8), walk: () => 'walk' + (Math.floor(G.frame / 6) % 8),
         jabW: 'windup', jab: 'punch', chargeW: 'point', charge: () => 'sprint' + (Math.floor(G.frame / 4) % 8), dazed: 'stun',
@@ -87,7 +87,7 @@
           if (this.t > (fast ? 22 : 40)) {
             if (!this.summoned && fast) { this.setState('summon'); break; }
             const r = Math.random();
-            if (ad < 60 && r < 0.45) this.setState('jabW');
+            if (ad < 44 && r < 0.45) this.setState('jabW');
             else if (r < 0.35) this.setState('chargeW');
             else if (r < 0.6) this.setState('buzz');
             else if (r < 0.8) this.setState('slamW');
@@ -96,12 +96,12 @@
           break;
         case 'walk':
           this.face = Math.sign(d) || this.face; this.vx = this.face * (fast ? 1.6 : 1.2);
-          if (ad < 56) { this.setState('jabW'); this.vx = 0; } else if (this.t > 60) this.setState('idle');
+          if (ad < 40) { this.setState('jabW'); this.vx = 0; } else if (this.t > 60) this.setState('idle');
           break;
         case 'jabW': this.vx = 0; this.telegraph = this.t > 8; if (this.t >= 16) { this.setState('jab'); this.vx = this.face * 2; } break;
         case 'jab':
           this.vx = U.approach(this.vx, 0, 0.2);
-          if (this.t < 8 && !this.hitDone && this.hitPlayer(w, this.front(6, -70, 40, 22), { dmg: 10, kb: 3, kby: -3, knock: true })) this.hitDone = true;
+          if (this.t < 8 && !this.hitDone && this.hitPlayer(w, this.front(4, -48, 28, 16), { dmg: 10, kb: 3, kby: -3, knock: true })) this.hitDone = true;
           if (this.t >= 22) { this.hitDone = false; this.setState('idle'); }
           break;
         case 'chargeW':
@@ -112,10 +112,10 @@
         case 'charge':
           this.vx = this.face * (fast ? 6 : 5.2);
           if (this.t % 3 === 0) w.fx.dust(this.x, this.y, this.face, 1);
-          if (!this.hitDone && this.hitPlayer(w, this.front(-8, -74, 34, 68), { dmg: 14, kb: 4, kby: -5, knock: true })) this.hitDone = true;
+          if (!this.hitDone && this.hitPlayer(w, this.front(-6, -50, 24, 46), { dmg: 14, kb: 4, kby: -5, knock: true })) this.hitDone = true;
           if (this.x <= this.arena.x0 + this.w / 2 + 4 || this.x >= this.arena.x1 - this.w / 2 - 4) {
             this.hitDone = false; this.setState('dazed'); this.vx = -this.face * 2;
-            w.shake(8); G.Audio.sfx('heavy'); w.fx.burst(this.x + this.face * 14, this.y - 44, 12, ['#ffffff', C.yellow], 3);
+            w.shake(8); G.Audio.sfx('heavy'); w.fx.burst(this.x + this.face * 10, this.y - 30, 12, ['#ffffff', C.yellow], 3);
           }
           break;
         case 'dazed': this.vx = U.approach(this.vx, 0, 0.15); if (this.t >= (fast ? 70 : 90)) this.setState('idle'); break;
@@ -124,7 +124,7 @@
           if (this.t % 24 === 12 && this.t < 24 * (fast ? 4 : 3)) {
             const word = U.pick(BUZZ);
             const sp = U.clamp(ad / 45, 1.6, 4) * U.rand(0.85, 1.15);
-            w.add(new G.Projectile(this.x + this.face * 14, this.y - 70, { spr: G.Art.word(word), vx: this.face * sp, vy: -3.6, g: 0.15, dmg: 8, hittable: true, w: 20, h: 9 }));
+            w.add(new G.Projectile(this.x + this.face * 10, this.y - 48, { spr: G.Art.word(word), vx: this.face * sp, vy: -3.6, g: 0.15, dmg: 8, hittable: true, w: 20, h: 9 }));
             G.Audio.sfx('throw');
           }
           if (this.t >= 24 * (fast ? 4 : 3) + 10) this.setState('idle');
@@ -134,7 +134,7 @@
           if (this.onGround && this.t > 5) {
             this.setState('slamLand'); this.vx = 0; w.shake(8); G.Audio.sfx('heavy');
             w.add(new G.Shockwave(this.x - 12, this.y, -1)); w.add(new G.Shockwave(this.x + 12, this.y, 1));
-            if (U.overlap(this.front(-28, -28, 56, 28), p.hurtbox())) p.takeHit({ dmg: 12, kb: 3, kby: -4, knock: true, dir: Math.sign(d) || 1, from: this }, w);
+            if (U.overlap(this.front(-20, -20, 40, 20), p.hurtbox())) p.takeHit({ dmg: 12, kb: 3, kby: -4, knock: true, dir: Math.sign(d) || 1, from: this }, w);
           }
           break;
         case 'slamLand': if (this.t >= 34) this.setState('idle'); break;
@@ -151,9 +151,9 @@
       super.draw(ctx);
       if (this.state === 'dazed') {
         const a = G.frame / 6;
-        for (let i = 0; i < 3; i++) G.Font.draw(ctx, '*', this.x + Math.cos(a + i * 2.1) * 16 - 2, this.y - 96 + Math.sin(a + i * 2.1) * 3, C.yellow);
+        for (let i = 0; i < 3; i++) G.Font.draw(ctx, '*', this.x + Math.cos(a + i * 2.1) * 12 - 2, this.y - 66 + Math.sin(a + i * 2.1) * 3, C.yellow);
       }
-      if (this.state === 'chargeW') G.Font.draw(ctx, '!', this.x - 2, this.y - 104 - (G.frame % 10 < 5 ? 1 : 0), C.red, { shadow: C.ink });
+      if (this.state === 'chargeW') G.Font.draw(ctx, '!', this.x - 2, this.y - 72 - (G.frame % 10 < 5 ? 1 : 0), C.red, { shadow: C.ink });
     }
   }
 
@@ -162,7 +162,7 @@
   // ===================================================================================
   class Rack extends Boss {
     constructor(x, y) {
-      super(x, y, { hp: 230, name: 'RACK-9000', w: 72, h: 104, score: 7000, kbMul: 0 });
+      super(x, y, { hp: 230, name: 'RACK-9000', w: 52, h: 74, score: 7000, kbMul: 0 });
       this.cable = 0; this.cableT = 0; this.cycle = 0; this.face = -1; this.vanish = false;
     }
     canStun() { return this.state === 'overheat'; }
@@ -189,8 +189,8 @@
         case 'cable': {
           const ext = 150, out = 14, hold = 8;
           this.cable = this.t < out ? ext * this.t / out : this.t < out + hold ? ext : Math.max(0, ext * (1 - (this.t - out - hold) / out));
-          const x0 = this.x + this.face * 36, x1 = x0 + this.face * this.cable;
-          const box = { x: Math.min(x0, x1), y: this.y - 39, w: Math.abs(x1 - x0), h: 12 };
+          const x0 = this.x + this.face * 26, x1 = x0 + this.face * this.cable;
+          const box = { x: Math.min(x0, x1), y: this.y - 28, w: Math.abs(x1 - x0), h: 9 };
           if (this.cable > 4) this.hitPlayer(w, box, { dmg: 12, kb: 3, kby: -4, knock: true });
           if (this.t >= out * 2 + hold) { this.cable = 0; this.setState(fast && !this.second ? 'cableW' : 'idle'); this.second = !this.second && fast; }
           break;
@@ -208,7 +208,7 @@
           if (this.t >= 40) {
             this.setState('laser');
             const x0 = this.face > 0 ? this.x + 20 : this.arena.x0, x1 = this.face > 0 ? this.arena.x1 : this.x - 20;
-            w.add(new G.Beam({ x0, x1, y: this.y - 46, thick: 8, warn: 1, on: 56, dmg: 13, col: C.red, srcX: this.x }));
+            w.add(new G.Beam({ x0, x1, y: this.y - 31, thick: 8, warn: 1, on: 56, dmg: 13, col: C.red, srcX: this.x }));
           }
           break;
         case 'laser': if (this.t >= 58) { this.setState('overheat'); G.Audio.sfx('glitch'); w.fx.text(this.x, this.y - 90, 'OVERHEATING!', C.orange, 60); } break;
@@ -221,10 +221,10 @@
     }
     c_hurt() { if (this.t >= this.stunT) this.setState('overheat'); }
     draw(ctx) {
-      const x = Math.round(this.x), y = Math.round(this.y), K = 1.4, p = new G.Gfx.ScaledPen(ctx, x, y, K);
+      const x = Math.round(this.x), y = Math.round(this.y), p = new G.Gfx.Pen(ctx);
       if (this.state === 'defeated' && this.t > 120) {
         p.rect(x - 28, y - 30, 56, 30, '#2a2e40'); p.rect(x - 26, y - 28, 52, 26, '#1a1e30');
-        G.Font.draw(ctx, 'BSOD', x - 11, p.ty(y - 20), C.blue); return;
+        G.Font.draw(ctx, 'BSOD', x - 11, y - 20, C.blue); return;
       }
       const flash = this.flash > 0, red = this.telegraph && (G.frame >> 1) % 2;
       const body = flash ? '#ffffff' : red ? '#ff7a7a' : '#7d86a0', dark = flash ? '#ffffff' : '#4a5068';
@@ -233,10 +233,9 @@
       // cable arm
       if (this.cable > 0) {
         const x0 = bx + this.face * 26;
-        const cl = this.cable / K;
-        p.line(x0, y - 24, x0 + this.face * cl, y - 24, C.ink, 5);
-        p.line(x0, y - 24, x0 + this.face * cl, y - 24, G.frame % 4 < 2 ? C.cyan : '#ffffff', 3);
-        p.rect(x0 + this.face * cl - 4, y - 29, 8, 10, C.ink); p.rect(x0 + this.face * cl - 3, y - 28, 6, 8, C.yellow);
+        p.line(x0, y - 24, x0 + this.face * this.cable, y - 24, C.ink, 5);
+        p.line(x0, y - 24, x0 + this.face * this.cable, y - 24, G.frame % 4 < 2 ? C.cyan : '#ffffff', 3);
+        p.rect(x0 + this.face * this.cable - 4, y - 29, 8, 10, C.ink); p.rect(x0 + this.face * this.cable - 3, y - 28, 6, 8, C.yellow);
       }
       // treads
       p.rect(bx - 30, y - 14, 60, 14, C.ink); p.rect(bx - 29, y - 13, 58, 12, '#2a2e40');
@@ -246,8 +245,8 @@
       p.rect(bx - 23, y - 72, 46, 56, dark);
       // face screen
       p.rect(bx - 19, y - 70, 38, 20, C.ink); p.rect(bx - 18, y - 69, 36, 18, '#0a1830');
-      if (this.state === 'laserW' || this.state === 'laser') G.Font.draw(ctx, '404', bx - 8, p.ty(y - 64), (G.frame >> 2) % 2 ? C.red : C.orange);
-      else if (this.state === 'overheat' || this.state === 'hurt') G.Font.draw(ctx, '@_@', bx - 8, p.ty(y - 64), C.orange);
+      if (this.state === 'laserW' || this.state === 'laser') G.Font.draw(ctx, '404', bx - 8, y - 64, (G.frame >> 2) % 2 ? C.red : C.orange);
+      else if (this.state === 'overheat' || this.state === 'hurt') G.Font.draw(ctx, '@_@', bx - 8, y - 64, C.orange);
       else {
         const ex = this.face * 3;
         p.rect(bx - 11 + ex, y - 66, 6, 6, C.cyan); p.rect(bx + 5 + ex, y - 66, 6, 6, C.cyan);
@@ -275,7 +274,7 @@
   // ===================================================================================
   class Spag extends Boss {
     constructor(x, y) {
-      super(x, y, { hp: 250, name: 'SPAGHETTI.EXE', w: 60, h: 56, score: 9000, kbMul: 0 });
+      super(x, y, { hp: 250, name: 'SPAGHETTI.EXE', w: 44, h: 40, score: 9000, kbMul: 0 });
       this.gravity = false; this.noClip = true; this.flying = true; this.vanish = true;
       this.home = { x, y }; this.summons = 0; this.cycle = 0;
     }
@@ -303,7 +302,7 @@
             const n = fast ? 7 : 5;
             for (let i = 0; i < n; i++) {
               const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.42;
-              w.add(new G.Projectile(this.x, this.y - 28, { spr: G.Art.proj.orb(), vx: Math.cos(a) * 2.6 + (p.x - this.x) / 140, vy: Math.sin(a) * 2.6, g: 0.12, bounce: 2, dmg: 8, hittable: true, life: 400 }));
+              w.add(new G.Projectile(this.x, this.y - 20, { spr: G.Art.proj.orb(), vx: Math.cos(a) * 2.6 + (p.x - this.x) / 140, vy: Math.sin(a) * 2.6, g: 0.12, bounce: 2, dmg: 8, hittable: true, life: 400 }));
             }
             G.Audio.sfx('shoot');
           }
@@ -347,7 +346,7 @@
     c_defeated() { this.vx = 0; this.vy = 0.4; Boss.prototype.c_defeated.apply(this, arguments); }
     draw(ctx) {
       if (this.gone) return;
-      const x = Math.round(this.x), cy = Math.round(this.y - 20), p = new G.Gfx.ScaledPen(ctx, x, Math.round(this.y), 1.4);
+      const x = Math.round(this.x), cy = Math.round(this.y - 20), p = new G.Gfx.Pen(ctx);
       const t = G.frame / 10, tang = this.state === 'tangled' || this.state === 'hurt';
       const col = this.flash > 0 ? '#ffffff' : this.telegraph && (G.frame >> 1) % 2 ? '#ff7a5a' : '#ffd24a';
       // dangling noodles
@@ -385,7 +384,7 @@
       p.grid(tang ? H.rows.map((r) => r.replace(/k/g, 'w')) : H.rows, H.pal, x - 12, cy - 10, 0, false, 2);
       // meatball crown
       p.circle(x - 8, cy - 22, 4, '#8a3a1a'); p.circle(x + 7, cy - 21, 3, '#8a3a1a'); p.px(x - 9, cy - 24, '#c86a3a');
-      if (tang) for (let i = 0; i < 3; i++) G.Font.draw(ctx, '?', x + Math.cos(G.frame / 8 + i * 2) * 28 - 2, p.ty(cy - 34) + Math.sin(G.frame / 8 + i * 2) * 3, C.cyan);
+      if (tang) for (let i = 0; i < 3; i++) G.Font.draw(ctx, '?', x + Math.cos(G.frame / 8 + i * 2) * 20 - 2, cy - 34 + Math.sin(G.frame / 8 + i * 2) * 3, C.cyan);
       if (G.DEBUG) { const hb = this.hurtbox(); if (hb) { ctx.strokeStyle = '#ff0'; ctx.strokeRect(hb.x + 0.5, hb.y + 0.5, hb.w, hb.h); } }
     }
   }
@@ -395,7 +394,7 @@
   // ===================================================================================
   class Nexus extends Boss {
     constructor(x, y) {
-      super(x, y, { hp: 300, name: 'N.E.X.U.S.', w: 60, h: 60, score: 15000, kbMul: 0 });
+      super(x, y, { hp: 300, name: 'N.E.X.U.S.', w: 44, h: 44, score: 15000, kbMul: 0 });
       this.gravity = false; this.noClip = true; this.flying = true; this.vanish = true;
       this.attacks = 0; this.cycle = 0; this.spin = 0;
     }
@@ -431,7 +430,7 @@
             const n = rage ? 14 : 10, off = this.t / 7;
             for (let i = 0; i < n; i++) {
               const a = (i / n) * Math.PI * 2 + off;
-              w.add(new G.Projectile(this.x, this.y - 31, { spr: G.Art.proj.packet(), vx: Math.cos(a) * 2.1, vy: Math.sin(a) * 2.1, dmg: 8, noWall: true, life: 260 }));
+              w.add(new G.Projectile(this.x, this.y - 22, { spr: G.Art.proj.packet(), vx: Math.cos(a) * 2.1, vy: Math.sin(a) * 2.1, dmg: 8, noWall: true, life: 260 }));
             }
             G.Audio.sfx('shoot');
           }
@@ -443,7 +442,7 @@
           const n = rage ? 4 : 3, gap = rage ? 46 : 56;
           if (this.t % gap === 1 && this.t < gap * n) {
             const low = Math.random() < 0.5;
-            w.add(new G.Beam({ x0: A.x0, x1: A.x1, y: low ? A.gy - 7 : A.gy - 46, thick: low ? 10 : 8, warn: 34, on: 18, dmg: 12, col: C.magenta, srcX: this.x }));
+            w.add(new G.Beam({ x0: A.x0, x1: A.x1, y: low ? A.gy - 7 : A.gy - 32, thick: low ? 10 : 8, warn: 34, on: 18, dmg: 12, col: C.magenta, srcX: this.x }));
             w.fx.text(this.x, this.y - 60, low ? 'JUMP!' : 'DUCK!', C.cyan, 30);
             G.Audio.sfx('warn');
           }
@@ -471,7 +470,7 @@
     c_defeated() { this.vx = 0; this.vy = 0.3; Boss.prototype.c_defeated.apply(this, arguments); }
     draw(ctx) {
       if (this.gone) return;
-      const x = Math.round(this.x), cy = Math.round(this.y - 22), p = new G.Gfx.ScaledPen(ctx, x, Math.round(this.y), 1.4);
+      const x = Math.round(this.x), cy = Math.round(this.y - 22), p = new G.Gfx.Pen(ctx);
       const rage = this.phase === 2, open = this.state === 'open' || this.state === 'hurt' || this.state === 'openW';
       const white = this.flash > 0;
       // outer glow

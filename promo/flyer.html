@@ -63,7 +63,7 @@ const draw2 = (spr, x, y, flip) => G.Gfx.draw(ctx, big(spr), x, y, flip);
 draw2(G.Art.body('bot', 'punch'), 300, 352, true);
 draw2(G.Art.body('manager', 'throwR'), 52, 340, false);
 G.Gfx.draw(ctx, G.Art.blob(2), 250, 372);
-G.Gfx.draw(ctx, G.Art.drone(0, true), 112, 186, true);
+draw2(G.Art.drone(0, true), 112, 186, true);
 G.Gfx.draw(ctx, G.Art.proj.memo(), 104, 236);
 // the heroes, mid-fight
 draw2(G.Art.body('girl', 'air'), 236, 290, true);
@@ -108,16 +108,15 @@ F.draw(ctx, 'PLAY', 52, 104, C.redD, { align: 'center' });
 F.draw(ctx, 'FREE!', 52, 114, C.redD, { align: 'center' });
 
 // hero name tags
-function tag(x, y, text, sub, col) {
-  const w = Math.max(F.width(text), F.width(sub)) + 10;
-  ctx.fillStyle = C.ink; ctx.fillRect(x - w / 2 - 1, y - 1, w + 2, 24);
-  ctx.fillStyle = col; ctx.fillRect(x - w / 2, y, w, 22);
-  ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x - w / 2, y + 11, w, 11);
+function tag(x, y, text, col) {
+  const w = F.width(text) + 10;
+  ctx.fillStyle = C.ink; ctx.fillRect(x - w / 2 - 1, y - 1, w + 2, 14);
+  ctx.fillStyle = col; ctx.fillRect(x - w / 2, y, w, 12);
+  ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x - w / 2, y + 7, w, 5);
   F.draw(ctx, text, x, y + 3, '#ffffff', { align: 'center' });
-  F.draw(ctx, sub, x, y + 13, C.yellow, { align: 'center' });
 }
-tag(118, 384, 'CODE BRO', '"BUFF BOY"', '#126fa6');
-tag(250, 384, 'CODE GIRL', '"HOT GIRL"', '#5a1fa0');
+tag(118, 390, 'CODE BRO', '#a8282a');
+tag(250, 390, 'CODE GIRL', '#3a7a3a');
 
 // feature strip
 ctx.fillStyle = C.ink; ctx.fillRect(0, 412, W, 38);

@@ -6,17 +6,17 @@
   // Attack table. Frames at 60 Hz. box = [forward offset, top (from feet, negative = up), w, h]
   // act = active frames [from, to], cancel = first frame the next chain hit may start
   const ATK = {
-    jab1: { dur: 15, act: [3, 6], cancel: 6, box: [5, -44, 24, 14], dmg: 3, kb: 1.2, stun: 18, next: 'jab2', lunge: 1, pose: ['idle0', 'jab1'], sfx: 'punch' },
-    jab2: { dur: 15, act: [3, 6], cancel: 6, box: [5, -44, 24, 14], dmg: 3, kb: 1.2, stun: 18, next: 'hook', lunge: 1, pose: ['idle0', 'jab2'], sfx: 'punch' },
-    hook: { dur: 18, act: [4, 7], cancel: 8, box: [5, -46, 27, 16], dmg: 4, kb: 1.6, stun: 22, next: 'kick', lunge: 1.5, pose: ['hookW', 'hook'], sfx: 'punch' },
-    kick: { dur: 26, act: [6, 10], box: [3, -36, 32, 16], dmg: 7, kb: 3.6, kby: -3, knock: true, stun: 30, lunge: 2, hitstop: 6, heavy: true, pose: ['kickW', 'kick'], sfx: 'heavy' },
-    upper: { dur: 26, act: [4, 11], box: [0, -70, 24, 50], dmg: 7, kb: 1, kby: -7, knock: true, breakGuard: true, stun: 30, lunge: 1, hitstop: 6, heavy: true, pose: ['upW', 'up'], sfx: 'heavy' },
-    air: { dur: 32, act: [3, 28], box: [3, -32, 27, 18], dmg: 6, kb: 3, kby: -2, knock: true, stun: 26, air: true, pose: ['jump', 'air'], sfx: 'heavy' },
-    dive: { dur: 60, act: [2, 60], box: [0, -20, 24, 22], dmg: 7, kb: 2.5, kby: -2.5, knock: true, breakGuard: true, stun: 26, air: true, pose: ['dive', 'dive'], sfx: 'heavy' },
+    jab1: { dur: 15, act: [3, 6], cancel: 6, box: [4, -30, 18, 10], dmg: 3, kb: 1.2, stun: 18, next: 'jab2', lunge: 1, pose: ['idle0', 'jab1'], sfx: 'punch' },
+    jab2: { dur: 15, act: [3, 6], cancel: 6, box: [4, -30, 18, 10], dmg: 3, kb: 1.2, stun: 18, next: 'hook', lunge: 1, pose: ['idle0', 'jab2'], sfx: 'punch' },
+    hook: { dur: 18, act: [4, 7], cancel: 8, box: [4, -32, 20, 12], dmg: 4, kb: 1.6, stun: 22, next: 'kick', lunge: 1.5, pose: ['hookW', 'hook'], sfx: 'punch' },
+    kick: { dur: 26, act: [6, 10], box: [2, -24, 24, 12], dmg: 7, kb: 3.6, kby: -3, knock: true, stun: 30, lunge: 2, hitstop: 6, heavy: true, pose: ['kickW', 'kick'], sfx: 'heavy' },
+    upper: { dur: 26, act: [4, 11], box: [0, -48, 18, 34], dmg: 7, kb: 1, kby: -7, knock: true, breakGuard: true, stun: 30, lunge: 1, hitstop: 6, heavy: true, pose: ['upW', 'up'], sfx: 'heavy' },
+    air: { dur: 32, act: [3, 28], box: [2, -22, 20, 14], dmg: 6, kb: 3, kby: -2, knock: true, stun: 26, air: true, pose: ['jump', 'air'], sfx: 'heavy' },
+    dive: { dur: 60, act: [2, 60], box: [0, -14, 18, 16], dmg: 7, kb: 2.5, kby: -2.5, knock: true, breakGuard: true, stun: 26, air: true, pose: ['dive', 'dive'], sfx: 'heavy' },
     // ducking attacks: they keep you low (under high shots and lasers)
-    cjab: { dur: 13, act: [2, 5], cancel: 5, box: [2, -16, 26, 16], dmg: 3, kb: 1, stun: 18, next: 'sweep', low: true, pose: ['crouch', 'cjab'], sfx: 'punch' },
-    sweep: { dur: 26, act: [4, 10], box: [0, -12, 34, 12], dmg: 6, kb: 1.5, kby: -2.5, knock: true, breakGuard: true, stun: 30, low: true, hitstop: 5, heavy: true, pose: ['crouch', 'sweep'], sfx: 'heavy' },
-    dashAtk: { dur: 28, act: [2, 16], box: [0, -46, 30, 36], dmg: 8, kb: 4.2, kby: -3, knock: true, stun: 30, hitstop: 5, heavy: true, pose: ['dashAtk', 'dashAtk'], sfx: 'heavy' },
+    cjab: { dur: 13, act: [2, 5], cancel: 5, box: [2, -12, 22, 12], dmg: 3, kb: 1, stun: 18, next: 'sweep', low: true, pose: ['crouch', 'cjab'], sfx: 'punch' },
+    sweep: { dur: 26, act: [4, 10], box: [0, -9, 26, 9], dmg: 6, kb: 1.5, kby: -2.5, knock: true, breakGuard: true, stun: 30, low: true, hitstop: 5, heavy: true, pose: ['crouch', 'sweep'], sfx: 'heavy' },
+    dashAtk: { dur: 28, act: [2, 16], box: [0, -32, 22, 26], dmg: 8, kb: 4.2, kby: -3, knock: true, stun: 30, hitstop: 5, heavy: true, pose: ['dashAtk', 'dashAtk'], sfx: 'heavy' },
   };
 
   const QUIPS = {
@@ -37,7 +37,7 @@
   class Player {
     constructor(x, y) {
       this.style = G.Art.hero(); this.stats = HEROES[this.style] || HEROES.bro;
-      this.x = x; this.y = y; this.w = 16; this.h = 52; this.baseH = 52;
+      this.x = x; this.y = y; this.w = 12; this.h = 36; this.baseH = 36;
       this.vx = 0; this.vy = 0; this.onGround = false; this.face = 1;
       this.hp = this.maxHp = this.stats.hp; this.meter = 0;
       this.state = 'normal'; this.t = 0;
@@ -81,7 +81,7 @@
       }
       const dx = ctl ? I.dirX() : 0;
       if (this.onGround) { this.coyote = 6; this.airDash = true; this.airAtk = true; } else if (this.coyote > 0) this.coyote--;
-      this.h = this.crouching ? 34 : this.baseH;
+      this.h = this.crouching ? 24 : this.baseH;
 
       const fn = this['st_' + this.state];
       if (fn) fn.call(this, w, dx, I, ctl);
@@ -198,7 +198,7 @@
     doAttack(w, name) {
       this.atk = ATK[name]; this.atkName = name;
       this.setState('attack'); this.hitList.clear(); this.connected = false; this.crouching = !!this.atk.low;
-      this.h = this.crouching ? 34 : this.baseH;
+      this.h = this.crouching ? 24 : this.baseH;
       if (name === 'dive') { this.vx = this.face * 4.2; this.vy = 4.5; }
       if (name === 'upper') this.vy = this.onGround ? -2.5 : this.vy;
       if (name === 'dashAtk') this.vx = this.face * Math.max(Math.abs(this.vx), 4.5);
@@ -275,7 +275,7 @@
       this.specBuf = 0;
       if (this.meter >= 100) this.meter = 0;
       else if (this.hp > 15) { this.hp -= 10; }
-      else { w.fx.text(this.x, this.y - 70, 'LOW HP!', G.C.red, 40); return; }
+      else { w.fx.text(this.x, this.y - 48, 'LOW HP!', G.C.red, 40); return; }
       this.setState('special'); this.inv = Math.max(this.inv, 50); this.vx = 0; this.crouching = false;
       if (!this.onGround) this.vy = -2;
       G.Audio.sfx('special'); this.say('special', true);
@@ -285,13 +285,13 @@
       this.vx = 0;
       if (this.t === 14) {
         w.flash = 6; w.shake(8);
-        w.fx.ring(this.x, this.y - 26, 110, G.C.cyan, 22); w.fx.ring(this.x, this.y - 26, 80, '#ffffff', 16);
+        w.fx.ring(this.x, this.y - 18, 110, G.C.cyan, 22); w.fx.ring(this.x, this.y - 18, 80, '#ffffff', 16);
         w.fx.bits(this.x, this.y, 20, G.C.cyan);
         for (const e of w.targets()) {
           const hb = e.hurtbox && e.hurtbox();
           if (!hb || !e.isEnemy && !e.breakable) continue;
           const cx = hb.x + hb.w / 2, cy = hb.y + hb.h / 2;
-          if (G.u.dist(cx, cy, this.x, this.y - 26) < 115) {
+          if (G.u.dist(cx, cy, this.x, this.y - 18) < 110) {
             const r = e.takeHit({ dmg: 16, kb: 4, kby: -5, dir: cx < this.x ? -1 : 1, knock: true, breakGuard: true, stun: 40, type: 'special', from: this }, w);
             if (r && e.isEnemy) { w.fx.spark(cx, cy, true); w.registerHit(16); }
           }
@@ -315,14 +315,14 @@
       const e = this.grabbed;
       if (!e || e.dead || e.state !== 'held') { this.grabbed = null; this.setState('normal'); return; }
       this.vx = 0;
-      e.x = this.x + this.face * 18; e.y = this.y; e.face = -this.face;
+      e.x = this.x + this.face * 13; e.y = this.y; e.face = -this.face;
       if (this.kneeT > 0) {
         this.kneeT--;
         if (this.kneeT === 8) {
           this.knees++;
           const last = this.knees >= 3;
           e.takeHit({ dmg: last ? 7 : 4, kb: last ? 3.5 : 0, kby: last ? -3.5 : 0, dir: this.face, knock: last, stun: 30, type: 'knee', from: this, grabHit: !last }, w);
-          w.fx.spark(e.x - this.face * 4, this.y - 30, last); G.Audio.sfx(last ? 'heavy' : 'punch');
+          w.fx.spark(e.x - this.face * 3, this.y - 20, last); G.Audio.sfx(last ? 'heavy' : 'punch');
           w.hitstop(last ? 6 : 3); w.registerHit(4); this.meter = Math.min(100, this.meter + 5);
           if (last) { this.grabbed = null; this.kneeT = 0; this.setState('normal'); this.chainT = 0; return; }
         }
@@ -339,7 +339,7 @@
     }
     st_throw(w) {
       const e = this.grabbed;
-      if (this.t < 8 && e && e.state === 'held') { e.x = this.x + this.face * (18 - this.t * 4); e.y = this.y - this.t * 4; }
+      if (this.t < 8 && e && e.state === 'held') { e.x = this.x + this.face * (13 - this.t * 3); e.y = this.y - this.t * 3; }
       if (this.t === 8 && e) {
         this.face = -this.face;
         e.thrown(this.face, w);
@@ -434,7 +434,7 @@
       if (this.state === 'special') {
         const r = this.t < 14 ? 6 + this.t : 20;
         const pen = new G.Gfx.Pen(ctx);
-        pen.ring(this.x, this.y - 26, r * 1.3 + (G.frame % 3), G.C.cyan, 2);
+        pen.ring(this.x, this.y - 18, r + (G.frame % 3), G.C.cyan, 2);
       }
       G.Gfx.draw(ctx, spr, this.x, this.y + 1, this.face < 0);
       if (G.DEBUG) {
@@ -449,7 +449,7 @@
       if (this.quipT <= 0 || !this.quip) return;
       const txt = this.quip.toUpperCase();
       const wdt = G.Font.width(txt) + 8;
-      let x = Math.round(this.x - wdt / 2), y = Math.round(this.y - 92);
+      let x = Math.round(this.x - wdt / 2), y = Math.round(this.y - 66);
       ctx.fillStyle = G.C.ink; ctx.fillRect(x - 1, y - 1, wdt + 2, 13);
       ctx.fillStyle = '#ffffff'; ctx.fillRect(x, y, wdt, 11);
       ctx.fillStyle = G.C.ink; ctx.fillRect(Math.round(this.x) - 2, y + 11, 5, 2); ctx.fillRect(Math.round(this.x) - 1, y + 13, 3, 2);

@@ -122,8 +122,8 @@
 
   // ---- Hero select ---------------------------------------------------------------------------
   const HERO_INFO = {
-    bro: { title: 'CODE BRO', tag: 'BUFF BOY', col: C.hood, bg: '#0e3a5a', lines: ['BENCHES 225, SHIPS ON', 'FRIDAYS. HITS HARD AND', 'TAKES A PUNCH.'], power: 5, speed: 2, health: 5, jump: 3 },
-    girl: { title: 'CODE GIRL', tag: 'HOT GIRL', col: '#c86aff', bg: '#3a1458', lines: ['VIM USER. RUNS THE', 'ON-CALL ROTA. FAST,', 'AGILE, HIGH JUMPS.'], power: 3, speed: 5, health: 3, jump: 5 },
+    bro: { title: 'CODE BRO', col: C.hood, bg: '#0e3a5a', lines: ['BENCHES 225, SHIPS ON', 'FRIDAYS. HITS HARD AND', 'TAKES A PUNCH.'], power: 5, speed: 2, health: 5, jump: 3 },
+    girl: { title: 'CODE GIRL', col: '#c86aff', bg: '#3a1458', lines: ['VIM USER. RUNS THE', 'ON-CALL ROTA. FAST,', 'AGILE, HIGH JUMPS.'], power: 3, speed: 5, health: 3, jump: 5 },
   };
   class HeroSelect {
     constructor(next) { this.next = next; this.t = 0; this.sel = G.store.get('hero', 'bro') === 'girl' ? 1 : 0; this.picked = -1; }
@@ -152,10 +152,9 @@
         const pose = pk ? 'win' : sel ? 'idle' + (Math.floor(this.t / 30) % 2) : 'stand';
         const spr = G.Art.body(h, pose);
         ctx.save(); ctx.globalAlpha = sel ? 1 : 0.55;
-        G.Gfx.draw(ctx, spr, x0 + 72, 124);
+        ctx.drawImage(G.Gfx.epxCanvas(spr), Math.round(x0 + 72 - spr.ox * 2), Math.round(126 - spr.oy * 2));
         ctx.restore();
         F.draw(ctx, info.title, x0 + 72, 132, sel ? info.col : C.grey, { align: 'center', scale: 2, shadow: C.ink });
-        F.draw(ctx, '"' + info.tag + '"', x0 + 72, 150, sel ? C.white : C.greyD, { align: 'center' });
         [['POWER', info.power], ['SPEED', info.speed], ['HEALTH', info.health], ['JUMP', info.jump]].forEach(([k, v], j) => {
           F.draw(ctx, k, x0 + 10, 164 + j * 10, C.greyL);
           for (let b = 0; b < 5; b++) { ctx.fillStyle = b < v ? (sel ? info.col : C.greyD) : '#1a1830'; ctx.fillRect(x0 + 60 + b * 14, 165 + j * 10, 12, 5); }
@@ -361,7 +360,7 @@
         F.draw(ctx, String(val), W - 50, 76 + k * 14, C.cyan, { align: 'right' });
       });
       F.draw(ctx, 'SCORE ' + String(G.session.score).padStart(7, '0'), W / 2, 146, C.yellow, { align: 'center', scale: 1, shadow: C.ink });
-      G.Gfx.draw(ctx, G.Art.body(G.Art.hero(), 'win'), W - 62, 196);
+      G.Gfx.draw(ctx, G.Art.body(G.Art.hero(), 'win'), W / 2, 196);
       if (this.shown >= this.rows.length && (this.t >> 4) % 2) F.draw(ctx, 'PRESS ATTACK', W / 2, 192, C.white, { align: 'center' });
     }
   }

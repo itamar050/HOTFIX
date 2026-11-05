@@ -10,8 +10,8 @@ Fight through the office, the server farm and the cloud to the AI core, and roll
 
 - 4 stages, each introducing new mechanics, each ending with a boss
   (Chad Brockman the VP of Synergy, RACK-9000, SPAGHETTI.EXE, and N.E.X.U.S. with two phases)
-- Two heroes to pick from: **Code Bro** ("Buff Boy": more health, harder hits) and
-  **Code Girl** ("Hot Girl": faster, higher jumps, quicker dash and combo timing)
+- Two heroes to pick from: **Code Bro** (more health, harder hits) and
+  **Code Girl** (faster, higher jumps, quicker dash and combo timing)
 - Beat 'em up combat: 4-hit chain, duck and strike (low jab into a sweep), uppercut juggles,
   air kick, dive kick (pogo), dash strike, stomps, grab on contact / knee / throw, and a
   HOTFIX special that uses the focus meter (or costs health)
@@ -224,11 +224,11 @@ pose they need when they load (`G.Art.prewarm`).
   `G.Art.hero()` is the picked hero; the speaker `'alex'` in dialog shows that hero.
 - **Faces and portraits**: `HEADS` in `art.js` are pixel grids (one character per pixel with
   a palette). The same grid is the in-game head and, scaled 3x, the dialog portrait.
-- **Scale**: characters are drawn and collide at `G.CS` = 1.5x the base rig, in the range
-  of Streets of Rage 2. Styles are written in base "design units" and the helpers in
-  `art.js` (`along`, `sw`, `ln`, `sg`, `box`) scale them. Enemy heads are enlarged with EPX
-  (`G.Rig.epx`, `G.Gfx.epxCanvas`), which rounds diagonals instead of making fat pixels; the
-  big code-drawn bosses use `G.Gfx.ScaledPen`.
+- **Detail**: heroes use realistic proportions (small heads, long limbs) with clothing
+  textures drawn on the rig: plaid flannel, rolled sleeves, a tee under an open shirt,
+  cargo pockets, boot shafts, fingerless gloves. `G.CS` (core.js) scales every character;
+  it is 1, which matches the tile size and backgrounds. `G.Rig.epx` / `G.Gfx.epxCanvas`
+  enlarge sprites 2x for menus and the flyer without fat square pixels.
 - **Bodies**: the pixel rig (`G.Rig` in `gfx.js`). A body is a hip, a torso and four two-bone
   limbs drawn as thick pixel lines. A `STYLE` (in `art.js`) gives bone lengths, colors and
   drawing functions for torso, head, limbs and held items; a `POSE` gives angles in degrees

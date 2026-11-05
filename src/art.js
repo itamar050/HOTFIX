@@ -28,47 +28,35 @@
       ],
     },
     bro: {
-      hires: true,
-      pal: { h: '#3a2416', H: '#22140c', g: '#5a3a26', s: '#e8a878', S: '#c48458', D: '#9a6040', k: C.ink, w: '#ffffff', l: '#9fe4ff', m: '#8a3030', b: '#b8805a', B: '#8a5a3a' },
+      pal: { h: '#4a2a18', H: '#2a160c', g: '#7a4a2a', s: '#eab084', S: '#c08058', k: C.ink, w: '#ffffff', l: '#a8e8ff', m: '#8a3a30', b: '#b88a64' },
       rows: [
-        '....hhhhhhh.....',
-        '..hhhhghhhhhh...',
-        '.hhhHhhhhghhhh..',
-        '.hhHhhhhhhhhhhh.',
-        'hhHHhhhhhhhhhhh.',
-        'hHHhhhsssshhhs..',
-        'hHHhssssssssss..',
-        'HHSssssskkkkk...',
-        'HHSSsssskwllks..',
-        'HSDSsssskllkkss.',
-        'HSDSsssskkkksss.',
-        '.SDSssssssssss..',
-        '..Dbsssssssss...',
-        '..Dbbssssmmms...',
-        '...bbbbbbbbb....',
-        '....BbbbbbbB....',
+        '...hhhh...',
+        '.hhhhghhh.',
+        'hhHhhhhghh',
+        'hHhhhhhhh.',
+        'hHhsssshh.',
+        'HSssskkkk.',
+        'HSsSskwlks',
+        '.SsssskkSs',
+        '.Ssbsssss.',
+        '..Sbbmmb..',
+        '...bbbb...',
       ],
     },
     girl: {
-      hires: true,
-      pal: { h: '#b8285a', H: '#6a1030', g: '#e05a86', s: '#f2c09a', S: '#d0946c', k: C.ink, w: '#ffffff', l: '#ffd0ec', m: '#d83a6a', e: '#ffd24a', r: '#f08a9a' },
+      pal: { h: '#a8402a', H: '#6a2014', g: '#d8703e', s: '#f2c09a', S: '#c88a62', k: C.ink, w: '#ffffff', m: '#c84a5a', G: '#3ad86a', D: '#1f8a40' },
       rows: [
-        '....hhhhhhh.....',
-        '..hhhhgghhhhh...',
-        '.hhhhhhhhgghhh..',
-        'hhhHhhhhhhhhhhh.',
-        'hhHhhhhhhhhhhhh.',
-        'hhHhhhhssshhhh..',
-        'hhHhhsssssssshh.',
-        'hhHhSsssskkkks..',
-        'hhHhSsssskwlkss.',
-        'hhHhSsssskllksss',
-        'hhHhSesssskkkss.',
-        'hhHhhSsssrrssss.',
-        'hhHhhSssssssmms.',
-        'hhHh..Sssssss...',
-        'hhH....SSsss....',
-        'hH..............',
+        '...hhhh...',
+        '.hhhghhhh.',
+        'hhhGGGGhh.',
+        'hhHhhhhghh',
+        'hHhhssshh.',
+        'hHGsssssss',
+        'hHDsskksss',
+        'hHGssssssS',
+        'hh.SsssmS.',
+        'h...SSss..',
+        'h.........',
       ],
     },
     bot: {
@@ -139,42 +127,36 @@
       ],
     },
     priya: {
-      hires: true,
-      pal: { h: '#2a1630', H: '#160a1c', g: '#4a2a50', s: '#c98a5e', S: '#9c623c', k: C.ink, w: '#ffffff', m: '#c0304a', e: C.gold },
+      pal: { h: '#2a1630', H: '#160a1c', s: '#c98a5e', S: '#9c623c', k: C.ink, w: '#ffffff', m: '#c0304a', e: C.gold },
       rows: [
-        '...hhhhhhhh....',
-        '.hhhhhhgghhhh..',
-        'hhhhhhhhhhhhhh.',
-        'hhHhhhhhhhhhhh.',
-        'hHhhhhhsshhhh..',
-        'hHhhsssssssss..',
-        'hHhSsssskkssss.',
-        'hHhSssssswksss.',
-        'hHhSsssssssssss',
-        'hHhSessssssss..',
-        'hhhSsssssmmss..',
-        '.hh.SSsssss....',
-        '..h...SSs......',
+        '....hhhhh..',
+        '..hhhhhhhh.',
+        '.hhhhhhhhhh',
+        'hhHhhhhhhh.',
+        'hhHhhhsshh.',
+        '.hHhsssssss',
+        '.hHSssskkss',
+        '.hHSessskss',
+        '.hHSssssssS',
+        '..hSssssms.',
+        '...SSssss..',
       ],
     },
     gus: {
-      hires: true,
-      pal: { b: '#3c8a3a', B: '#24572a', g: '#5ab05a', s: '#efb48c', S: '#c27c56', r: '#8a6a52', R: '#5e4636', q: '#a88a72', k: C.ink, w: '#ffffff', n: '#e08a6a' },
+      pal: { b: '#3c8a3a', B: '#24572a', s: '#efb48c', S: '#c27c56', r: '#8a6a52', R: '#5e4636', k: C.ink, w: '#ffffff', n: '#e08a6a' },
       rows: [
-        '...bbbbbbbb....',
-        '..bbbbgbbbbb...',
-        '.bbbbbbbbgbbb..',
-        '.BBBBBBBBBBBB..',
-        '.SSsssskkkssss.',
-        '.SSssssskwsssn.',
-        '.SRssssssssnnnn',
-        '.SRssssssssssn.',
-        '.RRrrrrrrrrrr..',
-        '.RRrrrqrkkkrrr.',
-        '..RRrrrrrrrqrr.',
-        '..RRrrqrrrrrr..',
-        '...RRrrrrrrr...',
-        '....RRrrrrr....',
+        '...bbbbbb..',
+        '..bbbbbbbb.',
+        '.bBbbbbbbbb',
+        '.BBBBBBBBB.',
+        '.SSsskksss.',
+        '.SSsssksnn.',
+        '.SRssssssn.',
+        '.RRrrrrrrs.',
+        '.RRrrrkkrr.',
+        '..RRrrrrrr.',
+        '...RRrrrr..',
+        '....RRrr...',
       ],
     },
     rack: {
@@ -241,8 +223,8 @@
   };
   // expression variants (grid edits)
   const FACES = {
-    bro: { hurt: { 8: 'HHSSsssskkkkks..', 9: 'HSDSssssskkkkss.', 13: '..Dbbsssmmmms...' }, shout: { 13: '..Dbbsssssmmm...', 14: '...bbbbbbmmb....' } },
-    girl: { hurt: { 8: 'hhHhSssssskkkss.', 9: 'hhHhSsssskkkksss', 12: 'hhHhhSsssssmmm..' }, shout: { 12: 'hhHhhSsssssmmm..', 13: 'hhHh..Sssssmm...' } },
+    bro: { hurt: { 6: 'HSsSskkkks', 9: '..Sbmmmb..' }, shout: { 9: '..Sbbmmb..', 10: '...bmmb...' } },
+    girl: { hurt: { 6: 'hHDsskkkss', 8: 'hh.Sssmmm.' }, shout: { 8: 'hh.SsssmS.', 9: 'h...SSmm..' } },
   };
   function headRows(name, face) {
     const h = HEADS[name], f = FACES[name] && FACES[name][face];
@@ -296,78 +278,80 @@
 
   const STYLES = {};
 
-  // Hero 1: CODE BRO. Sleeveless hoodie, big arms, stubble, heavy hitter.
+  // Hero 1: CODE BRO. Plaid flannel over a dark tee, rolled sleeves, jeans, glasses.
+  const FL = '#b8322e', FLD = '#7a1a1c', FLL = '#e05a4a', TEE = '#2a2a3a';
+  function plaid(p, J, t0, t1, w) { // dark check lines across and along a flannel panel
+    for (let t = t0 + 1; t < t1; t += 3) ln(p, J, along(J, t, w), along(J, t, -w), FLD, 1);
+    for (const o of [-w + 1.5, 0.5, w - 1.5]) ln(p, J, along(J, t0, o), along(J, t1, o), FLD, 1);
+  }
   STYLES.bro = {
-    thigh: 8, shin: 8, upper: 6, fore: 6, torso: 12, footH: 2.5, headUp: 6.5,
+    thigh: 9, shin: 9, upper: 6.5, fore: 6, torso: 12.5, footH: 2, headUp: 5,
     leg: (p, a, k, e, back, J) => {
-      G.Rig.limb(p, a, k, e, back ? C.jeansD : C.jeans, sw(J, 5));
-      shoe(p, J, e, C.shoe, C.shoeD, '#ffffff', back);
+      G.Rig.limb(p, a, k, e, back ? C.jeansD : C.jeans, 4);
+      if (!back) p.px(k[0] + 1, k[1] - 1, '#5a6ab8'); // worn knee
+      shoe(p, J, e, '#e8e8f0', '#9a9ab0', '#c03030', back);
     },
     arm: (p, a, k, e, back, J) => {
-      const sk = back ? '#b87650' : '#e8a878';
-      sg(p, J, a, k, sk, 6);
-      p.circle((a[0] + k[0]) / 2, (a[1] + k[1]) / 2, sw(J, 2.6), sk); // biceps
-      sg(p, J, k, e, sk, 4.5);
-      const wr = [k[0] + (e[0] - k[0]) * 0.72, k[1] + (e[1] - k[1]) * 0.72];
-      sg(p, J, wr, [wr[0] + (e[0] - k[0]) * 0.12, wr[1] + (e[1] - k[1]) * 0.12], back ? C.hoodD : C.hood, 5);
-      fist(p, J, e, sk, G.u.tint(sk, -0.3), 4.5);
+      const f = back ? FLD : FL;
+      G.Rig.seg(p, a[0], a[1], k[0], k[1], f, 4); // sleeve
+      p.line((a[0] + k[0]) / 2 - 1, (a[1] + k[1]) / 2, (a[0] + k[0]) / 2 + 1, (a[1] + k[1]) / 2, back ? '#4a0e10' : FLD, 1);
+      p.rect(k[0] - 2, k[1] - 1, 4, 3, back ? FLD : FLL); // rolled cuff at the elbow
+      G.Rig.seg(p, k[0], k[1], e[0], e[1], back ? '#c08058' : '#eab084', 3); // forearm
+      fist(p, J, e, back ? '#c08058' : '#eab084', '#9a6040', 3);
     },
-    behind(p, J) {
-      sg(p, J, along(J, 2, 7), along(J, 12, 7), C.pack, 7);
-      sg(p, J, along(J, 3, 9.5), along(J, 11, 9.5), C.packD, 2);
-      box(p, J, along(J, 6, 7.5), -1.5, -1, 3, 2, '#ffd27a'); // zip pull
-      box(p, J, along(J, 13, 5), -2, -1, 4, 2, C.packD);
+    behind(p, J) { // a slim laptop bag strap and bag
+      sg(p, J, along(J, 2, 6), along(J, 9, 6.5), '#3a3a4a', 4);
+      box(p, J, along(J, 5, 6), -1, -1, 2, 1, '#8a8aa0');
     },
     torsoDraw(p, J) {
-      sg(p, J, J.hip, along(J, 12), C.hood, 11);
-      sg(p, J, along(J, 9, 1), along(J, 13, 1), C.hood, 13); // broad shoulders
-      ln(p, J, along(J, 1, 4), along(J, 12, 4), C.hoodD, 2);
-      ln(p, J, along(J, 6, -4.5), along(J, 11, -4.5), C.hoodL, 1); // pec highlight
-      ln(p, J, along(J, -0.6), along(J, 0.4), C.jeans, 10);
-      ln(p, J, along(J, 0.6, 5), along(J, 0.6, -5), '#3a2416', 1); // belt
-      const lg = along(J, 7, -2);
-      p.grid(['k...k', '.k.k.', 'k...k'], { k: '#ffffff' }, lg[0] - 2, lg[1] - 1, 0, false, J.s >= 1.4 ? 1 : 1);
-      ln(p, J, along(J, 12, 2), along(J, 3, -1), C.packD, 1);
-      const hd = along(J, 12, 4); p.circle(hd[0], hd[1], sw(J, 3), C.hoodD);
-      const ds = along(J, 10, -3); p.rect(ds[0], ds[1], 1, sw(J, 3), '#ffffff');
+      sg(p, J, J.hip, along(J, 12.5), FL, 9);
+      plaid(p, J, 1, 12, 4);
+      ln(p, J, along(J, 1, -2.5), along(J, 11.5, -2.5), TEE, 2.5); // open shirt, dark tee
+      ln(p, J, along(J, 7, -2.5), along(J, 9, -2.5), '#5a5a7a', 1); // tee print
+      ln(p, J, along(J, 12, 1), along(J, 9.5, -3.5), FLL, 1); // collar
+      ln(p, J, along(J, 0), along(J, 1), C.jeans, 9);
+      ln(p, J, along(J, 0.6, 4.5), along(J, 0.6, -4.5), '#3a2416', 1); // belt
+      box(p, J, along(J, 0.6, -2), 0, -0.5, 1, 1, '#d8b040'); // buckle
+      ln(p, J, along(J, 12, 2), along(J, 3, -1), '#3a3a4a', 1); // bag strap
     },
     head: head('bro'),
   };
 
-  // Hero 2: CODE GIRL. Cropped jacket, high ponytail, fast and agile.
-  const JACKET = '#8a3ad8', JACKD = '#5a1fa0', PINK = '#ff4fb8', LEG = '#2e2648', LEGD = '#1c1630';
+  // Hero 2: CODE GIRL. Headset, grey tech jacket, olive cargo pants, boots, ponytail.
+  const JACKET = '#6a7088', JACKD = '#454a60', JACKL = '#9aa0b8', CARGO = '#6a7a42', CARGOD = '#46522a', BOOT = '#6a4024', NEON = '#3ad86a';
   STYLES.girl = {
-    thigh: 8.5, shin: 8.5, upper: 6, fore: 5.5, torso: 11, footH: 2.5, headUp: 6.5,
+    thigh: 9, shin: 9, upper: 6.5, fore: 5.5, torso: 11.5, footH: 2, headUp: 5,
     leg: (p, a, k, e, back, J) => {
-      G.Rig.limb(p, a, k, e, back ? LEGD : LEG, sw(J, 4));
-      const kn = [a[0] + (k[0] - a[0]) * 0.9, a[1] + (k[1] - a[1]) * 0.9];
-      p.rect(kn[0] - 1, kn[1] - 1, 2, 2, back ? JACKD : PINK); // knee stripe
-      shoe(p, J, e, '#ffffff', '#c8c8d8', PINK, back);
+      G.Rig.limb(p, a, k, e, back ? CARGOD : CARGO, 4);
+      if (!back) { const m = [(a[0] + k[0]) / 2, (a[1] + k[1]) / 2]; p.rect(m[0], m[1] - 1, 2, 3, CARGOD); p.px(m[0], m[1] - 1, '#8a9a5a'); } // thigh pocket
+      const sh = [k[0] + (e[0] - k[0]) * 0.65, k[1] + (e[1] - k[1]) * 0.65];
+      G.Rig.seg(p, sh[0], sh[1], e[0], e[1], back ? '#4a2c18' : BOOT, 4); // boot shaft
+      shoe(p, J, e, BOOT, '#4a2c18', '#2a1a10', back);
     },
     arm: (p, a, k, e, back, J) => {
-      G.Rig.limb(p, a, k, e, back ? JACKD : JACKET, sw(J, 3.5));
-      const cf = [k[0] + (e[0] - k[0]) * 0.8, k[1] + (e[1] - k[1]) * 0.8];
-      sg(p, J, cf, [cf[0] + (e[0] - k[0]) * 0.1, cf[1] + (e[1] - k[1]) * 0.1], back ? '#c8c8d8' : '#ffffff', 4); // cuff
-      fist(p, J, e, back ? '#c8865e' : '#f2c09a', '#a8664a', 3.5);
+      G.Rig.limb(p, a, k, e, back ? JACKD : JACKET, 3);
+      p.px(k[0], k[1], back ? JACKD : JACKL);
+      fist(p, J, e, back ? '#2a2a36' : '#3a3a4a', '#1a1a24', 3); // fingerless gloves
+      p.px(e[0] + 1, e[1] - 1, '#f2c09a');
     },
     behind(p, J) {
-      // high ponytail swinging from the back of the head
-      const top = along(J, 18.5, 4.5), sw0 = Math.sin((J.pose.lean || 0) / 20) * 3 * J.s;
-      const mid = [top[0] + J.back[0] * 5 * J.s - sw0, top[1] + 5 * J.s], tip = [mid[0] + J.back[0] * 3 * J.s - sw0, mid[1] + 9 * J.s];
-      G.Rig.seg(p, top[0], top[1], mid[0], mid[1], '#b8285a', sw(J, 5));
-      G.Rig.seg(p, mid[0], mid[1], tip[0], tip[1], '#b8285a', sw(J, 3.5));
-      p.rect(top[0] - 2, top[1] - 2, sw(J, 3), sw(J, 3), PINK); // scrunchie
-      sg(p, J, along(J, 3, 5), along(J, 9, 5), C.teal, 4); // sling bag
-      box(p, J, along(J, 6, 5), -1, -1, 2, 2, '#ffffff');
+      // ponytail swinging from the back of the head
+      const top = along(J, 15, 4), sw0 = Math.sin((J.pose.lean || 0) / 20) * 3;
+      const mid = [top[0] + J.back[0] * 4 - sw0, top[1] + 4], tip = [mid[0] + J.back[0] * 2 - sw0, mid[1] + 7];
+      G.Rig.seg(p, top[0], top[1], mid[0], mid[1], '#a8402a', 4);
+      G.Rig.seg(p, mid[0], mid[1], tip[0], tip[1], '#a8402a', 3);
+      p.px(tip[0], tip[1] + 1, '#d8703e');
+      p.rect(top[0] - 1, top[1] - 1, 2, 2, NEON);
     },
     torsoDraw(p, J) {
-      sg(p, J, J.hip, along(J, 11), JACKET, 9);
-      ln(p, J, along(J, 3, -2.2), along(J, 10, -2.2), C.teal, 2.2); // top under the jacket
-      ln(p, J, along(J, 3, -3.4), along(J, 11, -3.4), PINK, 1); // zipper
-      ln(p, J, along(J, 9.5, 3), along(J, 11, -3), '#ffffff', 1); // collar
-      ln(p, J, along(J, -0.6), along(J, 0.4), LEG, 8);
-      ln(p, J, along(J, 1, 4), along(J, 1, -4), PINK, 1); // belt
-      ln(p, J, along(J, 11, 2), along(J, 2, -3), C.tealD, 1);
+      sg(p, J, J.hip, along(J, 11.5), JACKET, 8);
+      ln(p, J, along(J, 2, -2.3), along(J, 10.5, -2.3), '#2a3a2e', 2); // tank top
+      ln(p, J, along(J, 6, -2.3), along(J, 7, -2.3), NEON, 1); // logo
+      ln(p, J, along(J, 2, -3.3), along(J, 11, -3.3), JACKL, 1); // zipper edge
+      ln(p, J, along(J, 5, 3.5), along(J, 9, 3.5), JACKD, 1); // seam
+      ln(p, J, along(J, 11, 2.5), along(J, 9, -3.5), JACKL, 1); // collar
+      ln(p, J, along(J, 0), along(J, 1), CARGO, 8);
+      ln(p, J, along(J, 0.8, 4), along(J, 0.8, -4), '#2a1a10', 1); // belt
     },
     head: head('girl'),
   };
@@ -677,7 +661,7 @@
 
   // ---- creatures drawn without the rig ------------------------------------------------
   function blob(frame, mini) {
-    const s = mini ? 0.9 : 1.5;
+    const s = mini ? 0.6 : 1;
     return G.Gfx.sprite('blob' + frame + (mini ? 'm' : ''), 48, 42, 24, 40, (p) => {
       // frame 0/1 idle squish, 2 stretched (jump), 3 squashed (land)
       const rx = [10, 11, 7, 13][frame] * s, ry = [8, 7, 11, 5][frame] * s;
@@ -703,7 +687,6 @@
     });
   }
 
-  // drones are drawn small and upscaled 2x with EPX (smooth, crisp pixel-art enlargement)
   function drone(frame, alert) {
     const key = 'drone' + frame + (alert ? 'a' : '');
     const raw = G.Gfx.sprite(key + 'raw', 30, 22, 15, 16, (p) => {
@@ -720,7 +703,7 @@
       p.rect(12, 16, 6, 3, '#3a4058'); p.rect(17, 17, 4, 1, '#3a4058');
       p.px(8, 13, C.cyan); p.px(11, 13, C.cyan);
     }, null);
-    return G.Gfx.sprite(key, 60, 44, 30, 32, (p, ctx) => ctx.drawImage(G.Gfx.epxCanvas(raw), 0, 0));
+    return G.Gfx.sprite(key, 30, 22, 15, 16, (p, ctx) => ctx.drawImage(raw, 0, 0));
   }
 
   const proj = {
