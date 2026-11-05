@@ -3,3 +3,4 @@ dist/
 out/
 art/preview/
 __pycache__/
+godot/.godot/

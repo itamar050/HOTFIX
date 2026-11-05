@@ -1,0 +1,209 @@
+extends Node2D
+## HOTFIX! Godot test slice: stage 1 with the new background art, Code Bro drawn with the
+## imported sprite strips, and a glitched clone to spar with. Everything is built in code
+## so main.tscn stays a single node.
+
+const GROUND_Y := 300.0
+const LEVEL_W := 2400.0
+const Fighter := preload("res://scripts/fighter.gd")
+
+var player: Fighter
+var clone: Fighter
+var cam: Camera2D
+var fx: Node2D
+var hitstop := 0
+var shake := 0.0
+var kos := 0
+var tick := 0
+var demo := false
+var show_boxes := false
+
+var hp_bar: ColorRect
+var clone_bar: ColorRect
+var ko_label: Label
+
+
+func _ready() -> void:
+	demo = "--demo" in OS.get_cmdline_user_args()
+	_setup_input()
+	_build_background()
+	player = Fighter.new()
+	player.setup(self, true, Vector2(220, GROUND_Y))
+	add_child(player)
+	clone = Fighter.new()
+	clone.setup(self, false, Vector2(520, GROUND_Y))
+	add_child(clone)
+	fx = Node2D.new()
+	fx.z_index = 20
+	add_child(fx)
+	cam = Camera2D.new()
+	cam.limit_left = 0
+	cam.limit_right = int(LEVEL_W)
+	cam.limit_top = 0
+	cam.limit_bottom = 360
+	cam.position_smoothing_enabled = true
+	cam.position_smoothing_speed = 7.0
+	player.add_child(cam)
+	_build_hud()
+
+
+# ---- input: keyboard and gamepad ------------------------------------------------------
+func _setup_input() -> void:
+	var keys := {
+		"left": [KEY_LEFT, KEY_A], "right": [KEY_RIGHT, KEY_D], "up": [KEY_UP, KEY_W], "down": [KEY_DOWN, KEY_S],
+		"jump": [KEY_Z, KEY_SPACE, KEY_K], "attack": [KEY_X, KEY_J], "debug": [KEY_F2],
+	}
+	var pad := {"left": JOY_BUTTON_DPAD_LEFT, "right": JOY_BUTTON_DPAD_RIGHT, "up": JOY_BUTTON_DPAD_UP,
+		"down": JOY_BUTTON_DPAD_DOWN, "jump": JOY_BUTTON_A, "attack": JOY_BUTTON_X}
+	for action in keys:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action, 0.4)
+		for k in keys[action]:
+			var ev := InputEventKey.new()
+			ev.physical_keycode = k
+			InputMap.action_add_event(action, ev)
+		if pad.has(action):
+			var jb := InputEventJoypadButton.new()
+			jb.button_index = pad[action]
+			InputMap.action_add_event(action, jb)
+	for dir in [["left", -1.0], ["right", 1.0]]:
+		var jm := InputEventJoypadMotion.new()
+		jm.axis = JOY_AXIS_LEFT_X
+		jm.axis_value = dir[1]
+		InputMap.action_add_event(dir[0], jm)
+
+
+## Input for the player. In --demo mode (used for automated screenshots) a script plays.
+func held(action: String) -> bool:
+	if demo:
+		return _demo(action, false)
+	return Input.is_action_pressed(action)
+
+
+func pressed(action: String) -> bool:
+	if demo:
+		return _demo(action, true)
+	return Input.is_action_just_pressed(action)
+
+
+func _demo(action: String, edge: bool) -> bool:
+	var t := tick
+	match action:
+		"right":
+			return (t > 20 and t < 110) or (t > 300 and t < 330)
+		"attack":
+			return edge and t > 120 and t < 290 and t % 14 == 0
+		"jump":
+			return edge and (t == 340)
+	return false
+
+
+# ---- the stage ---------------------------------------------------------------------------
+func _layer(path: String, scroll: float, y: float, z: int) -> void:
+	var p := Parallax2D.new()
+	var s := Sprite2D.new()
+	s.texture = load(path)
+	s.centered = false
+	s.position = Vector2(0, y)
+	p.add_child(s)
+	p.scroll_scale = Vector2(scroll, 1.0)
+	p.repeat_size = Vector2(s.texture.get_width(), 0)
+	p.repeat_times = 4
+	p.z_index = z
+	add_child(p)
+
+
+func _build_background() -> void:
+	_layer("res://assets/sprites/stage1_far.png", 0.35, 0.0, -20)
+	# the floor strip: feet stand about 55% of the way down its depth
+	var floor_tex: Texture2D = load("res://assets/sprites/stage1_floor.png")
+	_layer("res://assets/sprites/stage1_floor.png", 1.0, GROUND_Y - floor_tex.get_height() * 0.55, -10)
+
+
+# ---- HUD -------------------------------------------------------------------------------
+func _bar(x: float, y: float, w: float, col: Color, parent: Node) -> ColorRect:
+	var back := ColorRect.new()
+	back.color = Color(0.07, 0.05, 0.11)
+	back.position = Vector2(x - 1, y - 1)
+	back.size = Vector2(w + 2, 8)
+	parent.add_child(back)
+	var bar := ColorRect.new()
+	bar.color = col
+	bar.position = Vector2(x, y)
+	bar.size = Vector2(w, 6)
+	parent.add_child(bar)
+	return bar
+
+
+func _label(text: String, x: float, y: float, parent: Node, size := 10, col := Color.WHITE) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.position = Vector2(x, y)
+	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_color_override("font_color", col)
+	l.add_theme_color_override("font_shadow_color", Color(0.07, 0.05, 0.11))
+	l.add_theme_constant_override("shadow_offset_x", 1)
+	l.add_theme_constant_override("shadow_offset_y", 1)
+	parent.add_child(l)
+	return l
+
+
+func _build_hud() -> void:
+	var hud := CanvasLayer.new()
+	add_child(hud)
+	_label("CODE BRO", 8, 4, hud, 10, Color(1, 0.88, 0.3))
+	hp_bar = _bar(8, 20, 120, Color(0.29, 0.88, 0.35), hud)
+	_label("GLITCH CLONE", 512, 4, hud, 10, Color(0.8, 0.6, 1))
+	clone_bar = _bar(512, 20, 120, Color(1, 0.55, 0.12), hud)
+	ko_label = _label("KOs 0", 300, 4, hud, 10)
+	_label("TEST BUILD  -  ARROWS/WASD MOVE   Z JUMP   X PUNCH   F2 HITBOXES", 8, 344, hud, 8, Color(0.75, 0.78, 0.9))
+
+
+# ---- game loop -------------------------------------------------------------------------
+func _physics_process(_delta: float) -> void:
+	tick += 1
+	if Input.is_action_just_pressed("debug"):
+		show_boxes = not show_boxes
+	if hitstop > 0:
+		hitstop -= 1
+	# fighters cannot walk through each other
+	if player.state != "ko" and clone.state != "ko":
+		var dx: float = clone.position.x - player.position.x
+		if absf(dx) < 34.0 and absf(clone.position.y - player.position.y) < 60.0:
+			var push := (34.0 - absf(dx)) * 0.5 * (1.0 if dx >= 0.0 else -1.0)
+			clone.position.x += push
+			player.position.x -= push
+	shake = maxf(0.0, shake - 0.5)
+	cam.offset = Vector2(randf_range(-shake, shake), randf_range(-shake, shake))
+	hp_bar.size.x = 120.0 * player.hp / player.max_hp
+	clone_bar.size.x = 120.0 * clone.hp / clone.max_hp
+	ko_label.text = "KOs %d" % kos
+	if demo and tick == 380:
+		get_tree().quit()
+
+
+func hit_effect(pos: Vector2, heavy: bool) -> void:
+	hitstop = 6 if heavy else 4
+	shake = 3.0 if heavy else 1.5
+	var s := Spark.new()
+	s.position = pos
+	fx.add_child(s)
+
+
+## A hit spark: a white/yellow star that grows and fades in a few frames.
+class Spark extends Node2D:
+	var t := 0
+
+	func _physics_process(_delta: float) -> void:
+		t += 1
+		queue_redraw()
+		if t > 9:
+			queue_free()
+
+	func _draw() -> void:
+		var r := 4.0 + t * 1.6
+		var col := Color.WHITE if t < 4 else Color(1, 0.85, 0.3)
+		for i in 8:
+			var a := i * PI / 4.0
+			var len := r if i % 2 == 0 else r * 0.55
+			draw_line(Vector2.ZERO, Vector2(cos(a), sin(a)) * len, col, 2.0 if i % 2 == 0 else 1.0)

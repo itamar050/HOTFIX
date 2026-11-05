@@ -1,0 +1,58 @@
+# Builds the Godot test version (godot/) for Windows, Mac and Linux on every push that
+# changes it, and publishes the zips as a pre-release named "Godot test build N".
+name: godot-test
+
+on:
+  push:
+    branches: [main]
+    paths: ['godot/**', '.github/workflows/godot-test.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  GODOT: 4.4.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Godot and export templates
+        run: |
+          base=https://github.com/godotengine/godot/releases/download/${GODOT}-stable
+          curl -sSL -o godot.zip "$base/Godot_v${GODOT}-stable_linux.x86_64.zip"
+          unzip -q godot.zip && mv "Godot_v${GODOT}-stable_linux.x86_64" godot-bin
+          curl -sSL -o tpl.tpz "$base/Godot_v${GODOT}-stable_export_templates.tpz"
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT}.stable
+          unzip -q tpl.tpz && mv templates/* ~/.local/share/godot/export_templates/${GODOT}.stable/
+      - name: Export
+        run: |
+          mkdir -p dist/godot/windows dist/godot/linux dist/godot/mac
+          ./godot-bin --headless --path godot --import || true
+          ./godot-bin --headless --path godot --export-release Windows ../dist/godot/windows/HOTFIX.exe
+          ./godot-bin --headless --path godot --export-release Linux ../dist/godot/linux/HOTFIX.x86_64
+          ./godot-bin --headless --path godot --export-release macOS ../dist/godot/mac/HOTFIX.zip
+          test -s dist/godot/windows/HOTFIX.exe && test -s dist/godot/linux/HOTFIX.x86_64 && test -s dist/godot/mac/HOTFIX.zip
+      - name: Zip
+        run: |
+          (cd dist/godot/windows && zip -q ../../../HOTFIX-test-Windows.zip HOTFIX.exe)
+          (cd dist/godot/linux && chmod +x HOTFIX.x86_64 && zip -q ../../../HOTFIX-test-Linux.zip HOTFIX.x86_64)
+          cp dist/godot/mac/HOTFIX.zip HOTFIX-test-Mac.zip
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: godot-test-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: Godot test build ${{ github.run_number }}
+          prerelease: true
+          files: HOTFIX-test-*.zip
+          body: |
+            A test slice of the Godot version: stage 1 with the new art, Code Bro, and a glitched clone to spar with.
+            Not the full game. The full game is in the latest regular release.
+
+            - **Windows:** unzip, run `HOTFIX.exe`. If SmartScreen says "Windows protected your PC", click *More info* > *Run anyway*.
+            - **Mac:** unzip, right-click `HOTFIX.app` > *Open* > *Open* (not notarized).
+            - **Linux:** unzip, run `./HOTFIX.x86_64`.
+
+            Arrows/WASD move, Z jump, X punch (press again to chain), F2 shows hitboxes. Gamepads work too.
