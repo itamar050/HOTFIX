@@ -7,7 +7,12 @@ straight into the Godot version. Read **How it works** once, then copy the promp
 
 - **Target look:** detailed 16-bit beat 'em up pixel art (Streets of Rage 2, Final Fight).
   The game will run at **640x360**, with characters about **100 px tall**.
-- **One animation per image, at most 6 frames,** in one horizontal row. More frames make the
+- **Save every image as PNG** (not WebP or JPG): compression smears the edges pink.
+- **Every animation strip starts with a standing reference pose** (the character standing
+  upright and relaxed, exactly as in the character sheet). The importer measures it to get
+  the scale right (a crouched fighting stance would otherwise come out too big) and then
+  drops it.
+- **One animation per image, at most 6 frames plus the reference,** in one horizontal row. More frames make the
   character drift (different face, colors, size).
 - **Flat magenta background (#FF00FF)** with nothing else on it. Nano Banana cannot make
   real transparency; the importer turns the magenta into transparency.
@@ -56,10 +61,13 @@ Upload files), or send them to Claude in chat.
 ## B. Animation strip (one per animation)
 
 > Using the attached character sheet as the exact character design (same face, hair,
-> clothes, colors and proportions), draw a [N]-frame animation strip of [ANIMATION
-> DESCRIPTION]. All frames in one horizontal row, evenly spaced with clear gaps, identical
-> scale, feet on the same invisible baseline (except airborne frames). Frames read left to
-> right in time order. [STYLE]
+> clothes, colors and proportions), draw one horizontal row of [N+1] figures. Figure 1 is a
+> reference: the character standing upright and relaxed, arms at the sides, exactly as in
+> the character sheet. Figures 2 to [N+1] are the [N]-frame animation of [ANIMATION
+> DESCRIPTION], in time order from left to right. Same scale for every figure, feet on the
+> same invisible baseline (except airborne frames). Leave a wide empty gap of magenta
+> between figures: no fist, foot, hair or bag may reach into the next figure's space.
+> [STYLE]
 
 ---
 
@@ -68,8 +76,9 @@ Upload files), or send them to Claude in chat.
 Paste the description into `[CHARACTER DESCRIPTION]`.
 
 ### Heroes
-- **bro (Code Bro, Alex):** a fit young male software engineer, messy brown hair, black
-  rectangular glasses, light stubble, open red-and-brown plaid flannel shirt with sleeves
+- **bro (Code Bro, Alex):** a fit young male software engineer, messy brown hair, thin
+  black rectangular glasses with clear lenses and the eyes clearly visible behind them,
+  light stubble, open red-and-brown plaid flannel shirt with sleeves
   rolled to the elbows over a dark grey t-shirt, blue jeans, white sneakers with red
   details, a slim black laptop bag strap across the chest.
 - **girl (Code Girl):** an athletic young female software engineer, auburn hair in a high
@@ -117,8 +126,8 @@ crouch) are single images: put them side by side in one row.
 | File | Frames | Animation description |
 |------|--------|------------------------|
 | `idle` | 4 | idle fighting stance, subtle breathing |
-| `walk` | 6 | walk cycle |
-| `run` | 6 | fast sprint cycle, leaning forward, arms pumping |
+| `walk` | 6 | walk cycle where the legs alternate, one pose per frame: 1) right foot forward touching the ground, left arm forward; 2) weight down on the right leg; 3) left leg passing the right leg; 4) left foot forward touching the ground, right arm forward; 5) weight down on the left leg; 6) right leg passing the left leg. Frames 1 and 4 must show different legs in front. |
+| `run` | 6 | sprint cycle, leaning forward, legs alternating like the walk (frames 1-3 right leg leading, 4-6 left leg leading), arms pumping opposite to the legs |
 | `jump` | 3 | jump: takeoff crouch, rising with knees up, falling with arms out |
 | `punch` | 6 | jab-jab: frames 1-3 a quick left jab and return, frames 4-6 a quick right jab and return |
 | `hook` | 3 | a big swinging hook punch: wind-up, impact, follow-through |
@@ -168,8 +177,9 @@ image at **16:9**, in the same style. Attach your stage concept image as a refer
 > crisp hard pixels, no anti-aliasing, no blur, no characters, no people, no text, no UI.
 
 1. **far layer** (`stageN_far.png`): the distant view, e.g. *"night city skyline through
-   huge office windows, neon signs, rain"*. Must loop: *"the left and right edges must
-   connect seamlessly when tiled horizontally."*
+   huge office windows, neon signs, rain"*. To loop: *"the image must begin and end exactly
+   in the middle of a wide dark vertical pillar, so copies placed side by side join
+   inside the pillar."* (Stage 1's first far layer works by cropping pillar to pillar.)
 2. **back wall** (`stageN_wall.png`): the room behind the action, *"seen straight on, flat
    orthographic side view like a 2D side-scrolling game, the floor line at the very bottom
    of the image, the floor itself not shown"*. Make 3 to 5 of these per stage for variety
@@ -177,7 +187,10 @@ image at **16:9**, in the same style. Attach your stage concept image as a refer
    coffee machine; a corridor with posters; a glass meeting room; the executive lounge).
 3. **floor strip** (`stageN_floor.png`): *"a seamless horizontally tiling strip of floor
    seen from the side and slightly above, [carpet with scattered papers / metal grating with
-   cables / glowing data grid], 4:1 wide image."*
+   cables / glowing data grid], with the bottom of the wall (baseboard) along the top edge.
+   A shallow strip: the floor should look about as deep as a person is tall, 8:1 wide
+   image."* Objects on it should be small next to a person (a sheet of paper about the size
+   of a shoe).
 4. **props** (`stageN_props.png`): *"a row of separate objects on a flat magenta #FF00FF
    background, evenly spaced: [office chair, potted plant, water cooler, desk with a CRT
    monitor, printer, filing cabinet, cardboard box]"*. Desks and crates double as platforms

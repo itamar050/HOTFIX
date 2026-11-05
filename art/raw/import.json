@@ -1,0 +1,25 @@
+{
+  "_comment": "standing_px: source height of the character standing upright, for strips made before the standing reference frame was added to the prompts. Measured from bro_sheet (standing 571 px, fighting stance 552 px, ratio 0.967).",
+  "bro_sheet": {
+    "standing_px": 571
+  },
+  "bro_walk": {
+    "standing_px": 575
+  },
+  "bro_punch": {
+    "standing_px": 508
+  },
+  "stage1_far": {
+    "crop": [
+      212,
+      0,
+      1165,
+      768
+    ],
+    "_why": "pillar center to pillar center: the layer loops inside a pillar"
+  },
+  "stage1_floor": {
+    "scale": 0.42,
+    "_why": "papers about shoe-sized next to a 120 px character"
+  }
+}

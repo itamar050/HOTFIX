@@ -1,0 +1,67 @@
+{
+ "bro_punch": {
+  "frames": 6,
+  "source_heights": [
+   489,
+   493,
+   490,
+   489,
+   478,
+   490
+  ],
+  "standing_ref_px": 508,
+  "scale": 0.236,
+  "baseline_spread_px": 7,
+  "height_spread_pct": 3.1,
+  "palette": 48,
+  "clipped_frames": []
+ },
+ "bro_sheet": {
+  "frames": 4,
+  "source_heights": [
+   550,
+   569,
+   569,
+   533
+  ],
+  "standing_ref_px": 571,
+  "scale": 0.21,
+  "baseline_spread_px": 5,
+  "height_spread_pct": 6.4,
+  "palette": 48,
+  "clipped_frames": []
+ },
+ "bro_walk": {
+  "frames": 6,
+  "source_heights": [
+   568,
+   568,
+   567,
+   558,
+   568,
+   558
+  ],
+  "standing_ref_px": 575,
+  "scale": 0.209,
+  "baseline_spread_px": 10,
+  "height_spread_pct": 1.8,
+  "palette": 48,
+  "clipped_frames": []
+ },
+ "stage1_far": {
+  "size": [
+   447,
+   360
+  ],
+  "scale": 0.469,
+  "seam_difference": 0.3
+ },
+ "stage1_floor": {
+  "size": [
+   840,
+   208
+  ],
+  "scale": 0.42,
+  "seam_difference": 16.0
+ }
+}
