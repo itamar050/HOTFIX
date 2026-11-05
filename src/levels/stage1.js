@@ -18,7 +18,7 @@ G.Stages.push({
       ['priya', 'Alex! The bots are rioting! Quick refresher from onboarding:'],
       ['priya', 'Z jumps, X attacks. Land a hit and keep pressing X to chain a 4-hit combo.'],
       ['priya', 'UP + X is an uppercut. In the air, DOWN + X is a dive kick. SHIFT dashes, and X while dashing is a dash strike!'],
-      ['priya', 'Walk into a reeling enemy to grab it. X to knee, BACK + X to throw it into its friends.'],
+      ['priya', 'DOWN + X ducks and strikes low - hit twice for a sweep. Walk into an enemy to grab it: X to knee, BACK + X to throw.'],
       ['priya', 'When your FOCUS bar is full, C unleashes a HOTFIX that hits everything around you. Without focus it costs health!'],
       ['alex', 'You memorized the whole onboarding doc?'],
       ['priya', 'Somebody had to. Here, take a coffee!'],

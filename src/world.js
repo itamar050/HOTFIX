@@ -27,7 +27,7 @@
       this.dialog = null; this.boss = null; this.bossArena = null; this.cutscene = false;
       this.lastEnemy = null; this.lastEnemyT = 0; this.checkpoints = []; this.result = null;
       this.readyT = 90; this.kos = 0;
-      const styles = new Set(['alex', 'bot', 'manager']);
+      const styles = new Set([G.Art.hero(), 'bot', 'manager']);
       for (const sp of this.level.spawns) if (sp.ch === 'f') styles.add('brute');
       for (const a of def.arenas || []) for (const wv of a.waves) for (const s of wv) if (s.startsWith('brute')) styles.add('brute');
       for (const n of def.npcs || []) styles.add(n.who);
@@ -354,16 +354,22 @@
     drawBar(ctx, x, y, w, h, frac, col, back = '#3a1020') {
       ctx.fillStyle = C.ink; ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
       ctx.fillStyle = back; ctx.fillRect(x, y, w, h);
-      ctx.fillStyle = col; ctx.fillRect(x, y, Math.round(w * U.clamp(frac, 0, 1)), h);
-      ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(x, y, Math.round(w * U.clamp(frac, 0, 1)), 1);
-      ctx.fillStyle = 'rgba(0,0,0,0.25)'; for (let i = x + 4; i < x + w; i += 5) ctx.fillRect(i, y, 1, h);
+      const fw = Math.round(w * U.clamp(frac, 0, 1));
+      ctx.fillStyle = col; ctx.fillRect(x, y, fw, h);
+      if (/^#[0-9a-f]{6}$/i.test(col) && h >= 3) {
+        ctx.fillStyle = U.tint(col, 0.45); ctx.fillRect(x, y, fw, 1);
+        ctx.fillStyle = U.tint(col, 0.2); ctx.fillRect(x, y + 1, fw, 1);
+        ctx.fillStyle = U.tint(col, -0.35); ctx.fillRect(x, y + h - 1, fw, 1);
+      }
+      ctx.fillStyle = 'rgba(0,0,0,0.22)'; for (let i = x + 4; i < x + fw; i += 5) ctx.fillRect(i, y + 1, 1, h - 1);
+      ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillRect(x - 1, y + h + 1, w + 2, 1);
     }
 
     drawHUD(ctx) {
       const p = this.player, s = G.session, F = G.Font;
       // player panel
       ctx.fillStyle = C.ink; ctx.fillRect(3, 3, 17, 17); ctx.fillStyle = C.hoodD; ctx.fillRect(4, 4, 15, 15);
-      G.Gfx.draw(ctx, G.Art.headSprite('alex'), 11, 19);
+      G.Gfx.draw(ctx, G.Art.headSprite(G.Art.hero()), 11, 19);
       F.draw(ctx, 'ALEX', 24, 3, C.white, { shadow: C.ink });
       F.draw(ctx, 'x' + Math.max(0, s.lives), 52, 3, C.yellow, { shadow: C.ink });
       const hf = p.hp / p.maxHp;

@@ -70,23 +70,47 @@ G.Gfx = (() => {
     }
   }
 
-  // 1px outline around every opaque region (classic 16-bit sprite look)
-  function outline(src, color) {
+  // The 16-bit finishing pass, run once per cached sprite:
+  //  - lighting: light comes from the upper left. Pixels on a lit edge get a highlight,
+  //    pixels on the far edge (and the row above it) get shade, giving every shape 3 tones;
+  //  - selective outline: the 1px outline takes a very dark tint of the color it wraps
+  //    (pure ink only along the bottom, where the sprite meets the ground).
+  function outline(src, color, o = {}) {
     const w = src.width, h = src.height;
-    const sx = src.getContext('2d');
-    const img = sx.getImageData(0, 0, w, h), d = img.data;
+    const d = src.getContext('2d').getImageData(0, 0, w, h).data;
     const out = canvas(w, h), ox = out.getContext('2d');
-    const o = ox.createImageData(w, h), od = o.data;
-    const r = parseInt(color.slice(1, 3), 16), g = parseInt(color.slice(3, 5), 16), b = parseInt(color.slice(5, 7), 16);
+    const img = ox.createImageData(w, h), od = img.data;
+    const ir = parseInt(color.slice(1, 3), 16), ig = parseInt(color.slice(3, 5), 16), ib = parseInt(color.slice(5, 7), 16);
     const A = (x, y) => (x < 0 || y < 0 || x >= w || y >= h ? 0 : d[(y * w + x) * 4 + 3]);
+    const shade = o.shade !== false;
+    const put = (i, r, g, b) => { od[i] = r; od[i + 1] = g; od[i + 2] = b; od[i + 3] = 255; };
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         const i = (y * w + x) * 4;
-        if (d[i + 3] > 0) { od[i] = d[i]; od[i + 1] = d[i + 1]; od[i + 2] = d[i + 2]; od[i + 3] = 255; }
-        else if (A(x - 1, y) || A(x + 1, y) || A(x, y - 1) || A(x, y + 1)) { od[i] = r; od[i + 1] = g; od[i + 2] = b; od[i + 3] = 255; }
+        if (d[i + 3] > 0) {
+          let r = d[i], g = d[i + 1], b = d[i + 2];
+          if (shade) {
+            const lit = !A(x, y - 1);
+            const far = !A(x, y + 1) || !A(x + 1, y);
+            const near = !A(x, y + 2) || !A(x + 2, y);
+            if (lit && !far) { r += (255 - r) * 0.22; g += (255 - g) * 0.22; b += (255 - b) * 0.2; }
+            else if (far) { r *= 0.72; g *= 0.7; b *= 0.8; }
+            else if (near) { r *= 0.9; g *= 0.88; b *= 0.94; }
+          }
+          put(i, r, g, b);
+        } else {
+          // outline: tint from the opaque neighbors
+          let n = 0, r = 0, g = 0, b = 0;
+          for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+            if (A(x + dx, y + dy)) { const j = ((y + dy) * w + x + dx) * 4; r += d[j]; g += d[j + 1]; b += d[j + 2]; n++; }
+          }
+          if (!n) continue;
+          if (A(x, y - 1) && !A(x, y + 1) && o.inkBottom !== false) put(i, ir, ig, ib);
+          else put(i, (r / n) * 0.22 + ir * 0.6, (g / n) * 0.22 + ig * 0.6, (b / n) * 0.26 + ib * 0.6);
+        }
       }
     }
-    ox.putImageData(o, 0, 0);
+    ox.putImageData(img, 0, 0);
     return out;
   }
 
@@ -186,7 +210,19 @@ G.Rig = (() => {
   }
 
   // standard limb drawing: a thick segment pair plus an end cap (hand/shoe)
-  function limb(p, a, k, e, col, w) { p.line(a[0], a[1], k[0], k[1], col, w); p.line(k[0], k[1], e[0], e[1], col, w); }
+  // a limb segment shaded like a cylinder: base color, a highlight line on the lit side,
+  // a shadow line on the far side (light from the upper left of a right-facing sprite)
+  function seg(p, x0, y0, x1, y1, col, w) {
+    p.line(x0, y0, x1, y1, col, w);
+    if (w < 3) return;
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy) || 1;
+    let nx = -dy / L, ny = dx / L;              // a normal of the segment
+    if (nx * -0.6 + ny * -0.8 < 0) { nx = -nx; ny = -ny; } // point it toward the light
+    const o = (w - 1) / 2;
+    p.line(x0 + nx * o, y0 + ny * o, x1 + nx * o, y1 + ny * o, G.u.tint(col, 0.28), 1);
+    p.line(x0 - nx * o, y0 - ny * o, x1 - nx * o, y1 - ny * o, G.u.tint(col, -0.32), w >= 5 ? 2 : 1);
+  }
+  function limb(p, a, k, e, col, w) { seg(p, a[0], a[1], k[0], k[1], col, w); seg(p, k[0], k[1], e[0], e[1], col, w); }
 
-  return { draw, headGrid, limb };
+  return { draw, headGrid, limb, seg };
 })();

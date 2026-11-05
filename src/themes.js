@@ -12,12 +12,39 @@ G.Themes = (() => {
   }
 
   // shared tile shapes -----------------------------------------------------------------
-  function slope(p, x, y, dir, fill, edge, edge2) {
+  // 2-color ordered dither (checkerboard), the 16-bit way to blend two shades
+  function dith(p, x, y, w, h, c1, c2, seed = 0) {
+    p.rect(x, y, w, h, c1);
+    p.c.fillStyle = c2;
+    for (let j = 0; j < h; j++) for (let i = (j + seed) % 2; i < w; i += 2) p.c.fillRect(x + i, y + j, 1, 1);
+  }
+  // a bevelled panel: light top/left edges, dark bottom/right edges
+  function panel(p, x, y, w, h, base, light, dark) {
+    p.rect(x, y, w, h, base);
+    p.rect(x, y, w, 1, light); p.rect(x, y, 1, h, light);
+    p.rect(x, y + h - 1, w, 1, dark); p.rect(x + w - 1, y, 1, h, dark);
+  }
+  // one row of offset bricks (8 px tall)
+  function brick(p, x, y, row, base, light, dark) {
+    p.rect(x, y, 16, 8, base);
+    const off = (row % 2) * 8;
+    for (const bx of [-8 + off, off, 8 + off]) {
+      const x0 = Math.max(x, x + bx), x1 = Math.min(x + 16, x + bx + 16);
+      if (x1 <= x0) continue;
+      p.rect(x0, y, x1 - x0, 1, light);
+      p.rect(x0, y + 7, x1 - x0, 1, dark);
+      if (x + bx + 15 >= x && x + bx + 15 < x + 16) p.rect(x + bx + 15, y, 1, 8, dark);
+      if (x + bx >= x && x + bx < x + 16) p.rect(x + bx, y + 1, 1, 6, light);
+    }
+  }
+  function slope(p, x, y, dir, fill, edge, edge2, edge3) {
     for (let i = 0; i < 16; i++) {
       const top = dir > 0 ? 15 - i : i; // '/' rises to the right
       p.rect(x + i, y + top, 1, 16 - top, fill);
-      p.rect(x + i, y + top, 1, 2, edge);
-      p.rect(x + i, y + top + 2, 1, 1, edge2);
+      for (let j = top + 4; j < 16; j++) if ((i + j) % 2 === 0 && j < top + 7) p.px(x + i, y + j, edge2);
+      p.rect(x + i, y + top, 1, 1, edge);
+      p.rect(x + i, y + top + 1, 1, 1, edge3 || edge);
+      p.rect(x + i, y + top + 2, 1, 2, edge2);
     }
   }
   function wires(p, x, y, col, col2) {
@@ -35,19 +62,22 @@ G.Themes = (() => {
     sky: [[0, '#2a1a5a'], [0.45, '#b0408a'], [0.8, '#ff9a4a'], [1, '#ffd27a']],
     tile(p, kind, x, y, tx, ty) {
       if (kind === 'top') {
-        p.rect(x, y, 16, 16, '#3a4064');
-        p.rect(x, y, 16, 3, '#d8dcef'); p.rect(x, y + 3, 16, 5, '#5a6aa8');
-        if ((tx + ty) % 2) p.rect(x + 3, y + 5, 2, 1, '#7a8ac8'); else p.rect(x + 10, y + 4, 2, 1, '#7a8ac8');
-        p.rect(x, y + 8, 16, 1, '#262a48');
+        p.rect(x, y, 16, 16, '#343a5e');
+        p.rect(x, y, 16, 1, '#f4f6ff'); p.rect(x, y + 1, 16, 2, '#c4c9e2'); p.rect(x, y + 3, 16, 1, '#8a90b8');
+        dith(p, x, y + 4, 16, 5, '#5868a8', '#4a5894', tx);
+        p.rect(x, y + 4, 16, 1, '#6a7ac0');
+        p.rect(x, y + 9, 16, 1, '#232845');
+        brick(p, x, y + 10, ty, '#343a5e', '#41487a', '#262b48');
       } else if (kind === 'fill') {
-        p.rect(x, y, 16, 16, '#3a4064');
-        p.rect(x, y + 7, 16, 1, '#2c3152'); p.rect(x + ((ty % 2) ? 8 : 0), y, 1, 7, '#2c3152');
-        p.rect(x + ((ty % 2) ? 0 : 8), y + 8, 1, 8, '#2c3152');
+        brick(p, x, y, ty, '#343a5e', '#41487a', '#262b48');
+        brick(p, x, y + 8, ty + 1, '#343a5e', '#41487a', '#262b48');
       } else if (kind === 'oneway') { // office desk
-        p.rect(x, y, 16, 4, '#d89a50'); p.rect(x, y, 16, 1, '#ffd08a'); p.rect(x, y + 4, 16, 1, '#8a5a2a');
-        if (tx % 3 === 0) p.rect(x + 2, y + 5, 2, 11, '#5a5f78');
-        if (tx % 3 === 2) p.rect(x + 12, y + 5, 2, 11, '#5a5f78');
-      } else if (kind === 'slopeR' || kind === 'slopeL') slope(p, x, y, kind === 'slopeR' ? 1 : -1, '#3a4064', '#d8dcef', '#5a6aa8');
+        p.rect(x, y, 16, 5, '#d89a50'); p.rect(x, y, 16, 1, '#ffe0a8'); p.rect(x, y + 1, 16, 1, '#f0b870');
+        p.rect(x, y + 4, 16, 1, '#9a6430'); p.rect(x, y + 5, 16, 1, '#5e3a1a');
+        if ((tx + ty) % 2) p.rect(x + 5, y + 2, 4, 1, '#c88a44');
+        if (tx % 3 === 0) { p.rect(x + 2, y + 6, 3, 10, '#5a5f78'); p.rect(x + 2, y + 6, 1, 10, '#8a90a8'); }
+        if (tx % 3 === 2) { p.rect(x + 11, y + 6, 3, 10, '#5a5f78'); p.rect(x + 11, y + 6, 1, 10, '#8a90a8'); }
+      } else if (kind === 'slopeR' || kind === 'slopeL') slope(p, x, y, kind === 'slopeR' ? 1 : -1, '#343a5e', '#f4f6ff', '#5868a8', '#c4c9e2');
       else if (kind === 'spike') wires(p, x, y, C.yellow, '#ffffff');
     },
     props: {
@@ -127,19 +157,21 @@ G.Themes = (() => {
     sky: [[0, '#05060f'], [0.6, '#0c1430'], [1, '#14204a']],
     tile(p, kind, x, y, tx, ty) {
       if (kind === 'top') {
-        p.rect(x, y, 16, 16, '#262b40');
-        p.rect(x, y, 16, 4, '#9aa3bb'); p.rect(x, y, 16, 1, '#d8dcef');
-        for (let i = 0; i < 16; i += 4) p.rect(x + i + ((tx % 2) ? 2 : 0), y + 1, 2, 1, '#6a7290');
-        p.rect(x, y + 4, 16, 2, (tx % 2) ? C.yellow : '#262b40');
-        p.rect(x + 2, y + 9, 1, 1, '#4a5070'); p.rect(x + 13, y + 9, 1, 1, '#4a5070');
+        p.rect(x, y, 16, 16, '#232840');
+        p.rect(x, y, 16, 5, '#8a93ad'); p.rect(x, y, 16, 1, '#e4e8f6'); p.rect(x, y + 1, 16, 1, '#b8c0d8'); p.rect(x, y + 4, 16, 1, '#5a6280');
+        for (let i = 0; i < 16; i += 4) { const o = ((tx + (i >> 2)) % 2) * 2; p.px(x + i + o, y + 2, '#d8def0'); p.px(x + i + o + 1, y + 3, '#5a6280'); }
+        for (let i = 0; i < 16; i++) p.px(x + i, y + 5, ((i + tx * 16) >> 2) % 2 ? C.yellow : '#1a1a24');
+        for (let i = 0; i < 16; i++) p.px(x + i, y + 6, ((i + 1 + tx * 16) >> 2) % 2 ? '#d8a420' : '#1a1a24');
+        p.rect(x, y + 7, 16, 1, '#141828');
+        panel(p, x, y + 8, 16, 8, '#2a3048', '#3a4262', '#181c30');
       } else if (kind === 'fill') {
-        p.rect(x, y, 16, 16, '#262b40'); p.rect(x, y, 16, 1, '#1a1e30'); p.rect(x, y, 1, 16, '#1a1e30');
-        p.rect(x + 2, y + 2, 1, 1, '#4a5070'); p.rect(x + 13, y + 13, 1, 1, '#4a5070');
+        panel(p, x, y, 16, 16, '#262b44', '#363e5c', '#161a2c');
+        if ((tx + ty) % 3 === 0) for (let i = 0; i < 3; i++) p.rect(x + 4, y + 5 + i * 3, 8, 1, '#12162a');
       } else if (kind === 'oneway') {
-        p.rect(x, y, 16, 3, '#9aa3bb'); p.rect(x, y, 16, 1, '#d8dcef');
-        for (let i = 1; i < 16; i += 3) p.rect(x + i, y + 3, 1, 3, '#5a6078');
-        p.rect(x, y + 5, 16, 1, '#5a6078');
-      } else if (kind === 'slopeR' || kind === 'slopeL') slope(p, x, y, kind === 'slopeR' ? 1 : -1, '#262b40', '#9aa3bb', '#5a6078');
+        p.rect(x, y, 16, 3, '#9aa3bb'); p.rect(x, y, 16, 1, '#eef0f8'); p.rect(x, y + 2, 16, 1, '#5a6280');
+        for (let i = 1; i < 16; i += 3) { p.rect(x + i, y + 3, 1, 3, '#5a6078'); }
+        p.rect(x, y + 5, 16, 1, '#3a4058');
+      } else if (kind === 'slopeR' || kind === 'slopeL') slope(p, x, y, kind === 'slopeR' ? 1 : -1, '#262b44', '#e4e8f6', '#5a6280', '#8a93ad');
       else if (kind === 'spike') wires(p, x, y, C.cyan, '#ffffff');
     },
     props: {
@@ -176,15 +208,20 @@ G.Themes = (() => {
     sky: [[0, '#0a0420'], [0.5, '#2a0a50'], [1, '#5a1a7a']],
     tile(p, kind, x, y, tx, ty) {
       if (kind === 'top' || kind === 'fill') {
-        p.rect(x, y, 16, 16, '#160a30');
-        p.rect(x, y, 16, 1, '#3a1a6a'); p.rect(x, y, 1, 16, '#3a1a6a');
-        if (H(tx, ty) > 0.8) p.rect(x + 6, y + 6, 4, 4, '#2a1050');
-        if (kind === 'top') { p.rect(x, y, 16, 3, C.cyan); p.rect(x, y + 3, 16, 1, '#1a8ac0'); p.rect(x, y, 16, 1, '#e0ffff'); }
+        p.rect(x, y, 16, 16, '#140a2c');
+        p.rect(x + 1, y + 1, 14, 14, '#1c0f3c');
+        p.rect(x, y, 16, 1, '#3a1c70'); p.rect(x, y, 1, 16, '#3a1c70'); p.rect(x + 15, y + 1, 1, 15, '#0c0620'); p.rect(x + 1, y + 15, 15, 1, '#0c0620');
+        if (H(tx, ty) > 0.75) { p.rect(x + 5, y + 5, 6, 6, '#2a1458'); p.rect(x + 6, y + 6, 4, 4, '#3a1f78'); p.px(x + 6, y + 6, '#7a4ad8'); }
+        if (kind === 'top') {
+          p.rect(x, y, 16, 1, '#ffffff'); p.rect(x, y + 1, 16, 1, '#b8ffff'); p.rect(x, y + 2, 16, 1, C.cyan);
+          p.rect(x, y + 3, 16, 1, '#1aa8d8'); dith(p, x, y + 4, 16, 2, '#1c0f3c', '#1a6a9a', tx);
+        }
       } else if (kind === 'oneway') {
-        p.rect(x, y, 16, 4, 'rgba(63,242,255,0.55)'); p.rect(x, y, 16, 1, '#e0ffff'); p.rect(x, y + 4, 16, 1, '#1a8ac0');
-      } else if (kind === 'slopeR' || kind === 'slopeL') slope(p, x, y, kind === 'slopeR' ? 1 : -1, '#160a30', C.cyan, '#1a8ac0');
+        p.rect(x, y, 16, 1, '#ffffff'); p.rect(x, y + 1, 16, 2, 'rgba(63,242,255,0.75)'); p.rect(x, y + 3, 16, 2, 'rgba(26,138,192,0.6)');
+        if (tx % 2) p.rect(x + 7, y + 1, 2, 2, '#ffffff');
+      } else if (kind === 'slopeR' || kind === 'slopeL') slope(p, x, y, kind === 'slopeR' ? 1 : -1, '#1c0f3c', '#ffffff', '#1aa8d8', C.cyan);
       else if (kind === 'spike') {
-        for (let i = 0; i < 4; i++) { p.line(x + i * 4, y + 15, x + i * 4 + 2, y + 4, C.red, 2); p.line(x + i * 4 + 2, y + 4, x + i * 4 + 4, y + 15, C.magenta, 1); }
+        for (let i = 0; i < 4; i++) { p.line(x + i * 4, y + 15, x + i * 4 + 2, y + 4, C.red, 2); p.line(x + i * 4 + 2, y + 4, x + i * 4 + 4, y + 15, C.magenta, 1); p.px(x + i * 4 + 2, y + 4, '#ffd0f0'); }
         p.rect(x, y + 14, 16, 2, '#5a0a3a');
       }
     },
@@ -228,15 +265,19 @@ G.Themes = (() => {
     sky: [[0, '#0a0206'], [0.6, '#2a0612'], [1, '#5a0a1a']],
     tile(p, kind, x, y, tx, ty) {
       if (kind === 'top' || kind === 'fill') {
-        p.rect(x, y, 16, 16, '#22121c'); p.rect(x, y, 16, 1, '#3a1a28'); p.rect(x, y, 1, 16, '#3a1a28');
-        p.rect(x + 3, y + 3, 1, 1, '#5a2a3a'); p.rect(x + 12, y + 12, 1, 1, '#5a2a3a');
-        if (kind === 'top') { p.rect(x, y, 16, 4, '#5a5f78'); p.rect(x, y, 16, 1, '#c8ccd8'); p.rect(x, y + 4, 16, 1, C.red); }
+        panel(p, x, y, 16, 16, '#24121c', '#3a1e2c', '#140a10');
+        p.px(x + 3, y + 3, '#6a3a4a'); p.px(x + 12, y + 3, '#6a3a4a'); p.px(x + 3, y + 12, '#6a3a4a'); p.px(x + 12, y + 12, '#6a3a4a');
+        if (kind === 'top') {
+          p.rect(x, y, 16, 5, '#5a5f78'); p.rect(x, y, 16, 1, '#e8ecf8'); p.rect(x, y + 1, 16, 1, '#a8aec4'); p.rect(x, y + 4, 16, 1, '#3a3e52');
+          p.rect(x, y + 5, 16, 1, C.red); p.rect(x, y + 6, 16, 1, '#7a0a1a');
+          if (tx % 2) p.rect(x + 6, y + 2, 4, 1, '#8a90a8');
+        }
       } else if (kind === 'oneway') {
-        p.rect(x, y, 16, 4, '#5a5f78'); p.rect(x, y, 16, 1, '#c8ccd8'); p.rect(x + 2, y + 4, 12, 1, C.red);
-      } else if (kind === 'slopeR' || kind === 'slopeL') slope(p, x, y, kind === 'slopeR' ? 1 : -1, '#22121c', '#c8ccd8', C.red);
+        p.rect(x, y, 16, 4, '#5a5f78'); p.rect(x, y, 16, 1, '#e8ecf8'); p.rect(x, y + 3, 16, 1, '#3a3e52'); p.rect(x + 2, y + 4, 12, 1, C.red);
+      } else if (kind === 'slopeR' || kind === 'slopeL') slope(p, x, y, kind === 'slopeR' ? 1 : -1, '#24121c', '#e8ecf8', C.red, '#a8aec4');
       else if (kind === 'spike') {
-        p.rect(x, y + 10, 16, 6, '#5a0a1a');
-        for (let i = 0; i < 16; i += 2) p.rect(x + i, y + 6 + (H(tx * 16 + i, 1) * 5 | 0), 2, 6, i % 4 ? C.orange : C.yellow);
+        p.rect(x, y + 10, 16, 6, '#5a0a1a'); p.rect(x, y + 10, 16, 1, C.orange);
+        for (let i = 0; i < 16; i += 2) { const hh = 6 + (H(tx * 16 + i, 1) * 5 | 0); p.rect(x + i, y + 16 - hh - 4, 2, hh, i % 4 ? C.orange : C.yellow); p.px(x + i, y + 16 - hh - 4, '#fff6c0'); }
       }
     },
     props: {
@@ -268,6 +309,31 @@ G.Themes = (() => {
     },
   };
 
+  // a sky in 16 flat color bands, blended with a 4x4 ordered dither (Mega Drive / SNES style)
+  const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
+  function bandedSky(stops) {
+    const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const S = stops.map(([s, c]) => [s, rgb(c)]);
+    const at = (t) => {
+      let k = 0;
+      while (k < S.length - 2 && t > S[k + 1][0]) k++;
+      const [s0, c0] = S[k], [s1, c1] = S[k + 1], f = Math.min(1, Math.max(0, (t - s0) / (s1 - s0 || 1)));
+      return c0.map((v, i) => v + (c1[i] - v) * f);
+    };
+    const c = G.Gfx.canvas(G.W, G.H), x = c.getContext('2d'), img = x.createImageData(G.W, G.H), d = img.data;
+    const bands = 16;
+    for (let y = 0; y < G.H; y++) {
+      const f = (y / (G.H - 1)) * (bands - 1), b0 = Math.floor(f), fr = f - b0;
+      const ca = at(b0 / (bands - 1)), cb = at(Math.min(bands - 1, b0 + 1) / (bands - 1));
+      for (let xx = 0; xx < G.W; xx++) {
+        const col = fr > BAYER[(y % 4) * 4 + (xx % 4)] ? cb : ca, i = (y * G.W + xx) * 4;
+        d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; d[i + 3] = 255;
+      }
+    }
+    x.putImageData(img, 0, 0);
+    return c;
+  }
+
   // build (and cache) the layer canvases of a theme
   function prepare(name) {
     const th = themes[name];
@@ -283,11 +349,8 @@ G.Themes = (() => {
 
   // draw sky + parallax layers for a camera position
   function drawBackground(ctx, th, cam, t) {
-    if (!th.grad) {
-      th.grad = ctx.createLinearGradient(0, 0, 0, G.H);
-      for (const [s, c] of th.sky) th.grad.addColorStop(s, c);
-    }
-    ctx.fillStyle = th.grad; ctx.fillRect(0, 0, G.W, G.H);
+    if (!th.skyC) th.skyC = bandedSky(th.sky);
+    ctx.drawImage(th.skyC, 0, 0);
     if (th.overlay) th.overlay(ctx, cam, t);
     for (const L of th.layers) {
       const c = L.canvases[L.canvases.length > 1 ? Math.floor(t / 20) % L.canvases.length : 0];

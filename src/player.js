@@ -13,6 +13,9 @@
     upper: { dur: 26, act: [4, 11], box: [0, -48, 18, 34], dmg: 7, kb: 1, kby: -7, knock: true, breakGuard: true, stun: 30, lunge: 1, hitstop: 6, heavy: true, pose: ['upW', 'up'], sfx: 'heavy' },
     air: { dur: 32, act: [3, 28], box: [2, -22, 20, 14], dmg: 6, kb: 3, kby: -2, knock: true, stun: 26, air: true, pose: ['jump', 'air'], sfx: 'heavy' },
     dive: { dur: 60, act: [2, 60], box: [0, -14, 18, 16], dmg: 7, kb: 2.5, kby: -2.5, knock: true, breakGuard: true, stun: 26, air: true, pose: ['dive', 'dive'], sfx: 'heavy' },
+    // ducking attacks: they keep you low (under high shots and lasers)
+    cjab: { dur: 13, act: [2, 5], cancel: 5, box: [4, -20, 18, 9], dmg: 3, kb: 1, stun: 18, next: 'sweep', low: true, pose: ['crouch', 'cjab'], sfx: 'punch' },
+    sweep: { dur: 26, act: [4, 10], box: [0, -10, 26, 10], dmg: 6, kb: 1.5, kby: -2.5, knock: true, breakGuard: true, stun: 30, low: true, hitstop: 5, heavy: true, pose: ['crouch', 'sweep'], sfx: 'heavy' },
     dashAtk: { dur: 28, act: [2, 16], box: [0, -32, 22, 26], dmg: 8, kb: 4.2, kby: -3, knock: true, stun: 30, hitstop: 5, heavy: true, pose: ['dashAtk', 'dashAtk'], sfx: 'heavy' },
   };
 
@@ -25,11 +28,18 @@
     special: ['HOTFIX!', 'sudo rm -rf bugs!', 'Ctrl+Alt+DEFEAT!'],
   };
 
+  // the two heroes: CODE BRO hits harder and takes more punishment, CODE GIRL is faster
+  const HEROES = {
+    bro: { name: 'CODE BRO', hp: 120, dmg: 1.2, run: 2.5, sprint: 4.2, jump: 6.75, dashCd: 34, cancel: 0 },
+    girl: { name: 'CODE GIRL', hp: 95, dmg: 1, run: 2.9, sprint: 4.8, jump: 7.15, dashCd: 22, cancel: 1 },
+  };
+
   class Player {
     constructor(x, y) {
+      this.style = G.Art.hero(); this.stats = HEROES[this.style] || HEROES.bro;
       this.x = x; this.y = y; this.w = 12; this.h = 36; this.baseH = 36;
       this.vx = 0; this.vy = 0; this.onGround = false; this.face = 1;
-      this.hp = 100; this.maxHp = 100; this.meter = 0;
+      this.hp = this.maxHp = this.stats.hp; this.meter = 0;
       this.state = 'normal'; this.t = 0;
       this.inv = 0; this.flash = 0;
       this.coyote = 0; this.jumpBuf = 0; this.atkBuf = 0; this.dashBuf = 0; this.specBuf = 0;
@@ -110,7 +120,8 @@
     st_normal(w, dx, I) {
       const down = I.down('down') && this.control && !w.dialog;
       this.crouching = this.onGround && down && Math.abs(this.vx) < 2;
-      const sprintMax = this.overclock > 0 ? 5 : 4.3, runMax = this.overclock > 0 ? 3 : 2.6;
+      const S = this.stats, oc = this.overclock > 0 ? 1.15 : 1;
+      const sprintMax = S.sprint * oc, runMax = S.run * oc;
       this.sprint = this.onGround ? (this.runT > 50 || Math.abs(this.vx) > 3.3) : this.sprint;
       const max = this.sprint ? sprintMax : runMax;
       if (this.skid > 0) this.skid--;
@@ -154,8 +165,7 @@
       // grab: walk into a reeling enemy (or keep pushing into one)
       if (this.onGround && dx && !this.crouching) {
         const e = w.findGrab(this, dx);
-        if (e && (e.state === 'hurt' || this.pushT > 10)) { this.startGrab(w, e); return; }
-        this.pushT = e ? this.pushT + 1 : 0;
+        if (e && this.dashCd < this.stats.dashCd - 12) { this.startGrab(w, e); return; }
       } else this.pushT = 0;
 
       if (this.specBuf > 0) { this.trySpecial(w); return; }
@@ -164,7 +174,7 @@
     }
 
     jump(w) {
-      this.vy = -6.7 - Math.min(Math.abs(this.vx), 4.5) * 0.1;
+      this.vy = -this.stats.jump - Math.min(Math.abs(this.vx), 4.5) * 0.1;
       this.onGround = false; this.platform = null; this.coyote = 0; this.jumpBuf = 0; this.jumping = true;
       G.Audio.sfx('jump'); w.fx.dust(this.x, this.y, this.face, 2);
     }
@@ -176,6 +186,9 @@
         if (!this.airAtk) return;
         name = I.down('down') ? 'dive' : 'air';
         this.airAtk = false;
+      } else if (I.down('down')) {
+        // duck and strike: a quick low jab that chains into a sweep on hit
+        name = this.chainT > 0 && this.connected && this.atkName === 'cjab' ? 'sweep' : 'cjab';
       } else if (this.state === 'dash' || (this.sprint && Math.abs(this.vx) > 3.2)) name = 'dashAtk';
       else if (I.down('up')) name = 'upper';
       else name = this.chainT > 0 && this.connected && ATK[this.atkName] && ATK[this.atkName].next ? ATK[this.atkName].next : 'jab1';
@@ -184,11 +197,12 @@
 
     doAttack(w, name) {
       this.atk = ATK[name]; this.atkName = name;
-      this.setState('attack'); this.hitList.clear(); this.connected = false; this.crouching = false;
+      this.setState('attack'); this.hitList.clear(); this.connected = false; this.crouching = !!this.atk.low;
+      this.h = this.crouching ? 24 : this.baseH;
       if (name === 'dive') { this.vx = this.face * 4.2; this.vy = 4.5; }
       if (name === 'upper') this.vy = this.onGround ? -2.5 : this.vy;
       if (name === 'dashAtk') this.vx = this.face * Math.max(Math.abs(this.vx), 4.5);
-      if (!this.atk.air && name !== 'dashAtk' && name !== 'upper') this.vx *= 0.3;
+      if (!this.atk.air && name !== 'dashAtk' && name !== 'upper') this.vx *= this.atk.low ? 0.1 : 0.3;
       G.Audio.sfx('whiff');
     }
 
@@ -200,9 +214,9 @@
       if (A.air && this.atkName === 'air' && dx) this.vx = G.u.approach(this.vx, dx * 2.6, 0.1);
       if (this.t >= A.act[0] && this.t <= A.act[1]) this.doHits(w, A);
       // chain into the next attack on hit; uppercut can be jump-cancelled for juggles
-      if (A.next && this.t >= A.cancel && this.atkBuf > 0 && this.connected) { this.atkBuf = 0; this.doAttack(w, A.next); return; }
+      if (A.next && this.t >= A.cancel - this.stats.cancel && this.atkBuf > 0 && this.connected) { this.atkBuf = 0; this.doAttack(w, A.next); return; }
       if (this.atkName === 'upper' && this.connected && this.t > 8 && this.jumpBuf > 0) { this.setState('normal'); this.jump(w); this.airAtk = true; return; }
-      if (this.t >= A.dur && !(A.air && !this.onGround)) { this.setState('normal'); this.chainT = 22; }
+      if (this.t >= A.dur && !(A.air && !this.onGround)) { this.setState('normal'); this.chainT = 22; this.crouching = !!A.low && I.down('down'); }
       if (A.air && this.t >= A.dur) { this.state = 'normal'; this.chainT = 0; }
     }
 
@@ -214,7 +228,7 @@
 
     doHits(w, A) {
       const box = this.hitbox(A);
-      const mult = this.overclock > 0 ? 1.25 : 1;
+      const mult = (this.overclock > 0 ? 1.25 : 1) * this.stats.dmg;
       for (const e of w.targets()) {
         if (this.hitList.has(e)) continue;
         const hb = e.hurtbox && e.hurtbox();
@@ -241,7 +255,7 @@
     }
 
     startDash(w, dx) {
-      this.dashBuf = 0; this.dashCd = 34;
+      this.dashBuf = 0; this.dashCd = this.stats.dashCd;
       if (dx) this.face = dx;
       if (!this.onGround) { this.airDash = false; this.vy = 0; }
       this.vx = this.face * 7;
@@ -408,7 +422,7 @@
       }
       return 'idle' + (Math.floor(G.frame / 30) % 2);
     }
-    sprite() { return G.Art.body('alex', this.anim()); }
+    sprite() { return G.Art.body(this.style, this.anim()); }
 
     draw(ctx) {
       if (this.state === 'cutscene' && Math.abs(this.vx) > 0.3) this.animDist += Math.abs(this.vx);
@@ -447,4 +461,5 @@
   G.Player = Player;
   G.Player.ATK = ATK;
   G.Player.QUIPS = QUIPS;
+  G.Player.HEROES = HEROES;
 })();

@@ -40,9 +40,12 @@ G.Font = (() => {
     a = document.createElement('canvas');
     a.width = CHARS.length * 6; a.height = 7;
     const x = a.getContext('2d');
-    x.fillStyle = color;
+    // 16-bit style: the top rows a little lighter, the bottom rows a little darker
+    const hex = /^#[0-9a-f]{6}$/i.test(color);
+    const rowCol = (y) => (!hex ? color : y < 2 ? G.u.tint(color, 0.35) : y > 4 ? G.u.tint(color, -0.25) : color);
     CHARS.forEach((c, i) => {
       GLYPHS[c].forEach((row, y) => {
+        x.fillStyle = rowCol(y);
         for (let b = 0; b < 5; b++) if (row & (16 >> b)) x.fillRect(i * 6 + b, y, 1, 1);
       });
     });

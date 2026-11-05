@@ -403,7 +403,7 @@
   Enemy.prototype.canGrab = function () {
     if (!this.grabbable || this.dying || this.isBoss) return false;
     if (this.grabbableNow) return this.grabbableNow();
-    return ['idle', 'walk', 'hurt', 'recover', 'walkback'].includes(this.state);
+    return ['idle', 'walk', 'hurt', 'recover', 'walkback', 'windup', 'throwW', 'throwR', 'stun'].includes(this.state);
   };
 
   G.Enemy = Enemy;

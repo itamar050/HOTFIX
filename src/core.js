@@ -21,6 +21,17 @@ G.u = {
   // axis-aligned rectangles {x, y, w, h} (x, y = top-left)
   overlap: (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y,
   dist: (ax, ay, bx, by) => Math.hypot(bx - ax, by - ay),
+  // tint a #rrggbb color: f > 0 mixes toward white, f < 0 toward a cool dark (16-bit ramps)
+  tint(hex, f) {
+    const c = G.u._tc[hex + f];
+    if (c) return c;
+    let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+    if (f > 0) { r += (255 - r) * f; g += (255 - g) * f; b += (255 - b) * f * 0.9; }
+    else { const k = 1 + f; r *= k; g *= k * 0.98; b = b * k + 18 * -f; }
+    const h = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+    return (G.u._tc[hex + f] = '#' + h(r) + h(g) + h(b));
+  },
+  _tc: {},
   // deterministic hash of integers -> [0, 1): used for decor placement and LEDs
   hash(a, b = 0) {
     let h = (a * 374761393 + b * 668265263) | 0;

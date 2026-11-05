@@ -13,7 +13,7 @@
 
   G.newSession = (stage = 0) => {
     const d = DIFF[G.store.get('difficulty', 1)] || DIFF[1];
-    G.session = { score: 0, lives: d.lives, continues: 3, bits: 0, stage, checkpoint: -1, dmgMult: d.dmg, diff: d.name };
+    G.session = { score: 0, lives: d.lives, continues: 3, bits: 0, stage, checkpoint: -1, dmgMult: d.dmg, diff: d.name, hero: G.store.get('hero', 'bro') };
   };
 
   const go = (s) => G.game.set(s);
@@ -66,9 +66,9 @@
     x.fillStyle = 'rgba(255,255,255,0.8)';
     for (let yy = 4; yy < h; yy += 10) x.fillRect(0, yy, w, 1);
     x.globalCompositeOperation = 'source-over';
-    let o = G.Gfx.outline(c, C.redD);
+    let o = G.Gfx.outline(c, C.redD, { shade: false, inkBottom: false });
     const big = G.Gfx.canvas(w + 4, h + 4); big.getContext('2d').drawImage(o, 2, 2);
-    o = G.Gfx.outline(big, C.ink);
+    o = G.Gfx.outline(big, C.ink, { shade: false });
     const final = G.Gfx.canvas(o.width + 3, o.height + 3), fx = final.getContext('2d');
     fx.drawImage(G.Gfx.tinted(Object.assign(o, { ox: 0, oy: 0 }), C.ink), 3, 3); fx.drawImage(o, 0, 0);
     logoCanvas = final;
@@ -93,7 +93,7 @@
       this.t = 0;
       G.Audio.playMusic('title');
       this.menu = new Menu([
-        { label: 'START GAME', action: () => { G.newSession(0); go(new Story()); } },
+        { label: 'START GAME', action: () => { G.newSession(0); go(new HeroSelect(() => go(new Story()))); } },
         { label: 'STAGE SELECT', action: () => go(new StageSelect()) },
         { label: 'OPTIONS', action: () => go(new Options()) },
         { label: 'CONTROLS', action: () => go(new Controls()) },
@@ -108,8 +108,8 @@
       ctx.drawImage(lg, Math.round(W / 2 - lg.width / 2), ly);
       F.draw(ctx, 'NEXUS MELTDOWN', W / 2, ly + lg.height + 4, C.cyan, { align: 'center', shadow: C.ink, outline: true });
       // the cast
-      const run = G.Art.body('alex', 'sprint' + (Math.floor(this.t / 5) % 8));
-      G.Gfx.draw(ctx, run, 60, 176);
+      G.Gfx.draw(ctx, G.Art.body('girl', 'sprint' + (Math.floor(this.t / 5 + 3) % 8)), 84, 176);
+      G.Gfx.draw(ctx, G.Art.body('bro', 'sprint' + (Math.floor(this.t / 5) % 8)), 52, 176);
       G.Gfx.draw(ctx, G.Art.body('bot', 'walk' + (Math.floor(this.t / 6) % 8)), 262, 176, true);
       G.Gfx.draw(ctx, G.Art.blob(Math.floor(this.t / 15) % 2), 236, 176);
       ctx.fillStyle = C.ink; ctx.fillRect(0, 176, W, 2);
@@ -117,6 +117,52 @@
       F.draw(ctx, 'HI ' + String(G.store.get('hiscore', 0)).padStart(7, '0'), W / 2, 186, C.yellow, { align: 'center', shadow: C.ink });
       F.draw(ctx, 'Z JUMP  X ATTACK  C HOTFIX  SHIFT DASH', W / 2, 200, C.greyL, { align: 'center', shadow: C.ink });
       F.draw(ctx, '(C) NEXUS DYNAMICS. ALL BUGS RESERVED.', W / 2, 212, C.greyD, { align: 'center' });
+    }
+  }
+
+  // ---- Hero select ---------------------------------------------------------------------------
+  const HERO_INFO = {
+    bro: { title: 'CODE BRO', tag: 'BUFF BOY', col: C.hood, bg: '#0e3a5a', lines: ['BENCHES 225, SHIPS ON', 'FRIDAYS. HITS HARD AND', 'TAKES A PUNCH.'], power: 5, speed: 2, health: 5, jump: 3 },
+    girl: { title: 'CODE GIRL', tag: 'HOT GIRL', col: '#c86aff', bg: '#3a1458', lines: ['VIM USER. RUNS THE', 'ON-CALL ROTA. FAST,', 'AGILE, HIGH JUMPS.'], power: 3, speed: 5, health: 3, jump: 5 },
+  };
+  class HeroSelect {
+    constructor(next) { this.next = next; this.t = 0; this.sel = G.store.get('hero', 'bro') === 'girl' ? 1 : 0; this.picked = -1; }
+    update() {
+      this.t++;
+      if (this.picked >= 0) { if (this.t - this.pickT > 50) this.next(); return; }
+      if (I.pressed('left') || I.pressed('right')) { this.sel = 1 - this.sel; G.Audio.sfx('menu'); }
+      if (I.pressed('confirm')) {
+        const h = this.sel ? 'girl' : 'bro';
+        G.store.set('hero', h); G.session.hero = h;
+        this.picked = this.sel; this.pickT = this.t; G.Audio.sfx('select'); G.Audio.sfx('voice');
+      }
+      if (I.pressed('back')) go(new Title());
+    }
+    draw(ctx) {
+      backdrop(ctx, this.t, 'cloud');
+      ctx.fillStyle = 'rgba(8,6,20,0.55)'; ctx.fillRect(0, 0, W, H);
+      F.draw(ctx, 'CHOOSE YOUR CODER', W / 2, 10, C.yellow, { align: 'center', scale: 2, shadow: C.redD });
+      ['bro', 'girl'].forEach((h, i) => {
+        const info = HERO_INFO[h], x0 = i ? 166 : 10, sel = this.sel === i, pk = this.picked === i;
+        ctx.fillStyle = sel ? C.white : C.greyD; ctx.fillRect(x0, 32, 144, 180);
+        ctx.fillStyle = C.ink; ctx.fillRect(x0 + 1, 33, 142, 178);
+        ctx.fillStyle = info.bg; ctx.fillRect(x0 + 2, 34, 140, 176);
+        for (let y = 36; y < 210; y += 4) { ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(x0 + 2, y, 140, 1); }
+        // the hero at 2x
+        const pose = pk ? 'win' : sel ? 'idle' + (Math.floor(this.t / 30) % 2) : 'stand';
+        const spr = G.Art.body(h, pose);
+        ctx.save(); ctx.globalAlpha = sel ? 1 : 0.55;
+        ctx.drawImage(spr, Math.round(x0 + 72 - spr.ox * 2), Math.round(126 - spr.oy * 2), spr.width * 2, spr.height * 2);
+        ctx.restore();
+        F.draw(ctx, info.title, x0 + 72, 132, sel ? info.col : C.grey, { align: 'center', scale: 2, shadow: C.ink });
+        F.draw(ctx, '"' + info.tag + '"', x0 + 72, 150, sel ? C.white : C.greyD, { align: 'center' });
+        [['POWER', info.power], ['SPEED', info.speed], ['HEALTH', info.health], ['JUMP', info.jump]].forEach(([k, v], j) => {
+          F.draw(ctx, k, x0 + 10, 164 + j * 10, C.greyL);
+          for (let b = 0; b < 5; b++) { ctx.fillStyle = b < v ? (sel ? info.col : C.greyD) : '#1a1830'; ctx.fillRect(x0 + 60 + b * 14, 165 + j * 10, 12, 5); }
+        });
+        if (sel && this.picked < 0 && (this.t >> 4) % 2) F.draw(ctx, i ? '<' : '>', i ? x0 - 9 : x0 + 147, 118, C.cyan, { shadow: C.ink });
+      });
+      F.draw(ctx, 'LEFT/RIGHT TO CHOOSE   X OR ENTER TO PICK', W / 2, 214, C.greyL, { align: 'center', shadow: C.ink });
     }
   }
 
@@ -128,7 +174,7 @@
       this.menu = new Menu(G.Stages.map((s, i) => ({
         label: i < unlocked ? `STAGE ${i + 1}: ${s.name}` : `STAGE ${i + 1}: ????????`,
         disabled: i >= unlocked,
-        action: () => { G.newSession(i); go(new StageCard(i)); },
+        action: () => { G.newSession(i); go(new HeroSelect(() => go(new StageCard(i)))); },
       })).concat([{ label: 'BACK', action: () => go(new Title()) }]), { back: () => go(new Title()) });
     }
     update() { this.t++; this.menu.update(); }
@@ -173,10 +219,10 @@
         ['MOVE', 'ARROWS / WASD'], ['JUMP', 'Z / SPACE / K'], ['ATTACK', 'X / J'], ['HOTFIX SPECIAL', 'C / L'],
         ['DASH', 'SHIFT / V'], ['PAUSE', 'ENTER / ESC / P'], ['', ''],
         ['COMBO', 'ATTACK x4 (CHAINS ON HIT)'], ['UPPERCUT', 'UP + ATTACK'], ['DIVE KICK', 'DOWN + ATTACK IN AIR'],
-        ['DASH STRIKE', 'ATTACK WHILE DASHING'], ['GRAB', 'WALK INTO A REELING ENEMY'], ['  KNEE / THROW', 'ATTACK / BACK+ATTACK'],
+        ['DASH STRIKE', 'ATTACK WHILE DASHING'], ['DUCK + STRIKE', 'DOWN + ATTACK (x2 = SWEEP)'], ['GRAB', 'WALK INTO AN ENEMY'], ['  KNEE / THROW', 'ATTACK / BACK+ATTACK'],
         ['DROP DOWN', 'DOWN + JUMP ON PLATFORMS'], ['GAMEPAD', 'A JUMP X ATK Y SPC B DASH'],
       ];
-      rows.forEach(([a, b], i) => { F.draw(ctx, a, 24, 44 + i * 11, C.cyan); F.draw(ctx, b, 124, 44 + i * 11, C.white); });
+      rows.forEach(([a, b], i) => { F.draw(ctx, a, 24, 42 + i * 11, C.cyan); F.draw(ctx, b, 124, 42 + i * 11, C.white); });
     }
   }
 
@@ -188,7 +234,7 @@
     ['priya', "Uh, Alex? The printers are screaming. And the robots in the lobby just 'optimized' the CEO. Out a window."],
     ['alex', 'Who deploys on a Friday?! ...Oh. Right. Me.'],
     ['gus', 'Your build, your bug, kid. The AI core is in the basement under the server farm. Go roll it back.'],
-    ['alex', 'Fine. Hoodie on. Backpack on. It is HOTFIX time.'],
+    ['alex', 'Fine. Glasses on. Backpack on. It is HOTFIX time.'],
   ];
   class Story {
     constructor() { this.t = 0; this.dialog = { lines: STORY, i: 0, chars: 0 }; G.Audio.playMusic('intro'); }
@@ -203,7 +249,7 @@
       ctx.fillStyle = 'rgba(10,6,24,0.45)'; ctx.fillRect(0, 0, W, H);
       F.draw(ctx, 'ESC TO SKIP', W - 6, 6, C.greyL, { align: 'right', shadow: C.ink });
       // the office at the moment of the deploy
-      G.Gfx.draw(ctx, G.Art.body('alex', 'idle' + (Math.floor(this.t / 30) % 2)), 110, 150);
+      G.Gfx.draw(ctx, G.Art.body(G.Art.hero(), 'idle' + (Math.floor(this.t / 30) % 2)), 110, 150);
       G.Gfx.draw(ctx, G.Art.body('priya', 'stand'), 160, 150, true);
       G.Gfx.draw(ctx, G.Art.body('gus', 'stand'), 196, 150, true);
       if (this.dialog) G.World.prototype.drawDialog.call(this, ctx);
@@ -315,7 +361,7 @@
         F.draw(ctx, String(val), W - 50, 76 + k * 14, C.cyan, { align: 'right' });
       });
       F.draw(ctx, 'SCORE ' + String(G.session.score).padStart(7, '0'), W / 2, 146, C.yellow, { align: 'center', scale: 1, shadow: C.ink });
-      G.Gfx.draw(ctx, G.Art.body('alex', 'win'), W / 2, 196);
+      G.Gfx.draw(ctx, G.Art.body(G.Art.hero(), 'win'), W / 2, 196);
       if (this.shown >= this.rows.length && (this.t >> 4) % 2) F.draw(ctx, 'PRESS ATTACK', W / 2, 192, C.white, { align: 'center' });
     }
   }
@@ -343,7 +389,7 @@
     draw(ctx) {
       ctx.fillStyle = C.black; ctx.fillRect(0, 0, W, H);
       F.draw(ctx, 'GAME OVER', W / 2, 50, C.red, { align: 'center', scale: 3, shadow: C.redD });
-      G.Gfx.draw(ctx, G.Art.body('alex', 'down'), W / 2, 120);
+      G.Gfx.draw(ctx, G.Art.body(G.Art.hero(), 'down'), W / 2, 120);
       if (this.final) {
         F.draw(ctx, 'THE BUG WON THIS TIME.', W / 2, 140, C.greyL, { align: 'center' });
         F.draw(ctx, 'FINAL SCORE ' + G.session.score, W / 2, 156, C.yellow, { align: 'center' });
@@ -377,11 +423,11 @@
       });
       ctx.fillStyle = C.ink; ctx.fillRect(0, 150, W, 74);
       G.Gfx.draw(ctx, G.Art.body('priya', 'win'), 120, 196);
-      G.Gfx.draw(ctx, G.Art.body('alex', (this.t >> 5) % 2 ? 'win' : 'idle0'), 160, 196);
+      G.Gfx.draw(ctx, G.Art.body(G.Art.hero(), (this.t >> 5) % 2 ? 'win' : 'idle0'), 160, 196);
       G.Gfx.draw(ctx, G.Art.body('gus', 'stand'), 200, 196, true);
       F.draw(ctx, 'FINAL SCORE ' + String(G.session ? G.session.score : 0).padStart(7, '0'), W / 2, 206, C.yellow, { align: 'center' });
     }
   }
 
-  G.Scenes = { Boot, Title, StageSelect, Options, Controls, Story, StageCard, Play, Tally, GameOver, Ending, Menu };
+  G.Scenes = { Boot, Title, HeroSelect, StageSelect, Options, Controls, Story, StageCard, Play, Tally, GameOver, Ending, Menu };
 })();

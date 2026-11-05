@@ -27,6 +27,41 @@
         '...SSssss..',
       ],
     },
+    bro: {
+      pal: { h: '#3a2416', H: '#22140c', s: '#e8a878', S: '#b87650', k: C.ink, w: '#ffffff', l: '#9fe4ff', m: '#8a3030', b: '#a87452' },
+      rows: [
+        '...hhhhhh...',
+        '..hhhhhhhhh.',
+        '.hhhhhhhhhhh',
+        '.HhhhhHhhhh.',
+        '.HHsssssssh.',
+        '.HSsskkkkkk.',
+        '.SSsskwlkks.',
+        '.SSsssskksss',
+        '.SSssssssss.',
+        '..bSsssmmss.',
+        '..bbbbbbbbb.',
+        '...bbbbbbb..',
+      ],
+    },
+    girl: {
+      pal: { h: '#b8285a', H: '#6a1030', s: '#f2c09a', S: '#c8865e', k: C.ink, w: '#ffffff', l: '#ffd0ec', m: '#d83a6a', e: '#ffd24a' },
+      rows: [
+        '...hhhhhh...',
+        '..hhhhhhhhh.',
+        '.hhhhhhhhhhh',
+        'hhHhhhhhhhhh',
+        'hHhhhhssshh.',
+        'hHhhssssssh.',
+        'hHhSsskkkks.',
+        'hHhSsskwlks.',
+        'hHhSsskkkkss',
+        'hHhSessssss.',
+        'hHhhSssmms..',
+        'hHhh.SSss...',
+        'hHh.........',
+      ],
+    },
     bot: {
       pal: { g: '#a3abc4', G: '#5d657e', n: '#1a1b3a', r: C.magenta, m: '#c01fa0', a: '#ff4f4f', k: C.ink },
       rows: [
@@ -190,12 +225,16 @@
     },
   };
   // expression variants (grid edits)
+  const FACES = {
+    alex: { hurt: { 7: 'hHSSsskkkk.', 10: '..Sssssmmm.' }, shout: { 10: '..Sssssmm..', 11: '...SSssmm..' } },
+    bro: { hurt: { 6: '.SSsskkkkks.', 9: '..bSssmmmss.' }, shout: { 9: '..bSsssmmms.', 10: '..bbbbbmmbb.' } },
+    girl: { hurt: { 7: 'hHhSsskkkks.', 10: 'hHhhSssmmm..' }, shout: { 10: 'hHhhSsmmms..', 11: 'hHhh.SSmm...' } },
+  };
   function headRows(name, face) {
-    const h = HEADS[name];
-    if (name !== 'alex' || face === 'normal') return h.rows;
+    const h = HEADS[name], f = FACES[name] && FACES[name][face];
+    if (!f) return h.rows;
     const r = h.rows.slice();
-    if (face === 'hurt') { r[7] = 'hHSSsskkkk.'; r[10] = '..Sssssmmm.'; }
-    if (face === 'shout') { r[10] = '..Sssssmm..'; r[11] = '...SSssmm..'; }
+    for (const k in f) r[k] = f[k];
     return r;
   }
 
@@ -255,6 +294,82 @@
       p.circle(hd[0], hd[1], 3, C.hoodD);
     },
     head(p, hc, q, face) { G.Rig.headGrid(p, headRows('alex', face), HEADS.alex.pal, hc, q); },
+  };
+
+  // Hero 1: CODE BRO. Sleeveless hoodie, big arms, stubble, heavy hitter.
+  STYLES.bro = {
+    thigh: 8, shin: 8, upper: 6, fore: 6, torso: 12, footH: 2, headUp: 6,
+    leg: (p, a, k, e, back) => {
+      G.Rig.limb(p, a, k, e, back ? C.jeansD : C.jeans, 5);
+      p.rect(e[0] - 2, e[1] - 1, 7, 3, back ? C.shoeD : C.shoe); p.rect(e[0] - 2, e[1] + 1, 7, 1, '#ffffff');
+      p.rect(e[0] + 1, e[1] - 1, 2, 1, '#ffffff');
+    },
+    arm: (p, a, k, e, back) => {
+      const sk = back ? '#b87650' : '#e8a878';
+      G.Rig.seg(p, a[0], a[1], k[0], k[1], sk, 6);
+      G.Rig.seg(p, k[0], k[1], e[0], e[1], sk, 4);
+      p.rect(e[0] - 2, e[1] - 2, 4, 4, sk);
+      const wx = k[0] + (e[0] - k[0]) * 0.72, wy = k[1] + (e[1] - k[1]) * 0.72;
+      p.rect(wx - 2, wy - 1, 4, 3, back ? C.hoodD : C.hood);
+    },
+    behind(p, J) {
+      const a = along(J, 2, 7), b = along(J, 12, 7);
+      G.Rig.seg(p, a[0], a[1], b[0], b[1], C.pack, 7);
+      const t = along(J, 13, 5); p.rect(t[0] - 2, t[1] - 1, 4, 2, C.packD);
+    },
+    torsoDraw(p, J) {
+      const n = along(J, 12, 0);
+      G.Rig.seg(p, J.hip[0], J.hip[1], n[0], n[1], C.hood, 11);
+      const sh0 = along(J, 9, 1), sh1 = along(J, 13, 1);
+      G.Rig.seg(p, sh0[0], sh0[1], sh1[0], sh1[1], C.hood, 13); // broad shoulders
+      const s0 = along(J, 1, 4), s1 = along(J, 12, 4);
+      p.line(s0[0], s0[1], s1[0], s1[1], C.hoodD, 2);
+      const w = along(J, 0, 0);
+      p.line(w[0] - J.dir[0], w[1] - J.dir[1], w[0], w[1], C.jeans, 10);
+      const lg = along(J, 7, -2);
+      p.grid(['k.k.k', '.k.k.', 'k.k.k'].map((r) => r), { k: '#ffffff' }, lg[0] - 2, lg[1] - 1);
+      const st0 = along(J, 12, 2), st1 = along(J, 3, -1);
+      p.line(st0[0], st0[1], st1[0], st1[1], C.packD, 1);
+      const hd = along(J, 12, 4); p.circle(hd[0], hd[1], 3, C.hoodD);
+    },
+    head(p, hc, q, face) { G.Rig.headGrid(p, headRows('bro', face), HEADS.bro.pal, hc, q); },
+  };
+
+  // Hero 2: CODE GIRL. Cropped jacket, high ponytail, fast and agile.
+  const JACKET = '#8a3ad8', JACKD = '#5a1fa0', PINK = '#ff4fb8', LEG = '#2e2648', LEGD = '#1c1630';
+  STYLES.girl = {
+    thigh: 8, shin: 8, upper: 6, fore: 5, torso: 11, footH: 2, headUp: 6,
+    leg: (p, a, k, e, back) => {
+      G.Rig.limb(p, a, k, e, back ? LEGD : LEG, 4);
+      p.rect(e[0] - 1, e[1] - 2, 6, 4, back ? '#c8c8d8' : '#ffffff'); p.rect(e[0] - 1, e[1] + 1, 6, 1, PINK);
+    },
+    arm: (p, a, k, e, back) => {
+      G.Rig.limb(p, a, k, e, back ? JACKD : JACKET, 3);
+      p.rect(e[0] - 1, e[1] - 1, 3, 3, back ? '#c8865e' : '#f2c09a');
+    },
+    behind(p, J) {
+      // ponytail swinging from the back of the head
+      const top = along(J, 18, 4), sw = Math.sin((J.pose.lean || 0) / 20) * 3;
+      const mid = [top[0] + J.back[0] * 5 - sw, top[1] + 5], tip = [mid[0] + J.back[0] * 3 - sw, mid[1] + 8];
+      G.Rig.seg(p, top[0], top[1], mid[0], mid[1], '#b8285a', 5);
+      G.Rig.seg(p, mid[0], mid[1], tip[0], tip[1], '#b8285a', 3);
+      p.rect(top[0] - 1, top[1] - 1, 3, 3, PINK);
+      const a = along(J, 3, 5), b = along(J, 9, 5);
+      G.Rig.seg(p, a[0], a[1], b[0], b[1], C.teal, 4); // sling bag
+    },
+    torsoDraw(p, J) {
+      const n = along(J, 11, 0);
+      G.Rig.seg(p, J.hip[0], J.hip[1], n[0], n[1], JACKET, 9);
+      const c0 = along(J, 3, -2), c1 = along(J, 10, -2);
+      p.line(c0[0], c0[1], c1[0], c1[1], C.teal, 2);
+      const z0 = along(J, 3, -3), z1 = along(J, 11, -3);
+      p.line(z0[0], z0[1], z1[0], z1[1], PINK, 1);
+      const w = along(J, 0, 0);
+      p.line(w[0] - J.dir[0], w[1] - J.dir[1], w[0], w[1], LEG, 8);
+      const bl = along(J, 1, 0); p.line(bl[0] - J.back[0] * 4, bl[1] - J.back[1] * 4, bl[0] + J.back[0] * 4, bl[1] + J.back[1] * 4, PINK, 1);
+      const st0 = along(J, 11, 2), st1 = along(J, 2, -3); p.line(st0[0], st0[1], st1[0], st1[1], C.tealD, 1);
+    },
+    head(p, hc, q, face) { G.Rig.headGrid(p, headRows('girl', face), HEADS.girl.pal, hc, q); },
   };
 
   STYLES.bot = {
@@ -411,6 +526,8 @@
     special0: { lean: 18, bl: [40, -30], fl: [70, -10], ba: [20, -30], fa: [-20, 40], face: 'shout' },
     special1: { lean: -8, dy: -2, bl: [-20, -10], fl: [25, 10], ba: [-140, -160], fa: [140, 160], face: 'shout' },
     win: { lean: -4, bl: [-8, -4], fl: [10, 4], ba: [20, 150], fa: [170, 180], face: 'shout' },
+    cjab: { lean: 20, bl: [40, -40], fl: [75, -10], ba: [40, 150], fa: [82, 86], face: 'shout' },
+    sweep: { lean: 14, bl: [72, -72], fl: [88, 92], ba: [-50, -20], fa: [40, 150], face: 'shout' },
     // enemy-flavored poses
     windup: { lean: -12, bl: [-14, -6], fl: [18, 6], ba: [30, 150], fa: [-70, -30] },
     punch: { lean: 18, bl: [-18, -6], fl: [22, 6], ba: [25, 150], fa: [92, 92] },
@@ -444,6 +561,10 @@
     return POSES.idle0;
   }
 
+  // the hero the player picked ('bro' or 'girl'); 'alex' in dialog means this hero
+  const hero = () => (G.session && G.session.hero) || G.store.get('hero', 'bro');
+  HEADS.alex = HEADS.bro;
+
   // ---- sprite builders -----------------------------------------------------------------
   function body(style, poseName) {
     const st = STYLES[style];
@@ -459,8 +580,9 @@
   }
 
   // dialog portrait: framed, 3x head
-  const PORTRAIT_BG = { alex: C.hoodD, priya: C.tealD, gus: '#3c6a2a', chad: C.navy, rack: '#1a2a4a', spag: '#5a1a1a', nexus: '#2a0a2a', sys: '#062016', bot: '#2a2a4a' };
+  const PORTRAIT_BG = { alex: C.hoodD, bro: C.hoodD, girl: '#5a1fa0', priya: C.tealD, gus: '#3c6a2a', chad: C.navy, rack: '#1a2a4a', spag: '#5a1a1a', nexus: '#2a0a2a', sys: '#062016', bot: '#2a2a4a' };
   function portrait(who) {
+    if (who === 'alex') who = hero();
     return G.Gfx.sprite('portrait:' + who, 44, 44, 0, 0, (p) => {
       p.rect(0, 0, 44, 44, '#fff8ee');
       p.rect(1, 1, 42, 42, PORTRAIT_BG[who] || '#222');
@@ -491,7 +613,7 @@
     }),
     oneup: () => G.Gfx.sprite('oneup', 18, 18, 9, 17, (p) => {
       p.circle(9, 9, 8, C.gold); p.circle(9, 9, 6, '#fff0a0');
-      p.grid(HEADS.alex.rows, HEADS.alex.pal, 4, 3);
+      p.grid(HEADS.bro.rows, HEADS.bro.pal, 3, 3);
     }),
     bit: (f) => G.Gfx.sprite('bit' + f, 14, 14, 7, 13, (p) => {
       const w = [6, 4, 1, 4][f];
@@ -628,5 +750,5 @@
     for (let f = 0; f < 2; f++) for (const a of [false, true]) drone(f, a);
   }
 
-  G.Art = { HEADS, STYLES, POSES, pose, body, headSprite, portrait, items, blob, drone, proj, word, prewarm };
+  G.Art = { HEADS, STYLES, POSES, pose, body, headSprite, portrait, items, blob, drone, proj, word, prewarm, hero };
 })();

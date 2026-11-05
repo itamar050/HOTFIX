@@ -6,8 +6,11 @@ Fight through the office, the server farm and the cloud to the AI core, and roll
 
 - 4 stages, each introducing new mechanics, each ending with a boss
   (Chad Brockman the VP of Synergy, RACK-9000, SPAGHETTI.EXE, and N.E.X.U.S. with two phases)
-- Beat 'em up combat: 4-hit chain, uppercut juggles, air kick, dive kick (pogo), dash strike,
-  stomps, grab / knee / throw, and a HOTFIX special that uses the focus meter (or costs health)
+- Two heroes to pick from: **Code Bro** ("Buff Boy": more health, harder hits) and
+  **Code Girl** ("Hot Girl": faster, higher jumps, quicker dash and combo timing)
+- Beat 'em up combat: 4-hit chain, duck and strike (low jab into a sweep), uppercut juggles,
+  air kick, dive kick (pogo), dash strike, stomps, grab on contact / knee / throw, and a
+  HOTFIX special that uses the focus meter (or costs health)
 - Platforming with momentum: coyote time, jump buffering, variable jump height, sprint,
   air dash, slopes, one-way platforms, moving platforms, springs, boost pads, fan updrafts,
   crumbling blocks
@@ -48,11 +51,12 @@ Useful URL parameters:
 | Dash            | Shift, V                    | B, RB        |
 | Pause           | Enter, Esc, P               | Start        |
 
-Moves: attack x4 is the chain (it only continues when a hit lands). Up + attack is the
+Moves: attack x4 is the chain (it only continues when a hit lands). Down + attack ducks and
+strikes low (a second hit is a sweep that trips; ducking also dodges high shots). Up + attack is the
 uppercut (jump-cancel it to juggle). In the air: attack is a flying kick, down + attack is a
 dive kick that bounces off what it hits. Attack while dashing or sprinting is a dash strike.
-Land on enemies to stomp them. Walk into a reeling enemy (or keep pushing into one) to grab
-it: attack knees, back + attack (or jump) throws it into its friends. Down + jump drops
+Land on enemies to stomp them. Walk into an enemy to grab it (shielded Firewalls only when
+they are reeling): attack knees, back + attack (or jump) throws it into its friends. Down + jump drops
 through one-way platforms.
 
 ## Tech stack
@@ -182,11 +186,18 @@ Wave entries are `type:side:delay` with side `L` or `R` (materialize at that scr
 
 ## Art pipeline
 
-Everything is drawn by code into small canvases on first use, outlined (1 px dark line around
-opaque pixels, the classic 16-bit look) and cached (`G.Gfx.sprite`). Stages pre-build every
+Everything is drawn by code into small canvases on first use and cached (`G.Gfx.sprite`).
+A finishing pass (`G.Gfx.outline`) gives every sprite 16-bit treatment: top-lit highlights,
+shaded far edges, and a *selective outline* tinted from the color it wraps (pure ink only
+where the sprite meets the ground). Limbs are shaded like cylinders (`G.Rig.seg`), skies are
+16 flat bands blended with a 4x4 ordered dither, tiles use bevels and checkerboard dithering
+(`dith`, `panel`, `brick` in `themes.js`), and text is two-tone. `G.u.tint(color, f)`
+makes the lighter/darker steps of a color ramp. Stages pre-build every
 pose they need when they load (`G.Art.prewarm`).
 
 - **Palette**: named colors in `G.C` (`core.js`). Prefer these over new hex values.
+- **Heroes**: `STYLES.bro` and `STYLES.girl` (art) plus `HEROES` (stats, in `player.js`).
+  `G.Art.hero()` is the picked hero; the speaker `'alex'` in dialog shows that hero.
 - **Faces and portraits**: `HEADS` in `art.js` are pixel grids (one character per pixel with
   a palette). The same grid is the in-game head and, scaled 3x, the dialog portrait.
 - **Bodies**: the pixel rig (`G.Rig` in `gfx.js`). A body is a hip, a torso and four two-bone
