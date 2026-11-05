@@ -1,0 +1,72 @@
+# Builds the desktop app for Windows, Mac and Linux. Pushing a tag like v1.0.0 also
+# publishes a GitHub Release with the three zips (Actions > release > Run workflow
+# builds them without a release; the zips are then under the run's artifacts).
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            script: pack:win
+            out: HOTFIX-win32-x64
+            zip: HOTFIX-Windows.zip
+          - os: macos-latest
+            script: pack:mac
+            out: HOTFIX-darwin-universal
+            zip: HOTFIX-Mac.zip
+          - os: ubuntu-latest
+            script: pack:linux
+            out: HOTFIX-linux-x64
+            zip: HOTFIX-Linux.zip
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run ${{ matrix.script }}
+      - name: Zip
+        shell: bash
+        run: |
+          cd dist
+          if [ "$RUNNER_OS" = "Windows" ]; then 7z a -tzip "../${{ matrix.zip }}" "./${{ matrix.out }}/*"
+          elif [ "$RUNNER_OS" = "macOS" ]; then ditto -c -k --keepParent "${{ matrix.out }}/HOTFIX.app" "../${{ matrix.zip }}"
+          else (cd "${{ matrix.out }}" && zip -qr "../../${{ matrix.zip }}" .)
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.zip }}
+          path: ${{ matrix.zip }}
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: HOTFIX! ${{ github.ref_name }}
+          files: HOTFIX-*.zip
+          body: |
+            Download the zip for your computer, unzip it, and run HOTFIX.
+
+            - **Windows:** run `HOTFIX.exe`. If SmartScreen says "Windows protected your PC", click *More info* > *Run anyway* (the app is not code-signed).
+            - **Mac:** open `HOTFIX.app`. The first time, right-click it > *Open* > *Open* (the app is not notarized).
+            - **Linux:** run `./HOTFIX`.
+
+            Keys: arrows move, Z jump, X attack, C special, Shift dash, Enter/Esc pause, F11 fullscreen. Gamepads work too.

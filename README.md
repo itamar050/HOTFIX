@@ -32,6 +32,25 @@ python3 -m http.server 8000
 
 then open http://localhost:8000.
 
+### Desktop app
+
+The game ships as a desktop app through Electron (`desktop/main.js` opens `index.html` in
+its own window; F11 toggles fullscreen):
+
+```bash
+npm install
+```
+
+```bash
+npm start
+```
+
+`npm run pack:win`, `pack:mac` and `pack:linux` write a ready-to-run folder to `dist/`.
+Pushing a tag like `v1.0.1` makes the `release` workflow build all three on GitHub and
+publish them as a GitHub Release, which is the easiest link to send to testers. The apps are
+not code-signed, so Windows SmartScreen and macOS Gatekeeper ask for a confirmation the first
+time (the release notes explain the clicks).
+
 Useful URL parameters:
 
 | Parameter  | Effect                                                              |

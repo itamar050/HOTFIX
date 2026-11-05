@@ -1,0 +1,18 @@
+{
+  "name": "hotfix",
+  "productName": "HOTFIX",
+  "version": "1.0.0",
+  "description": "HOTFIX! Nexus Meltdown - a 16-bit style beat 'em up / platformer",
+  "main": "desktop/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "pack:win": "electron-packager . HOTFIX --platform=win32 --arch=x64 --out=dist --overwrite --asar --ignore=\"^/(dist|node_modules|\\.github|README\\.md)\"",
+    "pack:mac": "electron-packager . HOTFIX --platform=darwin --arch=universal --out=dist --overwrite --asar --ignore=\"^/(dist|node_modules|\\.github|README\\.md)\"",
+    "pack:linux": "electron-packager . HOTFIX --platform=linux --arch=x64 --out=dist --overwrite --asar --ignore=\"^/(dist|node_modules|\\.github|README\\.md)\""
+  },
+  "devDependencies": {
+    "@electron/packager": "18.3.6",
+    "electron": "45.2.0"
+  }
+}
