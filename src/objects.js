@@ -226,7 +226,7 @@
       const pose = Math.floor(G.frame / 40) % 2 ? 'stand1' : 'stand';
       G.Gfx.draw(ctx, G.Art.body(this.def.who, pose), this.x, this.y + 1, this.face < 0);
       if (!this.talked) {
-        const by = Math.round(this.y - 58 + Math.sin(G.frame / 8) * 2);
+        const by = Math.round(this.y - 84 + Math.sin(G.frame / 8) * 2);
         ctx.fillStyle = G.C.ink; ctx.fillRect(Math.round(this.x) - 5, by - 1, 11, 13);
         ctx.fillStyle = G.C.yellow; ctx.fillRect(Math.round(this.x) - 4, by, 9, 11);
         G.Font.draw(ctx, '!', this.x - 2, by + 2, G.C.ink);

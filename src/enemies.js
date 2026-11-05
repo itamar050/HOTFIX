@@ -188,7 +188,7 @@
   // ---- GLITCHBOT: basic brawler -------------------------------------------------------------
   class Bot extends Enemy {
     constructor(x, y) {
-      super(x, y, { hp: 16, name: 'GLITCHBOT', style: 'bot', score: 100, speed: 0.95 });
+      super(x, y, { hp: 16, name: 'GLITCHBOT', style: 'bot', score: 100, speed: 0.95, w: 18, h: 52 });
       this.poses = { windup: 'windup', attack: 'punch', recover: 'punch' };
       this.debris = ['#a3abc4', '#5d657e', G.C.magenta]; this.bitColor = G.C.magenta;
     }
@@ -199,19 +199,19 @@
         case 'idle': case 'walk': {
           if (p.state === 'dead') { this.vx = U.approach(this.vx, 0, 0.2); this.state = 'idle'; break; }
           this.face = Math.sign(d) || this.face;
-          const crowd = this.crowd(w), want = 22 + crowd * 28;
+          const crowd = this.crowd(w), want = 30 + crowd * 36;
           if (ad > want + 4) {
             if (this.ledge(w, this.face)) { this.vx = 0; this.state = 'idle'; }
             else { this.vx = U.approach(this.vx, this.face * this.speed, 0.15); this.state = 'walk'; }
           } else if (ad < want - 12) { this.vx = U.approach(this.vx, -this.face * this.speed * 0.6, 0.15); this.state = 'walk'; }
           else { this.vx = U.approach(this.vx, 0, 0.3); this.state = 'idle'; }
-          if (ad < 32 && Math.abs(p.y - this.y) < 18 && this.atkCd <= 0 && crowd === 0) { this.setState('windup'); this.vx = 0; }
+          if (ad < 42 && Math.abs(p.y - this.y) < 18 && this.atkCd <= 0 && crowd === 0) { this.setState('windup'); this.vx = 0; }
           break;
         }
         case 'windup': this.vx = 0; this.telegraph = this.t > 12; if (this.t >= 20) { this.setState('attack'); this.vx = this.face * 1.5; } break;
         case 'attack':
           this.vx = U.approach(this.vx, 0, 0.2);
-          if (this.t <= 6 && !this.hitDone) { if (this.hitPlayer(w, this.front(2, -32, 20, 12), { dmg: 7, kb: 2 })) this.hitDone = true; }
+          if (this.t <= 6 && !this.hitDone) { if (this.hitPlayer(w, this.front(2, -46, 28, 16), { dmg: 7, kb: 2 })) this.hitDone = true; }
           if (this.t >= 8) { this.setState('recover'); this.hitDone = false; }
           break;
         case 'recover': if (this.t >= 26) { this.setState('idle'); this.atkCd = U.randi(40, 90); } break;
@@ -229,7 +229,7 @@
   // ---- VIRUS BLOB: hopping contact damage, splits in two ------------------------------------
   class Blob extends Enemy {
     constructor(x, y, mini) {
-      super(x, y, { hp: mini ? 4 : 9, name: mini ? 'MINI VIRUS' : 'VIRUS BLOB', score: mini ? 50 : 120, w: mini ? 10 : 18, h: mini ? 10 : 16, grabbable: false, kbMul: 1.2 });
+      super(x, y, { hp: mini ? 4 : 9, name: mini ? 'MINI VIRUS' : 'VIRUS BLOB', score: mini ? 50 : 120, w: mini ? 15 : 26, h: mini ? 14 : 23, grabbable: false, kbMul: 1.2 });
       this.mini = mini; this.contact = mini ? 4 : 6; this.hopT = U.randi(20, 60); this.squash = 0;
       this.debris = [G.C.green, G.C.greenD, G.C.lime]; this.bitColor = G.C.lime;
     }
@@ -269,11 +269,11 @@
   const MANAGER_LINES = ['PER MY LAST EMAIL!', "LET'S TAKE THIS OFFLINE!", 'NEW PRIORITIES!', 'QUICK SYNC?', 'IS THIS BILLABLE?'];
   class Manager extends Enemy {
     constructor(x, y) {
-      super(x, y, { hp: 26, name: 'MIDDLE MANAGER', style: 'manager', score: 200, speed: 0.75 });
+      super(x, y, { hp: 26, name: 'MIDDLE MANAGER', style: 'manager', score: 200, speed: 0.75, w: 20, h: 54 });
       this.poses = { throwW: 'throwW', throwR: 'throwR', windup: 'windup', charge: 'bash', recover: 'stand', walkback: () => 'march' + (Math.floor(G.frame / 7) % 8) };
       this.debris = ['#ffffff', G.C.suit, '#f4b08a']; this.bitColor = '#ffffff';
     }
-    onWake(w) { if (Math.random() < 0.6) w.fx.text(this.x, this.y - 50, U.pick(MANAGER_LINES), G.C.yellow, 70); }
+    onWake(w) { if (Math.random() < 0.6) w.fx.text(this.x, this.y - 74, U.pick(MANAGER_LINES), G.C.yellow, 70); }
     ai(w) {
       const p = w.player, d = this.dist(w), ad = Math.abs(d);
       this.telegraph = false;
@@ -281,17 +281,17 @@
         case 'idle': case 'walk': case 'walkback':
           if (p.state === 'dead') { this.vx = 0; this.state = 'idle'; break; }
           this.face = Math.sign(d) || this.face;
-          if (ad < 34 && this.atkCd <= 0) { this.setState('windup'); this.vx = 0; break; }
+          if (ad < 46 && this.atkCd <= 0) { this.setState('windup'); this.vx = 0; break; }
           if (ad > 120) {
             if (this.ledge(w, this.face)) { this.vx = 0; this.state = 'idle'; }
             else { this.vx = U.approach(this.vx, this.face * this.speed, 0.1); this.state = 'walk'; }
           } else if (ad < 70 && !this.ledge(w, -this.face)) { this.vx = U.approach(this.vx, -this.face * this.speed * 0.8, 0.1); this.state = 'walkback'; }
           else { this.vx = U.approach(this.vx, 0, 0.2); this.state = 'idle'; }
-          if (this.atkCd <= 0 && ad < 200 && ad >= 34) { this.setState('throwW'); this.vx = 0; }
+          if (this.atkCd <= 0 && ad < 200 && ad >= 46) { this.setState('throwW'); this.vx = 0; }
           break;
         case 'throwW':
           if (this.t >= 18) {
-            const proj = new G.Projectile(this.x + this.face * 8, this.y - 34, { spr: G.Art.proj.memo(), vx: this.face * U.rand(2.4, 3.4), vy: -3.2, g: 0.15, dmg: 6, spin: true, hittable: true });
+            const proj = new G.Projectile(this.x + this.face * 12, this.y - 50, { spr: G.Art.proj.memo(), vx: this.face * U.rand(2.4, 3.4), vy: -3.2, g: 0.15, dmg: 6, spin: true, hittable: true });
             w.add(proj); G.Audio.sfx('throw'); this.setState('throwR');
           }
           break;
@@ -299,7 +299,7 @@
         case 'windup': this.telegraph = true; if (this.t >= 18) { this.setState('charge'); this.vx = this.face * 4; } break;
         case 'charge':
           this.vx = U.approach(this.vx, 0, 0.12);
-          if (!this.hitDone && this.hitPlayer(w, this.front(0, -34, 18, 30), { dmg: 9, kb: 3, kby: -3, knock: true })) this.hitDone = true;
+          if (!this.hitDone && this.hitPlayer(w, this.front(0, -50, 26, 44), { dmg: 9, kb: 3, kby: -3, knock: true })) this.hitDone = true;
           if (this.t >= 24) { this.setState('recover'); this.hitDone = false; }
           break;
         case 'recover': this.vx = 0; if (this.t >= 30) { this.setState('idle'); this.atkCd = U.randi(60, 100); } break;
@@ -310,7 +310,7 @@
   // ---- SECURITY DRONE: flies, aims, fires lasers ---------------------------------------------
   class Drone extends Enemy {
     constructor(x, y) {
-      super(x, y - 40, { hp: 10, name: 'SEC-DRONE', score: 150, w: 18, h: 14, grabbable: false, kbMul: 1.2 });
+      super(x, y - 56, { hp: 10, name: 'SEC-DRONE', score: 150, w: 28, h: 22, grabbable: false, kbMul: 1.2 });
       this.gravity = false; this.flying = true; this.fireT = U.randi(60, 120); this.side = Math.random() < 0.5 ? -1 : 1; this.noClip = true;
       this.debris = ['#a3abc4', '#5a6078', G.C.red]; this.bitColor = G.C.red;
     }
@@ -319,8 +319,8 @@
       if (this.state === 'hurt') return;
       if (Math.abs(p.x - this.x) > 110) this.side = Math.sign(this.x - p.x) || 1;
       if (p.onGround || this.pgy === undefined) this.pgy = p.y;
-      const tx = p.x + this.side * 56, ty = Math.min(this.pgy - 58, w.level.h - 80) + Math.sin(this.t / 22) * 6;
-      const close = Math.abs(p.x - this.x) < 36;
+      const tx = p.x + this.side * 56, ty = Math.min(this.pgy - 74, w.level.h - 96) + Math.sin(this.t / 22) * 6;
+      const close = Math.abs(p.x - this.x) < 44;
       this.vx = U.approach(this.vx, close ? 0 : U.clamp((tx - this.x) * 0.03, -1.1, 1.1), 0.06);
       this.vy = U.approach(this.vy, U.clamp((ty - (this.y - 7)) * 0.05, -1.4, 1.4), 0.08);
       this.face = Math.sign(p.x - this.x) || 1;
@@ -328,8 +328,8 @@
         if (this.fireT === -1) G.Audio.sfx('warn');
         this.aiming = true;
         if (this.fireT <= -36) {
-          const ang = Math.atan2((p.y - 18) - (this.y - 2), p.x - this.x);
-          w.add(new G.Projectile(this.x, this.y - 2, { spr: G.Art.proj.laser(), vx: Math.cos(ang) * 3.4, vy: Math.sin(ang) * 3.4, dmg: 7, rot: ang }));
+          const ang = Math.atan2((p.y - 26) - (this.y - 4), p.x - this.x);
+          w.add(new G.Projectile(this.x, this.y - 4, { spr: G.Art.proj.laser(), vx: Math.cos(ang) * 3.4, vy: Math.sin(ang) * 3.4, dmg: 7, rot: ang }));
           G.Audio.sfx('laser'); this.fireT = U.randi(90, 140); this.aiming = false;
         }
       }
@@ -345,13 +345,13 @@
         w.addScore(this.score, this.x, this.y - 24); w.onEnemyGone(this);
       }
     }
-    hurtbox() { if (!this.active || this.dead) return null; return { x: this.x - 9, y: this.y - 16, w: 18, h: 16 }; }
+    hurtbox() { if (!this.active || this.dead) return null; return { x: this.x - 14, y: this.y - 24, w: 28, h: 24 }; }
     sprite() { return G.Art.drone(G.frame % 4 < 2 ? 0 : 1, this.aiming && (G.frame >> 2) % 2); }
     draw(ctx) {
       if (!this.active) return;
       let spr = this.sprite();
       if (this.flash > 0) spr = G.Gfx.tinted(spr, '#ffffff');
-      if (this.dying) { ctx.save(); ctx.translate(Math.round(this.x), Math.round(this.y - 6)); ctx.rotate(this.t * 0.3); G.Gfx.draw(ctx, spr, 0, 6, false); ctx.restore(); return; }
+      if (this.dying) { ctx.save(); ctx.translate(Math.round(this.x), Math.round(this.y - 10)); ctx.rotate(this.t * 0.3); G.Gfx.draw(ctx, spr, 0, 10, false); ctx.restore(); return; }
       G.Gfx.draw(ctx, spr, this.x, this.y, this.face < 0);
     }
   }
@@ -359,7 +359,7 @@
   // ---- FIREWALL BRUTE: shield blocks frontal attacks ------------------------------------------
   class Brute extends Enemy {
     constructor(x, y) {
-      super(x, y, { hp: 42, name: 'FIREWALL', style: 'brute', score: 400, speed: 0.55, w: 18, h: 44, kbMul: 0.5 });
+      super(x, y, { hp: 42, name: 'FIREWALL', style: 'brute', score: 400, speed: 0.55, w: 26, h: 64, kbMul: 0.5 });
       this.poses = { idle: 'shield', walk: () => 'march' + (Math.floor(G.frame / 8) % 8), windup: 'shield', bash: 'bash', recover: 'stun' };
       this.debris = [G.C.orange, '#4a4a5c', G.C.yellow]; this.bitColor = G.C.orange;
     }
@@ -375,16 +375,16 @@
         case 'idle': case 'walk':
           if (p.state === 'dead') { this.vx = 0; this.state = 'idle'; break; }
           if (this.t % 20 === 0) this.face = Math.sign(d) || this.face;
-          if (ad > 36) {
+          if (ad > 48) {
             if (this.ledge(w, this.face)) { this.vx = 0; this.state = 'idle'; }
             else { this.vx = U.approach(this.vx, this.face * this.speed, 0.1); this.state = 'walk'; }
           } else { this.vx = 0; this.state = 'idle'; }
-          if (ad < 60 && this.atkCd <= 0 && Math.abs(p.y - this.y) < 24) { this.setState('windup'); this.vx = 0; }
+          if (ad < 80 && this.atkCd <= 0 && Math.abs(p.y - this.y) < 24) { this.setState('windup'); this.vx = 0; }
           break;
         case 'windup': this.telegraph = this.t > 16; if (this.t >= 30) { this.setState('bash'); this.vx = this.face * 4; G.Audio.sfx('dash'); } break;
         case 'bash':
           this.vx = U.approach(this.vx, 0, 0.1);
-          if (!this.hitDone && this.hitPlayer(w, this.front(0, -44, 22, 40), { dmg: 12, kb: 3.5, kby: -4, knock: true })) this.hitDone = true;
+          if (!this.hitDone && this.hitPlayer(w, this.front(0, -64, 32, 58), { dmg: 12, kb: 3.5, kby: -4, knock: true })) this.hitDone = true;
           if (this.t >= 26) { this.setState('recover'); this.hitDone = false; }
           break;
         case 'recover': this.vx = 0; if (this.t >= 55) { this.setState('idle'); this.atkCd = U.randi(60, 100); } break;
@@ -394,7 +394,7 @@
       super.draw(ctx);
       if (this.state === 'recover' && this.t < 50) {
         const a = G.frame / 6;
-        for (let i = 0; i < 3; i++) { ctx.fillStyle = G.C.yellow; ctx.fillRect(Math.round(this.x + Math.cos(a + i * 2.1) * 10), Math.round(this.y - 58 + Math.sin(a + i * 2.1) * 3), 2, 2); }
+        for (let i = 0; i < 3; i++) { ctx.fillStyle = G.C.yellow; ctx.fillRect(Math.round(this.x + Math.cos(a + i * 2.1) * 10), Math.round(this.y - 84 + Math.sin(a + i * 2.1) * 3), 2, 2); }
       }
     }
   }

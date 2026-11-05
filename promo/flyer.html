@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HOTFIX! flyer</title>
+<style>
+  html, body { margin: 0; background: #07050c; }
+  canvas { display: block; margin: 0 auto; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<!-- The flyer is drawn with the game's own art code at 360x450 and shown 3x (1080x1350).
+     Open this file in a browser and save the image (right-click > Save image as), or run
+     the screenshot command in README.md to regenerate promo/flyer.png. -->
+<canvas id="out" width="1080" height="1350"></canvas>
+<script src="../src/core.js"></script>
+<script src="../src/font.js"></script>
+<script src="../src/gfx.js"></script>
+<script src="../src/art.js"></script>
+<script src="../src/themes.js"></script>
+<script>
+'use strict';
+const W = 360, H = 450, C = G.C, F = G.Font;
+const cv = G.Gfx.canvas(W, H), ctx = cv.getContext('2d');
+const p = new G.Gfx.Pen(ctx);
+G.session = { hero: 'bro' };
+
+// sky: the Cloud stage's banded, dithered night
+const sky = G.Themes.get('cloud');
+G.W = W; G.H = H; // draw the sky bands at flyer size
+const layers = sky.layers; sky.layers = [layers[0]]; // stars and neon clouds, no digit rain
+G.Themes.drawBackground(ctx, sky, { x: 40, y: 0 }, 0);
+sky.layers = layers;
+G.W = 320; G.H = 224;
+
+// sunburst rays from behind the heroes (90s box-art style)
+const cx = 180, cy = 250;
+for (let i = 0; i < 28; i++) {
+  const a0 = (i / 28) * Math.PI * 2, a1 = a0 + Math.PI / 28;
+  ctx.fillStyle = i % 2 ? 'rgba(255,79,184,0.28)' : 'rgba(255,200,58,0.22)';
+  ctx.beginPath(); ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + Math.cos(a0) * 500, cy + Math.sin(a0) * 500); ctx.lineTo(cx + Math.cos(a1) * 500, cy + Math.sin(a1) * 500);
+  ctx.fill();
+}
+// glow disc
+for (let r = 90; r > 0; r -= 6) { ctx.fillStyle = `rgba(255,${150 + r},${60 + r},0.06)`; p.circle(cx, cy, r, ctx.fillStyle); }
+
+// neon perspective floor
+ctx.fillStyle = '#12062a'; ctx.fillRect(0, 330, W, 120);
+for (let i = -12; i <= 12; i++) p.line(cx + i * 10, 330, cx + i * 60, 450, '#ff4fb8', 1);
+for (let j = 0; j < 7; j++) { const y = 330 + j * j * 2.6; p.rect(0, y, W, 1, j ? '#a0207a' : '#3ff2ff'); }
+
+// the big boss in the background: N.E.X.U.S.
+const ex = 304, ey = 172;
+p.circle(ex, ey, 34, C.ink); p.circle(ex, ey, 32, '#e8e0f0');
+p.circle(ex - 6, ey + 2, 17, C.red); p.circle(ex - 6, ey + 2, 9, C.ink); p.rect(ex - 12, ey - 5, 4, 4, '#ffffff');
+for (let i = 0; i < 8; i++) { const a = i * 0.785 + 0.2; p.circle(ex + Math.cos(a) * 44, ey + Math.sin(a) * 44, 6, C.ink); p.circle(ex + Math.cos(a) * 44, ey + Math.sin(a) * 44, 5, C.orange); }
+
+// sprites, enlarged 2x with EPX
+const big = (spr) => { const e = G.Gfx.epxCanvas(spr); e.ox = spr.ox * 2; e.oy = spr.oy * 2; return e; };
+const draw2 = (spr, x, y, flip) => G.Gfx.draw(ctx, big(spr), x, y, flip);
+// enemies charging in
+draw2(G.Art.body('bot', 'punch'), 300, 352, true);
+draw2(G.Art.body('manager', 'throwR'), 52, 340, false);
+G.Gfx.draw(ctx, G.Art.blob(2), 250, 372);
+G.Gfx.draw(ctx, G.Art.drone(0, true), 112, 186, true);
+G.Gfx.draw(ctx, G.Art.proj.memo(), 104, 236);
+// the heroes, mid-fight
+draw2(G.Art.body('girl', 'air'), 236, 290, true);
+draw2(G.Art.body('bro', 'hook'), 140, 372, false);
+// impact spark between them and the bot
+for (let i = 0; i < 10; i++) { const a = i * 0.63; p.line(262, 292, 262 + Math.cos(a) * 14, 292 + Math.sin(a) * 14, i % 2 ? '#ffffff' : C.yellow, 2); }
+
+// logo
+function logo(text, scale) {
+  const w = F.width(text, scale) + 4, h = 7 * scale + 4;
+  const c = G.Gfx.canvas(w, h), x = c.getContext('2d');
+  F.draw(x, text, 2, 2, '#ffffff', { scale });
+  x.globalCompositeOperation = 'source-in';
+  const g = x.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, '#fff6a0'); g.addColorStop(0.45, C.yellow); g.addColorStop(0.55, C.orange); g.addColorStop(1, C.red);
+  x.fillStyle = g; x.fillRect(0, 0, w, h);
+  x.globalCompositeOperation = 'source-atop'; x.fillStyle = 'rgba(255,255,255,0.85)';
+  for (let yy = 4; yy < h; yy += scale * 2) x.fillRect(0, yy, w, 1);
+  x.globalCompositeOperation = 'source-over';
+  let o = G.Gfx.outline(c, C.redD, { shade: false, inkBottom: false });
+  const pad = G.Gfx.canvas(o.width + 4, o.height + 4); pad.getContext('2d').drawImage(o, 2, 2);
+  o = G.Gfx.outline(pad, C.ink, { shade: false });
+  return o;
+}
+const L = logo('HOTFIX!', 7);
+ctx.drawImage(G.Gfx.tinted(Object.assign(L, { ox: 0, oy: 0 }), C.ink), Math.round(W / 2 - L.width / 2) + 4, 18);
+ctx.drawImage(L, Math.round(W / 2 - L.width / 2), 14);
+F.draw(ctx, 'NEXUS MELTDOWN', W / 2, 74, C.cyan, { align: 'center', scale: 2, shadow: C.ink, outline: true });
+
+// tagline
+F.draw(ctx, 'YOUR FRIDAY DEPLOY WENT ROGUE.', W / 2, 100, C.white, { align: 'center', shadow: C.ink, outline: true });
+F.draw(ctx, 'TIME TO FIGHT BACK.', W / 2, 112, C.yellow, { align: 'center', shadow: C.ink, outline: true });
+
+// "NEW!" starburst sticker
+function star(x, y, r, col) {
+  ctx.fillStyle = col; ctx.beginPath();
+  for (let i = 0; i < 24; i++) { const a = (i / 24) * Math.PI * 2, rr = i % 2 ? r * 0.72 : r; ctx[i ? 'lineTo' : 'moveTo'](x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+  ctx.fill();
+}
+star(52, 112, 30, C.ink); star(52, 112, 27, C.red); star(52, 112, 22, C.yellow);
+F.draw(ctx, 'PLAY', 52, 104, C.redD, { align: 'center' });
+F.draw(ctx, 'FREE!', 52, 114, C.redD, { align: 'center' });
+
+// hero name tags
+function tag(x, y, text, sub, col) {
+  const w = Math.max(F.width(text), F.width(sub)) + 10;
+  ctx.fillStyle = C.ink; ctx.fillRect(x - w / 2 - 1, y - 1, w + 2, 24);
+  ctx.fillStyle = col; ctx.fillRect(x - w / 2, y, w, 22);
+  ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x - w / 2, y + 11, w, 11);
+  F.draw(ctx, text, x, y + 3, '#ffffff', { align: 'center' });
+  F.draw(ctx, sub, x, y + 13, C.yellow, { align: 'center' });
+}
+tag(118, 384, 'CODE BRO', '"BUFF BOY"', '#126fa6');
+tag(250, 384, 'CODE GIRL', '"HOT GIRL"', '#5a1fa0');
+
+// feature strip
+ctx.fillStyle = C.ink; ctx.fillRect(0, 412, W, 38);
+ctx.fillStyle = '#1a1840'; ctx.fillRect(0, 413, W, 36);
+p.rect(0, 413, W, 1, C.cyan);
+F.draw(ctx, '2 HEROES  *  4 STAGES  *  4 BOSSES  *  CHIPTUNE OST', W / 2, 417, C.white, { align: 'center' });
+F.draw(ctx, 'FREE DOWNLOAD: WINDOWS / MAC / LINUX', W / 2, 428, C.yellow, { align: 'center' });
+F.draw(ctx, 'GITHUB.COM/ITAMAR050/HOTFIX/RELEASES', W / 2, 439, C.cyan, { align: 'center' });
+
+// final: 3x nearest-neighbor
+const out = document.getElementById('out'), o = out.getContext('2d');
+o.imageSmoothingEnabled = false;
+o.drawImage(cv, 0, 0, W * 3, H * 3);
+window.flyerReady = true;
+</script>
+</body>
+</html>

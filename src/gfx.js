@@ -70,6 +70,20 @@ G.Gfx = (() => {
     }
   }
 
+  // A Pen that scales everything by k around an origin (the feet of a big, code-drawn
+  // boss), so hand-placed boss art can grow without rewriting every coordinate.
+  class ScaledPen extends Pen {
+    constructor(ctx, ox, oy, k) { super(ctx); this.ox = ox; this.oy = oy; this.k = k; }
+    tx(x) { return this.ox + (x - this.ox) * this.k; }
+    ty(y) { return this.oy + (y - this.oy) * this.k; }
+    rect(x, y, w, h, col) { const x0 = Math.round(this.tx(x)), y0 = Math.round(this.ty(y)); super.rect(x0, y0, Math.max(1, Math.round(this.tx(x + w)) - x0), Math.max(1, Math.round(this.ty(y + h)) - y0), col); }
+    px(x, y, col) { super.rect(this.tx(x), this.ty(y), Math.max(1, Math.round(this.k)), Math.max(1, Math.round(this.k)), col); }
+    line(x0, y0, x1, y1, col, w = 1) { super.line(this.tx(x0), this.ty(y0), this.tx(x1), this.ty(y1), col, Math.max(1, Math.round(w * this.k))); }
+    ellipse(cx, cy, rx, ry, col) { super.ellipse(this.tx(cx), this.ty(cy), Math.round(rx * this.k), Math.round(ry * this.k), col); }
+    ring(cx, cy, r, col, w = 1) { super.ring(this.tx(cx), this.ty(cy), r * this.k, col, Math.max(1, Math.round(w * this.k))); }
+    grid(rows, pal, x, y, rot = 0, flip = false, scale = 1) { super.grid(rows, pal, Math.round(this.tx(x)), Math.round(this.ty(y)), rot, flip, Math.max(1, Math.round(scale * this.k))); }
+  }
+
   // The 16-bit finishing pass, run once per cached sprite:
   //  - lighting: light comes from the upper left. Pixels on a lit edge get a highlight,
   //    pixels on the far edge (and the row above it) get shade, giving every shape 3 tones;
@@ -114,6 +128,28 @@ G.Gfx = (() => {
     return out;
   }
 
+  // EPX on an image: 2x enlargement that rounds diagonals (for canvas-drawn sprites)
+  function epxCanvas(src) {
+    if (src._epx) return src._epx;
+    const w = src.width, h = src.height, d = src.getContext('2d').getImageData(0, 0, w, h).data;
+    const out = canvas(w * 2, h * 2), ox = out.getContext('2d'), img = ox.createImageData(w * 2, h * 2), od = img.data;
+    const px = (x, y) => (x < 0 || y < 0 || x >= w || y >= h ? -1 : (y * w + x) * 4);
+    const same = (i, j) => (i < 0 || j < 0 ? i === j : d[i] === d[j] && d[i + 1] === d[j + 1] && d[i + 2] === d[j + 2] && d[i + 3] === d[j + 3]);
+    const put = (x, y, i) => { const o = (y * w * 2 + x) * 4; if (i < 0) return; od[o] = d[i]; od[o + 1] = d[i + 1]; od[o + 2] = d[i + 2]; od[o + 3] = d[i + 3]; };
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const P = px(x, y), A = px(x, y - 1), B = px(x + 1, y), Cc = px(x - 1, y), D = px(x, y + 1);
+      let e1 = P, e2 = P, e3 = P, e4 = P;
+      if (same(Cc, A) && !same(Cc, D) && !same(A, B)) e1 = A;
+      if (same(A, B) && !same(A, Cc) && !same(B, D)) e2 = B;
+      if (same(D, Cc) && !same(D, B) && !same(Cc, A)) e3 = Cc;
+      if (same(B, D) && !same(B, A) && !same(D, Cc)) e4 = D;
+      put(x * 2, y * 2, e1); put(x * 2 + 1, y * 2, e2); put(x * 2, y * 2 + 1, e3); put(x * 2 + 1, y * 2 + 1, e4);
+    }
+    ox.putImageData(img, 0, 0);
+    src._epx = out;
+    return out;
+  }
+
   // a silhouette copy (hit flash)
   function tinted(src, color) {
     const key = '_t' + color;
@@ -153,7 +189,7 @@ G.Gfx = (() => {
     if (alpha !== 1) ctx.globalAlpha = 1;
   }
 
-  return { canvas, Pen, outline, tinted, sprite, draw, cache };
+  return { canvas, Pen, ScaledPen, outline, tinted, sprite, draw, cache, epxCanvas };
 })();
 
 // ---- the pixel rig -----------------------------------------------------------------------
@@ -171,13 +207,13 @@ G.Rig = (() => {
   };
 
   function draw(p, pose, st, ox, oy) {
-    const s = st.scale || 1;
+    const s = (st.scale || 1) * G.CS;
     const L1 = st.thigh * s, L2 = st.shin * s, A1 = st.upper * s, A2 = st.fore * s, T = st.torso * s;
     const z = [0, 0];
     const bl0 = fk(z, pose.bl[0], L1, pose.bl[1], L2), fl0 = fk(z, pose.fl[0], L1, pose.fl[1], L2);
-    let hipY = pose.air ? -(pose.hy ?? (L1 + L2)) : -(Math.max(bl0.e[1], fl0.e[1]) + st.footH);
-    hipY += pose.dy || 0;
-    const hip = [ox + (pose.dx || 0), oy + hipY];
+    let hipY = pose.air ? -(pose.hy ?? (L1 + L2) / s) * s : -(Math.max(bl0.e[1], fl0.e[1]) + st.footH * s);
+    hipY += (pose.dy || 0) * s;
+    const hip = [ox + (pose.dx || 0) * s, oy + hipY];
     const lean = pose.lean || 0;
     const dir = [Math.sin(lean * D), -Math.cos(lean * D)];
     const neck = [hip[0] + dir[0] * T, hip[1] + dir[1] * T];
@@ -224,5 +260,29 @@ G.Rig = (() => {
   }
   function limb(p, a, k, e, col, w) { seg(p, a[0], a[1], k[0], k[1], col, w); seg(p, k[0], k[1], e[0], e[1], col, w); }
 
-  return { draw, headGrid, limb, seg };
+  // EPX / Scale2x: doubles a pixel grid and rounds its diagonals the way pixel artists
+  // would, so upscaled faces keep crisp, deliberate edges instead of fat square pixels
+  const epxCache = new Map();
+  function epx(key, rows) {
+    if (epxCache.has(key)) return epxCache.get(key);
+    const h = rows.length, w = rows[0].length, out = [];
+    const at = (x, y) => (x < 0 || y < 0 || x >= w || y >= h ? '.' : rows[y][x]);
+    for (let y = 0; y < h; y++) {
+      let r1 = '', r2 = '';
+      for (let x = 0; x < w; x++) {
+        const P = at(x, y), A = at(x, y - 1), B = at(x + 1, y), Cc = at(x - 1, y), D = at(x, y + 1);
+        let e1 = P, e2 = P, e3 = P, e4 = P;
+        if (Cc === A && Cc !== D && A !== B) e1 = A;
+        if (A === B && A !== Cc && B !== D) e2 = B;
+        if (D === Cc && D !== B && Cc !== A) e3 = Cc;
+        if (B === D && B !== A && D !== Cc) e4 = D;
+        r1 += e1 + e2; r2 += e3 + e4;
+      }
+      out.push(r1, r2);
+    }
+    epxCache.set(key, out);
+    return out;
+  }
+
+  return { draw, headGrid, limb, seg, epx };
 })();

@@ -5,6 +5,7 @@ const G = (window.G = window.G || {});
 G.W = 320;          // internal resolution (Mega Drive-style 320x224)
 G.H = 224;
 G.TS = 16;          // tile size in pixels
+G.CS = 1.5;         // character scale: bodies are drawn and collide at 1.5x the base rig
 G.GRAV = 0.38;      // gravity, px/frame^2 (all physics runs at a fixed 60 Hz)
 G.MAXFALL = 7;
 G.frame = 0;        // global frame counter (for blinking etc.)

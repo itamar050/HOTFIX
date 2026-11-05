@@ -1,5 +1,9 @@
 # HOTFIX! Nexus Meltdown
 
+<p align="center"><img src="promo/flyer.png" alt="HOTFIX! Nexus Meltdown flyer: Code Bro and Code Girl fighting Glitchbots under the N.E.X.U.S. eye" width="540"></p>
+
+**Download:** [latest release](https://github.com/itamar050/HOTFIX/releases/latest) for Windows, Mac and Linux.
+
 A 16-bit style side-scrolling beat 'em up / platformer hybrid. You are **Alex "Bug" Voss**,
 a senior engineer at Nexus Dynamics whose Friday deploy turned the company AI against everyone.
 Fight through the office, the server farm and the cloud to the AI core, and roll it back.
@@ -220,6 +224,11 @@ pose they need when they load (`G.Art.prewarm`).
   `G.Art.hero()` is the picked hero; the speaker `'alex'` in dialog shows that hero.
 - **Faces and portraits**: `HEADS` in `art.js` are pixel grids (one character per pixel with
   a palette). The same grid is the in-game head and, scaled 3x, the dialog portrait.
+- **Scale**: characters are drawn and collide at `G.CS` = 1.5x the base rig, in the range
+  of Streets of Rage 2. Styles are written in base "design units" and the helpers in
+  `art.js` (`along`, `sw`, `ln`, `sg`, `box`) scale them. Enemy heads are enlarged with EPX
+  (`G.Rig.epx`, `G.Gfx.epxCanvas`), which rounds diagonals instead of making fat pixels; the
+  big code-drawn bosses use `G.Gfx.ScaledPen`.
 - **Bodies**: the pixel rig (`G.Rig` in `gfx.js`). A body is a hip, a torso and four two-bone
   limbs drawn as thick pixel lines. A `STYLE` (in `art.js`) gives bone lengths, colors and
   drawing functions for torso, head, limbs and held items; a `POSE` gives angles in degrees
@@ -272,6 +281,12 @@ weak points, register it in `G.BossTypes` and reference it from a stage's `boss.
 **Add a song.** Add an entry to `data` in `music.js` and use its id in a stage's `music`.
 
 **Add a theme.** Add an entry in `themes.js` with `sky`, `tile`, `props` and `layers`.
+
+## Promo flyer
+
+`promo/flyer.html` draws the flyer with the game's own art code (360x450, shown 3x). Open it
+in a browser to see it; to regenerate `promo/flyer.png` with the Playwright that the tests
+use, screenshot its `#out` canvas at a 1080x1350 viewport.
 
 ## Testing and debugging
 

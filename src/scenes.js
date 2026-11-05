@@ -152,7 +152,7 @@
         const pose = pk ? 'win' : sel ? 'idle' + (Math.floor(this.t / 30) % 2) : 'stand';
         const spr = G.Art.body(h, pose);
         ctx.save(); ctx.globalAlpha = sel ? 1 : 0.55;
-        ctx.drawImage(spr, Math.round(x0 + 72 - spr.ox * 2), Math.round(126 - spr.oy * 2), spr.width * 2, spr.height * 2);
+        G.Gfx.draw(ctx, spr, x0 + 72, 124);
         ctx.restore();
         F.draw(ctx, info.title, x0 + 72, 132, sel ? info.col : C.grey, { align: 'center', scale: 2, shadow: C.ink });
         F.draw(ctx, '"' + info.tag + '"', x0 + 72, 150, sel ? C.white : C.greyD, { align: 'center' });
@@ -361,7 +361,7 @@
         F.draw(ctx, String(val), W - 50, 76 + k * 14, C.cyan, { align: 'right' });
       });
       F.draw(ctx, 'SCORE ' + String(G.session.score).padStart(7, '0'), W / 2, 146, C.yellow, { align: 'center', scale: 1, shadow: C.ink });
-      G.Gfx.draw(ctx, G.Art.body(G.Art.hero(), 'win'), W / 2, 196);
+      G.Gfx.draw(ctx, G.Art.body(G.Art.hero(), 'win'), W - 62, 196);
       if (this.shown >= this.rows.length && (this.t >> 4) % 2) F.draw(ctx, 'PRESS ATTACK', W / 2, 192, C.white, { align: 'center' });
     }
   }

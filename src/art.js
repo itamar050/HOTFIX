@@ -28,38 +28,47 @@
       ],
     },
     bro: {
-      pal: { h: '#3a2416', H: '#22140c', s: '#e8a878', S: '#b87650', k: C.ink, w: '#ffffff', l: '#9fe4ff', m: '#8a3030', b: '#a87452' },
+      hires: true,
+      pal: { h: '#3a2416', H: '#22140c', g: '#5a3a26', s: '#e8a878', S: '#c48458', D: '#9a6040', k: C.ink, w: '#ffffff', l: '#9fe4ff', m: '#8a3030', b: '#b8805a', B: '#8a5a3a' },
       rows: [
-        '...hhhhhh...',
-        '..hhhhhhhhh.',
-        '.hhhhhhhhhhh',
-        '.HhhhhHhhhh.',
-        '.HHsssssssh.',
-        '.HSsskkkkkk.',
-        '.SSsskwlkks.',
-        '.SSsssskksss',
-        '.SSssssssss.',
-        '..bSsssmmss.',
-        '..bbbbbbbbb.',
-        '...bbbbbbb..',
+        '....hhhhhhh.....',
+        '..hhhhghhhhhh...',
+        '.hhhHhhhhghhhh..',
+        '.hhHhhhhhhhhhhh.',
+        'hhHHhhhhhhhhhhh.',
+        'hHHhhhsssshhhs..',
+        'hHHhssssssssss..',
+        'HHSssssskkkkk...',
+        'HHSSsssskwllks..',
+        'HSDSsssskllkkss.',
+        'HSDSsssskkkksss.',
+        '.SDSssssssssss..',
+        '..Dbsssssssss...',
+        '..Dbbssssmmms...',
+        '...bbbbbbbbb....',
+        '....BbbbbbbB....',
       ],
     },
     girl: {
-      pal: { h: '#b8285a', H: '#6a1030', s: '#f2c09a', S: '#c8865e', k: C.ink, w: '#ffffff', l: '#ffd0ec', m: '#d83a6a', e: '#ffd24a' },
+      hires: true,
+      pal: { h: '#b8285a', H: '#6a1030', g: '#e05a86', s: '#f2c09a', S: '#d0946c', k: C.ink, w: '#ffffff', l: '#ffd0ec', m: '#d83a6a', e: '#ffd24a', r: '#f08a9a' },
       rows: [
-        '...hhhhhh...',
-        '..hhhhhhhhh.',
-        '.hhhhhhhhhhh',
-        'hhHhhhhhhhhh',
-        'hHhhhhssshh.',
-        'hHhhssssssh.',
-        'hHhSsskkkks.',
-        'hHhSsskwlks.',
-        'hHhSsskkkkss',
-        'hHhSessssss.',
-        'hHhhSssmms..',
-        'hHhh.SSss...',
-        'hHh.........',
+        '....hhhhhhh.....',
+        '..hhhhgghhhhh...',
+        '.hhhhhhhhgghhh..',
+        'hhhHhhhhhhhhhhh.',
+        'hhHhhhhhhhhhhhh.',
+        'hhHhhhhssshhhh..',
+        'hhHhhsssssssshh.',
+        'hhHhSsssskkkks..',
+        'hhHhSsssskwlkss.',
+        'hhHhSsssskllksss',
+        'hhHhSesssskkkss.',
+        'hhHhhSsssrrssss.',
+        'hhHhhSssssssmms.',
+        'hhHh..Sssssss...',
+        'hhH....SSsss....',
+        'hH..............',
       ],
     },
     bot: {
@@ -130,36 +139,42 @@
       ],
     },
     priya: {
-      pal: { h: '#2a1630', H: '#160a1c', s: '#c98a5e', S: '#9c623c', k: C.ink, w: '#ffffff', m: '#c0304a', e: C.gold },
+      hires: true,
+      pal: { h: '#2a1630', H: '#160a1c', g: '#4a2a50', s: '#c98a5e', S: '#9c623c', k: C.ink, w: '#ffffff', m: '#c0304a', e: C.gold },
       rows: [
-        '....hhhhh..',
-        '..hhhhhhhh.',
-        '.hhhhhhhhhh',
-        'hhHhhhhhhh.',
-        'hhHhhhsshh.',
-        '.hHhsssssss',
-        '.hHSssskkss',
-        '.hHSessskss',
-        '.hHSssssssS',
-        '..hSssssms.',
-        '...SSssss..',
+        '...hhhhhhhh....',
+        '.hhhhhhgghhhh..',
+        'hhhhhhhhhhhhhh.',
+        'hhHhhhhhhhhhhh.',
+        'hHhhhhhsshhhh..',
+        'hHhhsssssssss..',
+        'hHhSsssskkssss.',
+        'hHhSssssswksss.',
+        'hHhSsssssssssss',
+        'hHhSessssssss..',
+        'hhhSsssssmmss..',
+        '.hh.SSsssss....',
+        '..h...SSs......',
       ],
     },
     gus: {
-      pal: { b: '#3c8a3a', B: '#24572a', s: '#efb48c', S: '#c27c56', r: '#8a6a52', R: '#5e4636', k: C.ink, w: '#ffffff', n: '#e08a6a' },
+      hires: true,
+      pal: { b: '#3c8a3a', B: '#24572a', g: '#5ab05a', s: '#efb48c', S: '#c27c56', r: '#8a6a52', R: '#5e4636', q: '#a88a72', k: C.ink, w: '#ffffff', n: '#e08a6a' },
       rows: [
-        '...bbbbbb..',
-        '..bbbbbbbb.',
-        '.bBbbbbbbbb',
-        '.BBBBBBBBB.',
-        '.SSsskksss.',
-        '.SSsssksnn.',
-        '.SRssssssn.',
-        '.RRrrrrrrs.',
-        '.RRrrrkkrr.',
-        '..RRrrrrrr.',
-        '...RRrrrr..',
-        '....RRrr...',
+        '...bbbbbbbb....',
+        '..bbbbgbbbbb...',
+        '.bbbbbbbbgbbb..',
+        '.BBBBBBBBBBBB..',
+        '.SSsssskkkssss.',
+        '.SSssssskwsssn.',
+        '.SRssssssssnnnn',
+        '.SRssssssssssn.',
+        '.RRrrrrrrrrrr..',
+        '.RRrrrqrkkkrrr.',
+        '..RRrrrrrrrqrr.',
+        '..RRrrqrrrrrr..',
+        '...RRrrrrrrr...',
+        '....RRrrrrr....',
       ],
     },
     rack: {
@@ -226,9 +241,8 @@
   };
   // expression variants (grid edits)
   const FACES = {
-    alex: { hurt: { 7: 'hHSSsskkkk.', 10: '..Sssssmmm.' }, shout: { 10: '..Sssssmm..', 11: '...SSssmm..' } },
-    bro: { hurt: { 6: '.SSsskkkkks.', 9: '..bSssmmmss.' }, shout: { 9: '..bSsssmmms.', 10: '..bbbbbmmbb.' } },
-    girl: { hurt: { 7: 'hHhSsskkkks.', 10: 'hHhhSssmmm..' }, shout: { 10: 'hHhhSsmmms..', 11: 'hHhh.SSmm...' } },
+    bro: { hurt: { 8: 'HHSSsssskkkkks..', 9: 'HSDSssssskkkkss.', 13: '..Dbbsssmmmms...' }, shout: { 13: '..Dbbsssssmmm...', 14: '...bbbbbbmmb....' } },
+    girl: { hurt: { 8: 'hhHhSssssskkkss.', 9: 'hhHhSsssskkkksss', 12: 'hhHhhSsssssmmm..' }, shout: { 12: 'hhHhhSsssssmmm..', 13: 'hhHh..Sssssmm...' } },
   };
   function headRows(name, face) {
     const h = HEADS[name], f = FACES[name] && FACES[name][face];
@@ -239,179 +253,167 @@
   }
 
   // ---- body styles ---------------------------------------------------------------------
-  const darker = (c) => c; // styles pass explicit dark colors; kept for readability
-  function stdLeg(colors, w = 4, shoe = true) {
-    return (p, a, k, e, back) => {
-      const c = back ? colors.legD : colors.leg;
-      G.Rig.limb(p, a, k, e, c, w);
-      if (shoe) {
-        p.rect(e[0] - 1, e[1] - 1, 5, 3, back ? colors.shoeD : colors.shoe);
-        if (colors.sole) p.rect(e[0] - 1, e[1] + 1, 5, 1, colors.sole);
-      }
+  // Styles are written in "design units" (the old 1x sizes). Every length and width goes
+  // through the helpers below, which multiply by J.s (style scale x G.CS, the character
+  // scale), so all characters grow together and gain detail instead of just blocky pixels.
+  const sw = (J, w) => Math.max(1, Math.round(w * J.s));
+  const along = (J, t, off = 0) => [J.hip[0] + (J.dir[0] * t + J.back[0] * off) * J.s, J.hip[1] + (J.dir[1] * t + J.back[1] * off) * J.s];
+  const ln = (p, J, a, b, col, w) => p.line(a[0], a[1], b[0], b[1], col, sw(J, w));
+  const sg = (p, J, a, b, col, w) => G.Rig.seg(p, a[0], a[1], b[0], b[1], col, sw(J, w));
+  const box = (p, J, at, ox, oy, w, h, col) => p.rect(at[0] + ox * J.s, at[1] + oy * J.s, sw(J, w), sw(J, h), col);
+  // a fist with a knuckle line and a shaded underside
+  function fist(p, J, e, col, colD, size) {
+    const n = sw(J, size), o = Math.floor(n / 2);
+    p.rect(e[0] - o, e[1] - o, n, n, col);
+    p.rect(e[0] - o, e[1] - o + n - 1, n, 1, colD);
+    if (n >= 4) p.rect(e[0] - o + n - 2, e[1] - o + 1, 1, n - 2, colD);
+  }
+  // a sneaker: upper, toe cap, white sole, a lace highlight
+  function shoe(p, J, e, col, colD, sole, back) {
+    const w = sw(J, 6), h = sw(J, 3), x = e[0] - sw(J, 1.5), y = e[1] - sw(J, 1.5);
+    p.rect(x, y, w, h, back ? colD : col);
+    p.rect(x + w - sw(J, 2), y + 1, sw(J, 2), h - 1, back ? colD : G.u.tint(col, 0.25));
+    if (sole) p.rect(x, y + h, w, Math.max(1, sw(J, 1)), back ? G.u.tint(sole, -0.25) : sole);
+    if (!back) p.rect(x + 2, y, Math.max(1, w - 5), 1, G.u.tint(col, 0.45));
+  }
+  function stdLeg(colors, w = 4, hasShoe = true) {
+    return (p, a, k, e, back, J) => {
+      G.Rig.limb(p, a, k, e, back ? colors.legD : colors.leg, sw(J, w));
+      if (hasShoe) shoe(p, J, e, colors.shoe, colors.shoeD, colors.sole, back);
     };
   }
   function stdArm(colors, w = 3, hand = 3) {
-    return (p, a, k, e, back) => {
-      G.Rig.limb(p, a, k, e, back ? colors.armD : colors.arm, w);
-      const o = Math.floor(hand / 2);
-      p.rect(e[0] - o, e[1] - o, hand, hand, back ? colors.handD : colors.hand);
+    return (p, a, k, e, back, J) => {
+      G.Rig.limb(p, a, k, e, back ? colors.armD : colors.arm, sw(J, w));
+      fist(p, J, e, back ? colors.handD : colors.hand, G.u.tint(back ? colors.handD : colors.hand, -0.3), hand);
     };
   }
-  const along = (J, t, off = 0) => [J.hip[0] + J.dir[0] * t + J.back[0] * off, J.hip[1] + J.dir[1] * t + J.back[1] * off];
+  // heads: hand-made grids for heroes and friends; EPX-upscaled grids for everyone else
+  const head = (name) => (p, hc, q, face, J) => {
+    const rows = headRows(name, face), up = J.s >= 1.4 && !HEADS[name].hires;
+    G.Rig.headGrid(p, up ? G.Rig.epx(name + face, rows) : rows, HEADS[name].pal, hc, q);
+  };
 
   const STYLES = {};
 
-  STYLES.alex = {
-    thigh: 8, shin: 8, upper: 6, fore: 6, torso: 12, footH: 2, headUp: 6,
-    leg: stdLeg({ leg: C.jeans, legD: C.jeansD, shoe: C.shoe, shoeD: C.shoeD, sole: '#ffffff' }),
-    arm: stdArm({ arm: C.hood, armD: C.hoodD, hand: C.skin, handD: C.skinD }),
-    behind(p, J) { // backpack
-      const a = along(J, 3, 6), b = along(J, 11, 6);
-      p.line(a[0], a[1], b[0], b[1], C.pack, 6);
-      const c = along(J, 4, 8), d = along(J, 10, 8);
-      p.line(c[0], c[1], d[0], d[1], C.packD, 2);
-      const t = along(J, 12, 5);
-      p.rect(t[0] - 2, t[1] - 1, 4, 2, C.packD);
-    },
-    torsoDraw(p, J) {
-      const T = 12;
-      const n = along(J, T, 0);
-      p.line(J.hip[0], J.hip[1], n[0], n[1], C.hood, 9);
-      const s0 = along(J, 1, 3), s1 = along(J, T, 3);
-      p.line(s0[0], s0[1], s1[0], s1[1], C.hoodD, 3);
-      const f0 = along(J, 3, -3), f1 = along(J, T - 1, -3);
-      p.line(f0[0], f0[1], f1[0], f1[1], C.hoodL, 1);
-      // jeans waist and hoodie pocket
-      const w = along(J, 0, 0);
-      p.line(w[0] - J.dir[0], w[1] - J.dir[1], w[0], w[1], C.jeans, 9);
-      // strap and drawstrings
-      const st0 = along(J, T - 1, 1), st1 = along(J, 3, -1);
-      p.line(st0[0], st0[1], st1[0], st1[1], C.packD, 1);
-      const ds = along(J, T - 3, -2);
-      p.px(ds[0], ds[1], '#ffffff'); p.px(ds[0], ds[1] + 2, '#ffffff');
-      // hood behind the neck
-      const hd = along(J, T, 3);
-      p.circle(hd[0], hd[1], 3, C.hoodD);
-    },
-    head(p, hc, q, face) { G.Rig.headGrid(p, headRows('alex', face), HEADS.alex.pal, hc, q); },
-  };
-
   // Hero 1: CODE BRO. Sleeveless hoodie, big arms, stubble, heavy hitter.
   STYLES.bro = {
-    thigh: 8, shin: 8, upper: 6, fore: 6, torso: 12, footH: 2, headUp: 6,
-    leg: (p, a, k, e, back) => {
-      G.Rig.limb(p, a, k, e, back ? C.jeansD : C.jeans, 5);
-      p.rect(e[0] - 2, e[1] - 1, 7, 3, back ? C.shoeD : C.shoe); p.rect(e[0] - 2, e[1] + 1, 7, 1, '#ffffff');
-      p.rect(e[0] + 1, e[1] - 1, 2, 1, '#ffffff');
+    thigh: 8, shin: 8, upper: 6, fore: 6, torso: 12, footH: 2.5, headUp: 6.5,
+    leg: (p, a, k, e, back, J) => {
+      G.Rig.limb(p, a, k, e, back ? C.jeansD : C.jeans, sw(J, 5));
+      shoe(p, J, e, C.shoe, C.shoeD, '#ffffff', back);
     },
-    arm: (p, a, k, e, back) => {
+    arm: (p, a, k, e, back, J) => {
       const sk = back ? '#b87650' : '#e8a878';
-      G.Rig.seg(p, a[0], a[1], k[0], k[1], sk, 6);
-      G.Rig.seg(p, k[0], k[1], e[0], e[1], sk, 4);
-      p.rect(e[0] - 2, e[1] - 2, 4, 4, sk);
-      const wx = k[0] + (e[0] - k[0]) * 0.72, wy = k[1] + (e[1] - k[1]) * 0.72;
-      p.rect(wx - 2, wy - 1, 4, 3, back ? C.hoodD : C.hood);
+      sg(p, J, a, k, sk, 6);
+      p.circle((a[0] + k[0]) / 2, (a[1] + k[1]) / 2, sw(J, 2.6), sk); // biceps
+      sg(p, J, k, e, sk, 4.5);
+      const wr = [k[0] + (e[0] - k[0]) * 0.72, k[1] + (e[1] - k[1]) * 0.72];
+      sg(p, J, wr, [wr[0] + (e[0] - k[0]) * 0.12, wr[1] + (e[1] - k[1]) * 0.12], back ? C.hoodD : C.hood, 5);
+      fist(p, J, e, sk, G.u.tint(sk, -0.3), 4.5);
     },
     behind(p, J) {
-      const a = along(J, 2, 7), b = along(J, 12, 7);
-      G.Rig.seg(p, a[0], a[1], b[0], b[1], C.pack, 7);
-      const t = along(J, 13, 5); p.rect(t[0] - 2, t[1] - 1, 4, 2, C.packD);
+      sg(p, J, along(J, 2, 7), along(J, 12, 7), C.pack, 7);
+      sg(p, J, along(J, 3, 9.5), along(J, 11, 9.5), C.packD, 2);
+      box(p, J, along(J, 6, 7.5), -1.5, -1, 3, 2, '#ffd27a'); // zip pull
+      box(p, J, along(J, 13, 5), -2, -1, 4, 2, C.packD);
     },
     torsoDraw(p, J) {
-      const n = along(J, 12, 0);
-      G.Rig.seg(p, J.hip[0], J.hip[1], n[0], n[1], C.hood, 11);
-      const sh0 = along(J, 9, 1), sh1 = along(J, 13, 1);
-      G.Rig.seg(p, sh0[0], sh0[1], sh1[0], sh1[1], C.hood, 13); // broad shoulders
-      const s0 = along(J, 1, 4), s1 = along(J, 12, 4);
-      p.line(s0[0], s0[1], s1[0], s1[1], C.hoodD, 2);
-      const w = along(J, 0, 0);
-      p.line(w[0] - J.dir[0], w[1] - J.dir[1], w[0], w[1], C.jeans, 10);
+      sg(p, J, J.hip, along(J, 12), C.hood, 11);
+      sg(p, J, along(J, 9, 1), along(J, 13, 1), C.hood, 13); // broad shoulders
+      ln(p, J, along(J, 1, 4), along(J, 12, 4), C.hoodD, 2);
+      ln(p, J, along(J, 6, -4.5), along(J, 11, -4.5), C.hoodL, 1); // pec highlight
+      ln(p, J, along(J, -0.6), along(J, 0.4), C.jeans, 10);
+      ln(p, J, along(J, 0.6, 5), along(J, 0.6, -5), '#3a2416', 1); // belt
       const lg = along(J, 7, -2);
-      p.grid(['k.k.k', '.k.k.', 'k.k.k'].map((r) => r), { k: '#ffffff' }, lg[0] - 2, lg[1] - 1);
-      const st0 = along(J, 12, 2), st1 = along(J, 3, -1);
-      p.line(st0[0], st0[1], st1[0], st1[1], C.packD, 1);
-      const hd = along(J, 12, 4); p.circle(hd[0], hd[1], 3, C.hoodD);
+      p.grid(['k...k', '.k.k.', 'k...k'], { k: '#ffffff' }, lg[0] - 2, lg[1] - 1, 0, false, J.s >= 1.4 ? 1 : 1);
+      ln(p, J, along(J, 12, 2), along(J, 3, -1), C.packD, 1);
+      const hd = along(J, 12, 4); p.circle(hd[0], hd[1], sw(J, 3), C.hoodD);
+      const ds = along(J, 10, -3); p.rect(ds[0], ds[1], 1, sw(J, 3), '#ffffff');
     },
-    head(p, hc, q, face) { G.Rig.headGrid(p, headRows('bro', face), HEADS.bro.pal, hc, q); },
+    head: head('bro'),
   };
 
   // Hero 2: CODE GIRL. Cropped jacket, high ponytail, fast and agile.
   const JACKET = '#8a3ad8', JACKD = '#5a1fa0', PINK = '#ff4fb8', LEG = '#2e2648', LEGD = '#1c1630';
   STYLES.girl = {
-    thigh: 8, shin: 8, upper: 6, fore: 5, torso: 11, footH: 2, headUp: 6,
-    leg: (p, a, k, e, back) => {
-      G.Rig.limb(p, a, k, e, back ? LEGD : LEG, 4);
-      p.rect(e[0] - 1, e[1] - 2, 6, 4, back ? '#c8c8d8' : '#ffffff'); p.rect(e[0] - 1, e[1] + 1, 6, 1, PINK);
+    thigh: 8.5, shin: 8.5, upper: 6, fore: 5.5, torso: 11, footH: 2.5, headUp: 6.5,
+    leg: (p, a, k, e, back, J) => {
+      G.Rig.limb(p, a, k, e, back ? LEGD : LEG, sw(J, 4));
+      const kn = [a[0] + (k[0] - a[0]) * 0.9, a[1] + (k[1] - a[1]) * 0.9];
+      p.rect(kn[0] - 1, kn[1] - 1, 2, 2, back ? JACKD : PINK); // knee stripe
+      shoe(p, J, e, '#ffffff', '#c8c8d8', PINK, back);
     },
-    arm: (p, a, k, e, back) => {
-      G.Rig.limb(p, a, k, e, back ? JACKD : JACKET, 3);
-      p.rect(e[0] - 1, e[1] - 1, 3, 3, back ? '#c8865e' : '#f2c09a');
+    arm: (p, a, k, e, back, J) => {
+      G.Rig.limb(p, a, k, e, back ? JACKD : JACKET, sw(J, 3.5));
+      const cf = [k[0] + (e[0] - k[0]) * 0.8, k[1] + (e[1] - k[1]) * 0.8];
+      sg(p, J, cf, [cf[0] + (e[0] - k[0]) * 0.1, cf[1] + (e[1] - k[1]) * 0.1], back ? '#c8c8d8' : '#ffffff', 4); // cuff
+      fist(p, J, e, back ? '#c8865e' : '#f2c09a', '#a8664a', 3.5);
     },
     behind(p, J) {
-      // ponytail swinging from the back of the head
-      const top = along(J, 18, 4), sw = Math.sin((J.pose.lean || 0) / 20) * 3;
-      const mid = [top[0] + J.back[0] * 5 - sw, top[1] + 5], tip = [mid[0] + J.back[0] * 3 - sw, mid[1] + 8];
-      G.Rig.seg(p, top[0], top[1], mid[0], mid[1], '#b8285a', 5);
-      G.Rig.seg(p, mid[0], mid[1], tip[0], tip[1], '#b8285a', 3);
-      p.rect(top[0] - 1, top[1] - 1, 3, 3, PINK);
-      const a = along(J, 3, 5), b = along(J, 9, 5);
-      G.Rig.seg(p, a[0], a[1], b[0], b[1], C.teal, 4); // sling bag
+      // high ponytail swinging from the back of the head
+      const top = along(J, 18.5, 4.5), sw0 = Math.sin((J.pose.lean || 0) / 20) * 3 * J.s;
+      const mid = [top[0] + J.back[0] * 5 * J.s - sw0, top[1] + 5 * J.s], tip = [mid[0] + J.back[0] * 3 * J.s - sw0, mid[1] + 9 * J.s];
+      G.Rig.seg(p, top[0], top[1], mid[0], mid[1], '#b8285a', sw(J, 5));
+      G.Rig.seg(p, mid[0], mid[1], tip[0], tip[1], '#b8285a', sw(J, 3.5));
+      p.rect(top[0] - 2, top[1] - 2, sw(J, 3), sw(J, 3), PINK); // scrunchie
+      sg(p, J, along(J, 3, 5), along(J, 9, 5), C.teal, 4); // sling bag
+      box(p, J, along(J, 6, 5), -1, -1, 2, 2, '#ffffff');
     },
     torsoDraw(p, J) {
-      const n = along(J, 11, 0);
-      G.Rig.seg(p, J.hip[0], J.hip[1], n[0], n[1], JACKET, 9);
-      const c0 = along(J, 3, -2), c1 = along(J, 10, -2);
-      p.line(c0[0], c0[1], c1[0], c1[1], C.teal, 2);
-      const z0 = along(J, 3, -3), z1 = along(J, 11, -3);
-      p.line(z0[0], z0[1], z1[0], z1[1], PINK, 1);
-      const w = along(J, 0, 0);
-      p.line(w[0] - J.dir[0], w[1] - J.dir[1], w[0], w[1], LEG, 8);
-      const bl = along(J, 1, 0); p.line(bl[0] - J.back[0] * 4, bl[1] - J.back[1] * 4, bl[0] + J.back[0] * 4, bl[1] + J.back[1] * 4, PINK, 1);
-      const st0 = along(J, 11, 2), st1 = along(J, 2, -3); p.line(st0[0], st0[1], st1[0], st1[1], C.tealD, 1);
+      sg(p, J, J.hip, along(J, 11), JACKET, 9);
+      ln(p, J, along(J, 3, -2.2), along(J, 10, -2.2), C.teal, 2.2); // top under the jacket
+      ln(p, J, along(J, 3, -3.4), along(J, 11, -3.4), PINK, 1); // zipper
+      ln(p, J, along(J, 9.5, 3), along(J, 11, -3), '#ffffff', 1); // collar
+      ln(p, J, along(J, -0.6), along(J, 0.4), LEG, 8);
+      ln(p, J, along(J, 1, 4), along(J, 1, -4), PINK, 1); // belt
+      ln(p, J, along(J, 11, 2), along(J, 2, -3), C.tealD, 1);
     },
-    head(p, hc, q, face) { G.Rig.headGrid(p, headRows('girl', face), HEADS.girl.pal, hc, q); },
+    head: head('girl'),
   };
 
   STYLES.bot = {
     thigh: 8, shin: 8, upper: 7, fore: 6, torso: 11, footH: 2, headUp: 6,
-    leg: stdLeg({ leg: '#8d96b0', legD: '#5d657e', shoe: '#3a3f55', shoeD: '#2a2e40' }, 3),
-    arm: (p, a, k, e, back) => {
-      G.Rig.limb(p, a, k, e, back ? '#5d657e' : '#8d96b0', 3);
-      p.rect(e[0] - 2, e[1] - 2, 4, 4, back ? '#3a3f55' : '#c4cbe0');
+    leg: (p, a, k, e, back, J) => {
+      G.Rig.limb(p, a, k, e, back ? '#5d657e' : '#8d96b0', sw(J, 3.2));
+      p.circle(k[0], k[1], sw(J, 2), back ? '#3a3f55' : '#5d657e'); // knee joint
+      box(p, J, e, -2, -1.5, 6, 3, back ? '#2a2e40' : '#3a3f55');
+    },
+    arm: (p, a, k, e, back, J) => {
+      G.Rig.limb(p, a, k, e, back ? '#5d657e' : '#8d96b0', sw(J, 3));
+      p.circle(k[0], k[1], sw(J, 1.6), back ? '#3a3f55' : '#5d657e');
+      fist(p, J, e, back ? '#3a3f55' : '#c4cbe0', '#5d657e', 4);
     },
     torsoDraw(p, J) {
-      const a = along(J, 0), b = along(J, 11);
-      p.line(a[0], a[1], b[0], b[1], '#7d86a0', 10);
-      const c = along(J, 3, -1), d = along(J, 8, -1);
-      p.line(c[0], c[1], d[0], d[1], '#1a1b3a', 5);
-      const m = along(J, 6, -1);
-      p.rect(m[0] - 1, m[1] - 1, 2, 2, C.magenta);
-      const s = along(J, 1, 4), t = along(J, 10, 4);
-      p.line(s[0], s[1], t[0], t[1], '#4a5068', 2);
+      sg(p, J, J.hip, along(J, 11), '#7d86a0', 10);
+      ln(p, J, along(J, 3, -1), along(J, 8, -1), '#1a1b3a', 5);
+      box(p, J, along(J, 6, -1), -1, -1, 2, 2, C.magenta);
+      box(p, J, along(J, 4.5, -1), -2, 0, 1, 1, C.cyan);
+      ln(p, J, along(J, 1, 4), along(J, 10, 4), '#4a5068', 2);
+      ln(p, J, along(J, 0.5, 5), along(J, 0.5, -5), '#3a3f55', 1.5);
     },
-    head(p, hc, q) { G.Rig.headGrid(p, HEADS.bot.rows, HEADS.bot.pal, hc, q); },
+    head: head('bot'),
   };
 
   STYLES.manager = {
     thigh: 8, shin: 8, upper: 6, fore: 6, torso: 13, footH: 2, headUp: 6,
     leg: stdLeg({ leg: C.suitD, legD: '#1e2840', shoe: '#2a1a14', shoeD: '#1a100c' }),
-    arm: stdArm({ arm: C.suit, armD: C.suitD, hand: '#f4b08a', handD: '#c97c58' }),
+    arm: stdArm({ arm: C.suit, armD: C.suitD, hand: '#f4b08a', handD: '#c97c58' }, 3, 3.5),
     torsoDraw(p, J) {
-      const a = along(J, 0), b = along(J, 13);
-      p.line(a[0], a[1], b[0], b[1], C.suit, 11); // belly
-      const c = along(J, 5, -2), d = along(J, 12, -2);
-      p.line(c[0], c[1], d[0], d[1], '#ffffff', 3);
-      const e = along(J, 6, -3), f = along(J, 12, -3);
-      p.line(e[0], e[1], f[0], f[1], C.red, 1);
-      const s0 = along(J, 1, 4), s1 = along(J, 12, 4);
-      p.line(s0[0], s0[1], s1[0], s1[1], C.suitD, 3);
+      sg(p, J, J.hip, along(J, 13), C.suit, 11); // belly
+      ln(p, J, along(J, 5, -2), along(J, 12, -2), '#ffffff', 3);
+      ln(p, J, along(J, 6, -3), along(J, 12, -3), C.red, 1.2);
+      ln(p, J, along(J, 1, 4), along(J, 12, 4), C.suitD, 3);
+      box(p, J, along(J, 9, -4), 0, 0, 2, 1, '#ffffff'); // pocket square
+      ln(p, J, along(J, 0.5, 5.5), along(J, 0.5, -5.5), '#1a100c', 1);
     },
-    head(p, hc, q) { G.Rig.headGrid(p, HEADS.manager.rows, HEADS.manager.pal, hc, q); },
+    head: head('manager'),
     front(p, J, arm) { // clipboard in the front hand
       if (J.pose.noItem) return;
-      p.rect(arm.e[0] - 1, arm.e[1] - 6, 6, 8, '#a87040');
-      p.rect(arm.e[0], arm.e[1] - 5, 4, 6, '#ffffff');
-      p.rect(arm.e[0] + 1, arm.e[1] - 7, 2, 2, '#c0c0c0');
+      box(p, J, arm.e, -1, -6, 6, 8, '#a87040');
+      box(p, J, arm.e, 0, -5, 4, 6, '#ffffff');
+      box(p, J, arm.e, 1, -7, 2, 2, '#c0c0c0');
+      box(p, J, arm.e, 0.5, -3.5, 3, 0.7, '#6a7aa8'); box(p, J, arm.e, 0.5, -1.5, 3, 0.7, '#6a7aa8');
     },
   };
 
@@ -420,18 +422,14 @@
     leg: stdLeg({ leg: C.navy, legD: '#10163a', shoe: '#120c0c', shoeD: '#0a0606' }, 5),
     arm: stdArm({ arm: '#26346e', armD: C.navy, hand: '#f2b48a', handD: '#c47a50' }, 5, 4),
     torsoDraw(p, J) {
-      const a = along(J, 0), b = along(J, 17);
-      p.line(a[0], a[1], b[0], b[1], '#26346e', 14);
-      const c = along(J, 7, -3), d = along(J, 16, -3);
-      p.line(c[0], c[1], d[0], d[1], '#ffffff', 4);
-      const e = along(J, 6, -4), f = along(J, 16, -4);
-      p.line(e[0], e[1], f[0], f[1], C.gold, 2);
-      const s0 = along(J, 1, 5), s1 = along(J, 16, 5);
-      p.line(s0[0], s0[1], s1[0], s1[1], C.navy, 4);
-      const pin = along(J, 13, -1);
-      p.rect(pin[0] - 1, pin[1] - 1, 2, 2, C.red);
+      sg(p, J, J.hip, along(J, 17), '#26346e', 14);
+      ln(p, J, along(J, 7, -3), along(J, 16, -3), '#ffffff', 4);
+      ln(p, J, along(J, 6, -4), along(J, 16, -4), C.gold, 2);
+      ln(p, J, along(J, 1, 5), along(J, 16, 5), C.navy, 4);
+      ln(p, J, along(J, 16, -1), along(J, 9, -5), '#3a4a8a', 1.5); // lapel
+      box(p, J, along(J, 13, -1), -1, -1, 2, 2, C.red);
     },
-    head(p, hc, q) { G.Rig.headGrid(p, HEADS.chad.rows, HEADS.chad.pal, hc, q); },
+    head: head('chad'),
   };
 
   STYLES.brute = {
@@ -439,56 +437,51 @@
     leg: stdLeg({ leg: '#3a3a4a', legD: '#24242e', shoe: C.orange, shoeD: '#b0480e' }, 6),
     arm: stdArm({ arm: '#4a4a5c', armD: '#2a2a36', hand: C.orange, handD: '#b0480e' }, 5, 5),
     torsoDraw(p, J) {
-      const a = along(J, 0), b = along(J, 16);
-      p.line(a[0], a[1], b[0], b[1], '#4a4a5c', 15);
-      const c = along(J, 4, -1), d = along(J, 14, -1);
-      p.line(c[0], c[1], d[0], d[1], C.orange, 7);
-      const e = along(J, 6, -1), f = along(J, 12, -1);
-      p.line(e[0], e[1], f[0], f[1], C.yellow, 2);
+      sg(p, J, J.hip, along(J, 16), '#4a4a5c', 15);
+      ln(p, J, along(J, 4, -1), along(J, 14, -1), C.orange, 7);
+      ln(p, J, along(J, 6, -1), along(J, 12, -1), C.yellow, 2);
+      for (let i = 5; i < 14; i += 3) box(p, J, along(J, i, -4), 0, 0, 1, 1, '#ffd27a'); // rivets
     },
-    head(p, hc, q) { G.Rig.headGrid(p, HEADS.brute.rows, HEADS.brute.pal, hc, q); },
+    head: head('brute'),
     front(p, J, arm) { // the firewall shield
       if (J.pose.noItem) return;
-      const x = arm.e[0] + 1, y = arm.e[1] - 16;
-      p.rect(x, y, 7, 30, '#b0480e');
-      p.rect(x + 1, y + 1, 5, 28, C.orange);
-      for (let i = 0; i < 5; i++) p.rect(x + 1, y + 3 + i * 6, 5, 1, C.yellow);
-      p.rect(x + 3, y + 1, 1, 28, C.yellow);
+      const x = arm.e[0] + J.s, y = arm.e[1] - 16 * J.s, w = sw(J, 7), h = sw(J, 30);
+      p.rect(x, y, w, h, '#b0480e');
+      p.rect(x + 1, y + 1, w - 2, h - 2, C.orange);
+      for (let i = 0; i < 5; i++) p.rect(x + 1, y + Math.round((3 + i * 6) * J.s), w - 2, Math.max(1, Math.round(J.s)), C.yellow);
+      p.rect(x + Math.floor(w / 2), y + 1, 1, h - 2, C.yellow);
+      p.rect(x + 1, y + 1, 1, h - 2, '#ffd27a');
     },
   };
 
   STYLES.priya = {
-    thigh: 7, shin: 7, upper: 6, fore: 5, torso: 11, footH: 2, headUp: 6,
-    leg: stdLeg({ leg: C.tealD, legD: '#0c5f53', shoe: '#ffffff', shoeD: '#c8c8d8' }, 3),
+    thigh: 7, shin: 7, upper: 6, fore: 5, torso: 11, footH: 2, headUp: 6.5,
+    leg: stdLeg({ leg: C.tealD, legD: '#0c5f53', shoe: '#ffffff', shoeD: '#c8c8d8', sole: C.blue }, 3),
     arm: stdArm({ arm: C.yellow, armD: C.yellowD, hand: '#c98a5e', handD: '#9c623c' }),
     torsoDraw(p, J) {
-      const a = along(J, 0), b = along(J, 11);
-      p.line(a[0], a[1], b[0], b[1], C.yellow, 9);
-      const c = along(J, 2, -2), d = along(J, 10, -2);
-      p.line(c[0], c[1], d[0], d[1], '#ffffff', 2);
-      const badge = along(J, 7, -3);
-      p.rect(badge[0] - 1, badge[1], 3, 3, C.blue);
+      sg(p, J, J.hip, along(J, 11), C.yellow, 9);
+      ln(p, J, along(J, 2, -2), along(J, 10, -2), '#ffffff', 2);
+      box(p, J, along(J, 7, -3), -1, 0, 3, 3, C.blue);
+      ln(p, J, along(J, 10, -3), along(J, 4, -3.4), '#3a6cff', 0.8); // lanyard
     },
-    head(p, hc, q) { G.Rig.headGrid(p, HEADS.priya.rows, HEADS.priya.pal, hc, q); },
-    behind(p, J) { const t = along(J, 15, 5); p.rect(t[0] - 2, t[1], 3, 7, '#2a1630'); },
+    head: head('priya'),
   };
 
   STYLES.gus = {
-    thigh: 8, shin: 8, upper: 7, fore: 6, torso: 13, footH: 2, headUp: 6,
+    thigh: 8, shin: 8, upper: 7, fore: 6, torso: 13, footH: 2, headUp: 6.5,
     leg: stdLeg({ leg: C.jeans, legD: C.jeansD, shoe: '#5e3a20', shoeD: '#3e2614' }, 5),
-    arm: stdArm({ arm: '#c0302c', armD: '#801c1c', hand: '#efb48c', handD: '#c27c56' }, 4),
+    arm: stdArm({ arm: '#c0302c', armD: '#801c1c', hand: '#efb48c', handD: '#c27c56' }, 4, 3.5),
     torsoDraw(p, J) {
-      const a = along(J, 0), b = along(J, 13);
-      p.line(a[0], a[1], b[0], b[1], '#c0302c', 13);
-      for (let i = 1; i < 13; i += 4) { const c = along(J, i, 6), d = along(J, i, -6); p.line(c[0], c[1], d[0], d[1], '#801c1c', 1); }
-      const c = along(J, 0, 6), d = along(J, 13, 6);
-      p.line(c[0], c[1], d[0], d[1], '#801c1c', 1);
+      sg(p, J, J.hip, along(J, 13), '#c0302c', 13);
+      for (let i = 1; i < 13; i += 4) ln(p, J, along(J, i, 6), along(J, i, -6), '#801c1c', 1);
+      for (const o of [-3, 2]) ln(p, J, along(J, 0, o), along(J, 13, o), '#801c1c', 1);
+      ln(p, J, along(J, 0, 6), along(J, 13, 6), '#801c1c', 1);
     },
-    head(p, hc, q) { G.Rig.headGrid(p, HEADS.gus.rows, HEADS.gus.pal, hc, q); },
+    head: head('gus'),
     front(p, J, arm) { // coffee mug
-      p.rect(arm.e[0], arm.e[1] - 4, 5, 5, '#ffffff');
-      p.rect(arm.e[0] + 5, arm.e[1] - 3, 1, 3, '#ffffff');
-      p.rect(arm.e[0] + 1, arm.e[1] - 4, 3, 1, '#5e3a20');
+      box(p, J, arm.e, 0, -4, 5, 5, '#ffffff');
+      box(p, J, arm.e, 5, -3, 1, 3, '#ffffff');
+      box(p, J, arm.e, 1, -4, 3, 1, '#5e3a20');
     },
   };
 
@@ -569,8 +562,8 @@
   function body(style, poseName) {
     const st = STYLES[style];
     const big = (st.scale || 1) > 1.1;
-    const S = big ? 96 : 64;
-    return G.Gfx.sprite(style + ':' + poseName, S, S, S / 2, S - 4, (p) => G.Rig.draw(p, pose(poseName), st, S / 2, S - 4));
+    const S = Math.ceil(((big ? 96 : 64) * G.CS) / 2) * 2;
+    return G.Gfx.sprite(style + ':' + poseName, S, S, S / 2, S - 6, (p) => G.Rig.draw(p, pose(poseName), st, S / 2, S - 6));
   }
 
   function headSprite(name, scale = 1) {
@@ -588,8 +581,9 @@
       p.rect(1, 1, 42, 42, PORTRAIT_BG[who] || '#222');
       for (let y = 3; y < 42; y += 4) p.rect(1, y, 42, 1, 'rgba(255,255,255,0.06)');
       const h = HEADS[who] || HEADS.sys;
-      const w = h.rows[0].length * 3, ht = h.rows.length * 3;
-      p.grid(h.rows, h.pal, Math.round(22 - w / 2), Math.min(42 - ht, Math.round(22 - ht / 2) + 2), 0, false, 3);
+      const rows = h.hires ? G.Rig.epx('portrait:' + who, h.rows) : h.rows, sc = h.hires ? 1 : 3;
+      const w = rows[0].length * sc, ht = rows.length * sc;
+      p.grid(rows, h.pal, Math.round(22 - w / 2), Math.min(42 - ht, Math.round(22 - ht / 2) + 2), 0, false, sc);
     }, null);
   }
 
@@ -683,38 +677,50 @@
 
   // ---- creatures drawn without the rig ------------------------------------------------
   function blob(frame, mini) {
-    const s = mini ? 0.6 : 1;
-    return G.Gfx.sprite('blob' + frame + (mini ? 'm' : ''), 32, 28, 16, 26, (p) => {
+    const s = mini ? 0.9 : 1.5;
+    return G.Gfx.sprite('blob' + frame + (mini ? 'm' : ''), 48, 42, 24, 40, (p) => {
       // frame 0/1 idle squish, 2 stretched (jump), 3 squashed (land)
       const rx = [10, 11, 7, 13][frame] * s, ry = [8, 7, 11, 5][frame] * s;
-      const cy = 26 - ry - 1;
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2 + 0.3;
-        p.circle(16 + Math.cos(a) * (rx + 1), cy + Math.sin(a) * (ry + 1), Math.max(1, 1.5 * s), C.greenD);
+      const cx = 24, cy = 40 - ry - 1;
+      for (let i = 0; i < 7; i++) { // virus spikes with bulb tips
+        const an = (i / 7) * Math.PI * 2 + 0.3, r = Math.max(1, 1.5 * s);
+        p.line(cx + Math.cos(an) * rx * 0.8, cy + Math.sin(an) * ry * 0.8, cx + Math.cos(an) * (rx + 2 * s), cy + Math.sin(an) * (ry + 2 * s), C.greenD, Math.max(1, Math.round(s)));
+        p.circle(cx + Math.cos(an) * (rx + 2 * s), cy + Math.sin(an) * (ry + 2 * s), r, C.lime);
       }
-      p.ellipse(16, cy, rx, ry, C.greenD);
-      p.ellipse(16, cy - 1, rx - 1, ry - 1, C.green);
-      p.ellipse(16 - rx * 0.35, cy - ry * 0.45, Math.max(1, rx * 0.25), Math.max(1, ry * 0.2), '#c8ffb0');
-      const ex = 16 + rx * 0.35, ey = cy - ry * 0.15;
-      p.rect(ex - 2, ey - 2, 3, 4, '#ffffff'); p.rect(ex + 2, ey - 2, 3, 4, '#ffffff');
-      p.rect(ex - 1, ey - 1, 2, 2, C.ink); p.rect(ex + 3, ey - 1, 2, 2, C.ink);
-      p.rect(ex - 2, ey - 3, 3, 1, C.ink); p.rect(ex + 2, ey - 3, 3, 1, C.ink);
+      p.ellipse(cx, cy, rx, ry, C.greenD);
+      p.ellipse(cx, cy - 1, rx - 1, ry - 1, C.green);
+      p.ellipse(cx + rx * 0.1, cy + ry * 0.35, rx * 0.7, ry * 0.35, '#2fb848'); // belly shade
+      p.ellipse(cx - rx * 0.35, cy - ry * 0.45, Math.max(1, rx * 0.25), Math.max(1, ry * 0.2), '#c8ffb0');
+      p.px(cx - rx * 0.5, cy - ry * 0.55, '#ffffff');
+      for (let i = 0; i < 4; i++) p.px(cx - rx * 0.2 + i * 3, cy + ry * 0.1 + (i % 2) * 2, '#1f9a3a'); // spots
+      const k = Math.max(1, Math.round(s * 0.8)), ex = cx + rx * 0.3, ey = cy - ry * 0.18;
+      for (const ox of [-3 * k, 2 * k]) {
+        p.rect(ex + ox, ey - 2 * k, 3 * k, 4 * k, '#ffffff');
+        p.rect(ex + ox + k, ey - k, 2 * k, 2 * k, C.ink);
+        p.rect(ex + ox, ey - 3 * k, 3 * k, k, C.ink); // angry brows
+      }
+      p.rect(ex - k, ey + 3 * k, 4 * k, k, C.ink); // frown
     });
   }
 
+  // drones are drawn small and upscaled 2x with EPX (smooth, crisp pixel-art enlargement)
   function drone(frame, alert) {
-    return G.Gfx.sprite('drone' + frame + (alert ? 'a' : ''), 30, 22, 15, 16, (p) => {
+    const key = 'drone' + frame + (alert ? 'a' : '');
+    const raw = G.Gfx.sprite(key + 'raw', 30, 22, 15, 16, (p) => {
       p.rect(14, 2, 2, 4, '#5a6078');
       const w = frame ? 6 : 12;
       p.rect(15 - w, 1, w * 2, 2, '#c8ccd8');
       p.ellipse(15, 11, 10, 6, '#5a6078');
       p.ellipse(15, 10, 9, 5, '#a3abc4');
+      p.ellipse(13, 8, 4, 2, '#d8def0');
       p.rect(6, 12, 18, 2, '#5a6078');
       p.circle(19, 10, 3, C.ink);
       p.circle(19, 10, 2, alert ? C.yellow : C.red);
       p.px(18, 9, '#ffffff');
       p.rect(12, 16, 6, 3, '#3a4058'); p.rect(17, 17, 4, 1, '#3a4058');
-    });
+      p.px(8, 13, C.cyan); p.px(11, 13, C.cyan);
+    }, null);
+    return G.Gfx.sprite(key, 60, 44, 30, 32, (p, ctx) => ctx.drawImage(G.Gfx.epxCanvas(raw), 0, 0));
   }
 
   const proj = {
