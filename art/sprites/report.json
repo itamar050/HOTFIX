@@ -145,10 +145,10 @@
  "stage1_floor": {
   "size": [
    840,
-   208
+   186
   ],
   "scale": 0.42,
-  "seam_difference": 16.0
+  "seam_difference": 17.1
  },
  "stage1_wall": {
   "size": [

@@ -101,29 +101,45 @@ func _demo(action: String, edge: bool) -> bool:
 
 
 # ---- the stage ---------------------------------------------------------------------------
-func _layer(path: String, scroll: float, y: float, z: int) -> void:
+func _layer(path: String, scroll: float, y: float, z: int, tint := Color.WHITE) -> void:
+	_layer_tex(load(path), scroll, y, z, tint)
+
+
+func _layer_tex(tex: Texture2D, scroll: float, y: float, z: int, tint := Color.WHITE) -> void:
 	var p := Parallax2D.new()
 	var s := Sprite2D.new()
-	s.texture = load(path)
+	s.texture = tex
 	s.centered = false
 	s.position = Vector2(0, y)
+	s.modulate = tint
 	p.add_child(s)
 	p.scroll_scale = Vector2(scroll, 1.0)
-	p.repeat_size = Vector2(s.texture.get_width(), 0)
-	p.repeat_times = 4
+	p.repeat_size = Vector2(tex.get_width(), 0)
+	p.repeat_times = maxi(4, int(ceil(700.0 / tex.get_width())) + 2)
 	p.z_index = z
 	add_child(p)
 
 
 func _build_background() -> void:
-	_layer("res://assets/sprites/stage1_far.png", 0.35, 0.0, -20)
-	# the floor strip: feet stand about 55% of the way down its depth
-	var floor_tex: Texture2D = load("res://assets/sprites/stage1_floor.png")
-	var floor_top := GROUND_Y - floor_tex.get_height() * 0.55
+	# depth: the further back a layer is, the darker and cooler it is drawn
+	_layer("res://assets/sprites/stage1_far.png", 0.35, 0.0, -20, Color(0.72, 0.72, 0.88))
+	# the floor runs from just under the cubicles to below the screen; feet stand 100 px into it
+	var floor_top := GROUND_Y - 100.0
 	# the back wall: cubicles in front of big windows (transparent, the skyline shows through)
 	var wall_tex: Texture2D = load("res://assets/sprites/stage1_wall.png")
-	_layer("res://assets/sprites/stage1_wall.png", 0.75, floor_top + 6.0 - wall_tex.get_height(), -15)
+	_layer("res://assets/sprites/stage1_wall.png", 0.75, floor_top + 4.0 - wall_tex.get_height(), -15, Color(0.86, 0.86, 0.96))
 	_layer("res://assets/sprites/stage1_floor.png", 1.0, floor_top, -10)
+	# a soft contact shadow where the wall meets the floor, so they read as one room
+	var grad := Gradient.new()
+	grad.set_color(0, Color(0, 0, 0.05, 0.6))
+	grad.set_color(1, Color(0, 0, 0.05, 0.0))
+	var shadow := GradientTexture2D.new()
+	shadow.gradient = grad
+	shadow.width = 64
+	shadow.height = 22
+	shadow.fill_from = Vector2(0, 0)
+	shadow.fill_to = Vector2(0, 1)
+	_layer_tex(shadow, 1.0, floor_top, -9)
 
 
 # ---- HUD -------------------------------------------------------------------------------

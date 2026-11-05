@@ -16,8 +16,14 @@
     "_why": "pillar center to pillar center: the layer loops inside a pillar"
   },
   "stage1_floor": {
+    "crop": [
+      0,
+      52,
+      2000,
+      496
+    ],
     "scale": 0.42,
-    "_why": "papers about shoe-sized next to a 120 px character"
+    "_why": "drop the concrete baseboard band at the top (it read as a low wall in front of the cubicles); papers about shoe-sized next to a 120 px character"
   },
   "stage1_wall": {
     "crop": [
