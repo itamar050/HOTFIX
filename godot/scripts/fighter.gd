@@ -7,12 +7,13 @@ const CELL := Vector2(160, 128)
 const ANCHOR := Vector2(80, 124)
 const STRIPS := {
 	"sheet": "res://assets/sprites/bro_sheet.png",
+	"idle": "res://assets/sprites/bro_idle.png",
 	"walk": "res://assets/sprites/bro_walk.png",
 	"punch": "res://assets/sprites/bro_punch.png",
 }
 ## Animations: [strip, frame, ticks] steps. Attacks mark their active step with "hit".
 const ANIMS := {
-	"idle": [["sheet", 0, 34], ["punch", 3, 34]],
+	"idle": [["idle", 0, 18], ["idle", 1, 12], ["idle", 2, 22], ["idle", 3, 12]],
 	"walk": [["walk", 0, 7], ["walk", 1, 7], ["walk", 2, 7], ["walk", 3, 7], ["walk", 4, 7], ["walk", 5, 7]],
 	"jump": [["walk", 3, 99]],
 	"jab_a": [["punch", 0, 2], ["punch", 1, 7, "hit"], ["punch", 2, 6]],

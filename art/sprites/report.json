@@ -12,6 +12,7 @@
   "standing_ref_px": 508,
   "scale": 0.236,
   "baseline_spread_px": 7,
+  "warning": "",
   "height_spread_pct": 3.1,
   "palette": 48,
   "clipped_frames": []
@@ -27,6 +28,7 @@
   "standing_ref_px": 571,
   "scale": 0.21,
   "baseline_spread_px": 5,
+  "warning": "",
   "height_spread_pct": 6.4,
   "palette": 48,
   "clipped_frames": []
@@ -44,6 +46,7 @@
   "standing_ref_px": 275,
   "scale": 0.436,
   "baseline_spread_px": 1,
+  "warning": "",
   "height_spread_pct": 1.8,
   "palette": 48,
   "clipped_frames": []
@@ -63,5 +66,13 @@
   ],
   "scale": 0.42,
   "seam_difference": 16.0
+ },
+ "stage1_wall": {
+  "size": [
+   717,
+   372
+  ],
+  "scale": 0.7,
+  "seam_difference": 5.7
  }
 }

@@ -107,6 +107,9 @@ def mode_downsample(rgb, alpha, scale):
     its source block, or stays transparent when the block is mostly background."""
     h, w = alpha.shape
     oh, ow = max(1, round(h * scale)), max(1, round(w * scale))
+    if scale >= 1:  # enlarging (a too-small source): nearest neighbor, no new detail
+        rgba = np.dstack([rgb, alpha.astype(np.uint8) * 255])
+        return np.asarray(Image.fromarray(rgba, 'RGBA').resize((ow, oh), Image.NEAREST))
     out = np.zeros((oh, ow, 4), np.uint8)
     ys = np.linspace(0, h, oh + 1).astype(int)
     xs = np.linspace(0, w, ow + 1).astype(int)
@@ -194,6 +197,7 @@ def import_strip(path, target_h, report, all_frames):
     report[name] = {
         'frames': len(frames), 'source_heights': heights, 'standing_ref_px': int(ref), 'scale': round(scale, 3),
         'baseline_spread_px': int(max(bottoms) - min(bottoms)) if bottoms else 0,
+        'warning': 'source too small: figures must be at least %d px tall (2x the game height)' % int(target_h * 2) if ref < target_h * 2 else '',
         'height_spread_pct': round(100 * (max(heights) - min(heights)) / med, 1) if heights else 0,
     }
     all_frames[name] = frames
@@ -223,14 +227,21 @@ def import_background(path, report):
     if 'crop' in cfg:  # e.g. pillar center to pillar center, so the layer loops seamlessly
         im = im.crop(tuple(cfg['crop']))
     rgb = np.asarray(im)
+    # wall layers have magenta holes (windows) that the far layer shows through
+    alpha = np.ones(rgb.shape[:2], bool)
+    if name.endswith('_wall'):
+        alpha = erode_fringe(rgb, key_magenta(rgb))
+        rgb = despill(rgb, alpha)
     if 'scale' in cfg:
         scale = cfg['scale']
     elif name.endswith('_floor'):  # floor strips keep their aspect ratio at the game's width
         scale = GAME_W * 2 / im.width
     else:
         scale = GAME_H / im.height
-    out = mode_downsample(rgb, np.ones(rgb.shape[:2], bool), scale)
-    img = Image.fromarray(out, 'RGBA').convert('RGB')
+    out = mode_downsample(rgb, alpha, scale)
+    img = Image.fromarray(out, 'RGBA')
+    if not name.endswith('_wall'):
+        img = img.convert('RGB')
     img.save(os.path.join(OUT, name + '.png'))
     # how well does it tile horizontally? compare the left and right edge columns
     a = np.asarray(img).astype(int)

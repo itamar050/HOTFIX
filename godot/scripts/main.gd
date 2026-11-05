@@ -117,7 +117,11 @@ func _build_background() -> void:
 	_layer("res://assets/sprites/stage1_far.png", 0.35, 0.0, -20)
 	# the floor strip: feet stand about 55% of the way down its depth
 	var floor_tex: Texture2D = load("res://assets/sprites/stage1_floor.png")
-	_layer("res://assets/sprites/stage1_floor.png", 1.0, GROUND_Y - floor_tex.get_height() * 0.55, -10)
+	var floor_top := GROUND_Y - floor_tex.get_height() * 0.55
+	# the back wall: cubicles in front of big windows (transparent, the skyline shows through)
+	var wall_tex: Texture2D = load("res://assets/sprites/stage1_wall.png")
+	_layer("res://assets/sprites/stage1_wall.png", 0.75, floor_top + 6.0 - wall_tex.get_height(), -15)
+	_layer("res://assets/sprites/stage1_floor.png", 1.0, floor_top, -10)
 
 
 # ---- HUD -------------------------------------------------------------------------------

@@ -18,5 +18,15 @@
   "stage1_floor": {
     "scale": 0.42,
     "_why": "papers about shoe-sized next to a 120 px character"
+  },
+  "stage1_wall": {
+    "crop": [
+      0,
+      0,
+      1024,
+      532
+    ],
+    "scale": 0.7,
+    "_why": "desks waist-high next to a 120 px character; drop the black band below the floor line"
   }
 }

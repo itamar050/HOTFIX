@@ -12,6 +12,12 @@ straight into the Godot version. Read **How it works** once, then copy the promp
   upright and relaxed, exactly as in the character sheet). The importer measures it to get
   the scale right (a crouched fighting stance would otherwise come out too big) and then
   drops it.
+- **Big figures:** each figure at least **500 px tall** (ask for a wide 21:9 image with the
+  figures filling its height). Small figures lose detail, and below about 240 px the
+  importer flags them as too small.
+- **Idle animations are not generated.** AI idle strips redraw the whole figure every
+  frame, so they shimmer. `tools/breathe.py` builds the breathing loop from one approved
+  guard frame instead.
 - **One animation per image, at most 6 frames plus the reference,** in one horizontal row. More frames make the
   character drift (different face, colors, size).
 - **Flat magenta background (#FF00FF)** with nothing else on it. Nano Banana cannot make
@@ -125,7 +131,6 @@ crouch) are single images: put them side by side in one row.
 
 | File | Frames | Animation description |
 |------|--------|------------------------|
-| `idle` | 4 | idle fighting stance, subtle breathing |
 | `walk` | 6 | walk cycle where the legs alternate, one pose per frame: 1) right foot forward touching the ground, left arm forward; 2) weight down on the right leg; 3) left leg passing the right leg; 4) left foot forward touching the ground, right arm forward; 5) weight down on the left leg; 6) right leg passing the left leg. Frames 1 and 4 must show different legs in front. |
 | `run` | 6 | sprint cycle, leaning forward, legs alternating like the walk (frames 1-3 right leg leading, 4-6 left leg leading), arms pumping opposite to the legs |
 | `jump` | 3 | jump: takeoff crouch, rising with knees up, falling with arms out |
