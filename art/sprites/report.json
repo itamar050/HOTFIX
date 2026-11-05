@@ -34,16 +34,16 @@
  "bro_walk": {
   "frames": 6,
   "source_heights": [
-   568,
-   568,
-   567,
-   558,
-   568,
-   558
+   275,
+   271,
+   275,
+   274,
+   270,
+   274
   ],
-  "standing_ref_px": 575,
-  "scale": 0.209,
-  "baseline_spread_px": 10,
+  "standing_ref_px": 275,
+  "scale": 0.436,
+  "baseline_spread_px": 1,
   "height_spread_pct": 1.8,
   "palette": 48,
   "clipped_frames": []
