@@ -6,15 +6,17 @@
   // Attack table. Frames at 60 Hz. box = [forward offset, top (from feet, negative = up), w, h]
   // act = active frames [from, to], cancel = first frame the next chain hit may start
   const ATK = {
-    jab1: { dur: 15, act: [3, 6], cancel: 6, box: [4, -30, 18, 10], dmg: 3, kb: 1.2, stun: 18, next: 'jab2', lunge: 1, pose: ['idle0', 'jab1'], sfx: 'punch' },
-    jab2: { dur: 15, act: [3, 6], cancel: 6, box: [4, -30, 18, 10], dmg: 3, kb: 1.2, stun: 18, next: 'hook', lunge: 1, pose: ['idle0', 'jab2'], sfx: 'punch' },
-    hook: { dur: 18, act: [4, 7], cancel: 8, box: [4, -32, 20, 12], dmg: 4, kb: 1.6, stun: 22, next: 'kick', lunge: 1.5, pose: ['hookW', 'hook'], sfx: 'punch' },
-    kick: { dur: 26, act: [6, 10], box: [2, -24, 24, 12], dmg: 7, kb: 3.6, kby: -3, knock: true, stun: 30, lunge: 2, hitstop: 6, heavy: true, pose: ['kickW', 'kick'], sfx: 'heavy' },
+    jab1: { dur: 15, act: [3, 6], cancel: 6, box: [4, -30, 19, 26], dmg: 3, kb: 1.2, stun: 18, next: 'jab2', lunge: 1, pose: ['idle0', 'jab1'], sfx: 'punch' },
+    jab2: { dur: 15, act: [3, 6], cancel: 6, box: [4, -30, 19, 26], dmg: 3, kb: 1.2, stun: 18, next: 'hook', lunge: 1, pose: ['idle0', 'jab2'], sfx: 'punch' },
+    hook: { dur: 18, act: [4, 7], cancel: 8, box: [4, -32, 21, 28], dmg: 4, kb: 1.6, stun: 22, next: 'kick', lunge: 1.5, pose: ['hookW', 'hook'], sfx: 'punch' },
+    kick: { dur: 26, act: [6, 10], box: [2, -24, 25, 24], dmg: 7, kb: 3.6, kby: -3, knock: true, stun: 30, lunge: 2, hitstop: 6, heavy: true, pose: ['kickW', 'kick'], sfx: 'heavy' },
     upper: { dur: 26, act: [4, 11], box: [0, -48, 18, 34], dmg: 7, kb: 1, kby: -7, knock: true, breakGuard: true, stun: 30, lunge: 1, hitstop: 6, heavy: true, pose: ['upW', 'up'], sfx: 'heavy' },
     air: { dur: 32, act: [3, 28], box: [2, -22, 20, 14], dmg: 6, kb: 3, kby: -2, knock: true, stun: 26, air: true, pose: ['jump', 'air'], sfx: 'heavy' },
     dive: { dur: 60, act: [2, 60], box: [0, -14, 18, 16], dmg: 7, kb: 2.5, kby: -2.5, knock: true, breakGuard: true, stun: 26, air: true, pose: ['dive', 'dive'], sfx: 'heavy' },
     // ducking attacks: they keep you low (under high shots and lasers)
-    cjab: { dur: 13, act: [2, 5], cancel: 5, box: [2, -12, 22, 12], dmg: 3, kb: 1, stun: 18, next: 'sweep', low: true, pose: ['crouch', 'cjab'], sfx: 'punch' },
+    // ground-level low kick: fast, long reach, and its active frames last long enough to
+    // catch a blob that is landing from a hop
+    cjab: { dur: 16, act: [2, 9], cancel: 7, box: [0, -14, 30, 14], dmg: 4, kb: 1.5, stun: 22, next: 'sweep', low: true, pose: ['crouch', 'lowkick'], sfx: 'punch' },
     sweep: { dur: 26, act: [4, 10], box: [0, -9, 26, 9], dmg: 6, kb: 1.5, kby: -2.5, knock: true, breakGuard: true, stun: 30, low: true, hitstop: 5, heavy: true, pose: ['crouch', 'sweep'], sfx: 'heavy' },
     dashAtk: { dur: 28, act: [2, 16], box: [0, -32, 22, 26], dmg: 8, kb: 4.2, kby: -3, knock: true, stun: 30, hitstop: 5, heavy: true, pose: ['dashAtk', 'dashAtk'], sfx: 'heavy' },
   };

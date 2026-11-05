@@ -50,7 +50,7 @@
       }
       if (this.y > w.level.h + 64) { this.dead = true; if (this.hp > 0) w.onEnemyGone(this); }
       // contact damage
-      if (this.contact && !this.dying && this.state !== 'hurt' && this.state !== 'downAir' && this.state !== 'held' && this.state !== 'thrown') {
+      if (this.contact && !(this.contactAir && this.onGround) && !this.dying && this.state !== 'hurt' && this.state !== 'downAir' && this.state !== 'held' && this.state !== 'thrown') {
         const p = w.player, hb = this.hurtbox();
         if (hb && U.overlap(hb, p.hurtbox())) p.takeHit({ dmg: this.contact, kb: 2, dir: Math.sign(p.x - this.x) || 1, from: this }, w);
       }
@@ -229,8 +229,8 @@
   // ---- VIRUS BLOB: hopping contact damage, splits in two ------------------------------------
   class Blob extends Enemy {
     constructor(x, y, mini) {
-      super(x, y, { hp: mini ? 4 : 9, name: mini ? 'MINI VIRUS' : 'VIRUS BLOB', score: mini ? 50 : 120, w: mini ? 10 : 18, h: mini ? 10 : 16, grabbable: false, kbMul: 1.2 });
-      this.mini = mini; this.contact = mini ? 4 : 6; this.hopT = U.randi(20, 60); this.squash = 0;
+      super(x, y, { hp: mini ? 4 : 9, name: mini ? 'MINI VIRUS' : 'VIRUS BLOB', score: mini ? 50 : 120, w: mini ? 14 : 22, h: mini ? 12 : 18, grabbable: false, kbMul: 1.2 });
+      this.mini = mini; this.contact = mini ? 4 : 6; this.contactAir = true; this.hopT = U.randi(20, 60); this.squash = 0;
       this.debris = [G.C.green, G.C.greenD, G.C.lime]; this.bitColor = G.C.lime;
     }
     ai(w) {
@@ -241,10 +241,10 @@
         if (--this.hopT <= 0 && w.player.state !== 'dead') {
           this.face = Math.sign(d) || this.face;
           if (!this.ledge(w, this.face) || Math.abs(d) < 40) {
-            this.vx = this.face * (this.mini ? 1.8 : 1.5) * U.rand(0.8, 1.2);
-            this.vy = this.mini ? -3.8 : -4.6; this.onGround = false;
+            this.vx = this.face * (this.mini ? 1.5 : 1.3) * U.rand(0.8, 1.2);
+            this.vy = this.mini ? -3 : -3.4; this.onGround = false;
           }
-          this.hopT = U.randi(this.mini ? 25 : 40, this.mini ? 45 : 75);
+          this.hopT = U.randi(this.mini ? 50 : 65, this.mini ? 80 : 100);
         }
       }
       if (this.justLanded) this.squash = 6;

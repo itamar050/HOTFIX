@@ -504,6 +504,7 @@
     special1: { lean: -8, dy: -2, bl: [-20, -10], fl: [25, 10], ba: [-140, -160], fa: [140, 160], face: 'shout' },
     win: { lean: -4, bl: [-8, -4], fl: [10, 4], ba: [20, 150], fa: [170, 180], face: 'shout' },
     cjab: { lean: 20, bl: [40, -40], fl: [75, -10], ba: [40, 150], fa: [82, 86], face: 'shout' },
+    lowkick: { lean: 10, bl: [55, -55], fl: [84, 90], ba: [40, 150], fa: [50, 160], face: 'shout' },
     sweep: { lean: 14, bl: [72, -72], fl: [88, 92], ba: [-50, -20], fa: [40, 150], face: 'shout' },
     // enemy-flavored poses
     windup: { lean: -12, bl: [-14, -6], fl: [18, 6], ba: [30, 150], fa: [-70, -30] },

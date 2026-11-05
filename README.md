@@ -75,8 +75,8 @@ Useful URL parameters:
 | Dash            | Shift, V                    | B, RB        |
 | Pause           | Enter, Esc, P               | Start        |
 
-Moves: attack x4 is the chain (it only continues when a hit lands). Down + attack ducks and
-strikes low (a second hit is a sweep that trips; ducking also dodges high shots). Up + attack is the
+Moves: attack x4 is the chain (it only continues when a hit lands). Down + attack is a
+ground-level low kick (a second hit is a sweep that trips; it also ducks under high shots). Up + attack is the
 uppercut (jump-cancel it to juggle). In the air: attack is a flying kick, down + attack is a
 dive kick that bounces off what it hits. Attack while dashing or sprinting is a dash strike.
 Land on enemies to stomp them. Walk into an enemy to grab it (shielded Firewalls only when

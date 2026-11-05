@@ -218,7 +218,7 @@
         ['MOVE', 'ARROWS / WASD'], ['JUMP', 'Z / SPACE / K'], ['ATTACK', 'X / J'], ['HOTFIX SPECIAL', 'C / L'],
         ['DASH', 'SHIFT / V'], ['PAUSE', 'ENTER / ESC / P'], ['', ''],
         ['COMBO', 'ATTACK x4 (CHAINS ON HIT)'], ['UPPERCUT', 'UP + ATTACK'], ['DIVE KICK', 'DOWN + ATTACK IN AIR'],
-        ['DASH STRIKE', 'ATTACK WHILE DASHING'], ['DUCK + STRIKE', 'DOWN + ATTACK (x2 = SWEEP)'], ['GRAB', 'WALK INTO AN ENEMY'], ['  KNEE / THROW', 'ATTACK / BACK+ATTACK'],
+        ['DASH STRIKE', 'ATTACK WHILE DASHING'], ['LOW KICK', 'DOWN + ATTACK (x2 = SWEEP)'], ['GRAB', 'WALK INTO AN ENEMY'], ['  KNEE / THROW', 'ATTACK / BACK+ATTACK'],
         ['DROP DOWN', 'DOWN + JUMP ON PLATFORMS'], ['GAMEPAD', 'A JUMP X ATK Y SPC B DASH'],
       ];
       rows.forEach(([a, b], i) => { F.draw(ctx, a, 24, 42 + i * 11, C.cyan); F.draw(ctx, b, 124, 42 + i * 11, C.white); });

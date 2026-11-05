@@ -1,7 +1,7 @@
 {
   "name": "hotfix",
   "productName": "HOTFIX",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "HOTFIX! Nexus Meltdown - a 16-bit style beat 'em up / platformer",
   "main": "desktop/main.js",
   "private": true,
