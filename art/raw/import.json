@@ -28,5 +28,17 @@
     ],
     "scale": 0.7,
     "_why": "desks waist-high next to a 120 px character; drop the black band below the floor line"
+  },
+  "bro_run": {
+    "drop": [
+      8
+    ],
+    "_why": "the last figure is a stopping pose, not running"
+  },
+  "bro_knockdown": {
+    "drop": [
+      0
+    ],
+    "_why": "a stray standing pose before the knockdown starts"
   }
 }

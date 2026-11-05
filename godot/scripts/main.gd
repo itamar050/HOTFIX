@@ -51,10 +51,10 @@ func _ready() -> void:
 func _setup_input() -> void:
 	var keys := {
 		"left": [KEY_LEFT, KEY_A], "right": [KEY_RIGHT, KEY_D], "up": [KEY_UP, KEY_W], "down": [KEY_DOWN, KEY_S],
-		"jump": [KEY_Z, KEY_SPACE, KEY_K], "attack": [KEY_X, KEY_J], "debug": [KEY_F2],
+		"jump": [KEY_Z, KEY_SPACE, KEY_K], "attack": [KEY_X, KEY_J], "run": [KEY_SHIFT, KEY_V], "debug": [KEY_F2],
 	}
 	var pad := {"left": JOY_BUTTON_DPAD_LEFT, "right": JOY_BUTTON_DPAD_RIGHT, "up": JOY_BUTTON_DPAD_UP,
-		"down": JOY_BUTTON_DPAD_DOWN, "jump": JOY_BUTTON_A, "attack": JOY_BUTTON_X}
+		"down": JOY_BUTTON_DPAD_DOWN, "jump": JOY_BUTTON_A, "attack": JOY_BUTTON_X, "run": JOY_BUTTON_RIGHT_SHOULDER}
 	for action in keys:
 		if not InputMap.has_action(action):
 			InputMap.add_action(action, 0.4)
@@ -90,11 +90,13 @@ func _demo(action: String, edge: bool) -> bool:
 	var t := tick
 	match action:
 		"right":
-			return (t > 20 and t < 110) or (t > 300 and t < 330)
+			return (t > 20 and t < 75) or (t > 330 and t < 360)
+		"run":
+			return t > 20 and t < 60
 		"attack":
-			return edge and t > 120 and t < 290 and t % 14 == 0
+			return edge and t > 90 and t < 300 and t % 10 == 0
 		"jump":
-			return edge and (t == 340)
+			return edge and (t == 365)
 	return false
 
 
@@ -160,7 +162,7 @@ func _build_hud() -> void:
 	_label("GLITCH CLONE", 512, 4, hud, 10, Color(0.8, 0.6, 1))
 	clone_bar = _bar(512, 20, 120, Color(1, 0.55, 0.12), hud)
 	ko_label = _label("KOs 0", 300, 4, hud, 10)
-	_label("TEST BUILD  -  ARROWS/WASD MOVE   Z JUMP   X PUNCH   F2 HITBOXES", 8, 344, hud, 8, Color(0.75, 0.78, 0.9))
+	_label("TEST BUILD  -  ARROWS/WASD MOVE   SHIFT RUN   Z JUMP   X ATTACK (x4 COMBO)   F2 HITBOXES", 8, 344, hud, 8, Color(0.75, 0.78, 0.9))
 
 
 # ---- game loop -------------------------------------------------------------------------
@@ -182,7 +184,9 @@ func _physics_process(_delta: float) -> void:
 	hp_bar.size.x = 120.0 * player.hp / player.max_hp
 	clone_bar.size.x = 120.0 * clone.hp / clone.max_hp
 	ko_label.text = "KOs %d" % kos
-	if demo and tick == 380:
+	if demo and tick % 10 == 0:
+		print("demo t=%d bro=%s/%s clone=%s hp=%d" % [tick, player.state, player.anim, clone.state, clone.hp])
+	if demo and tick == 420:
 		get_tree().quit()
 
 

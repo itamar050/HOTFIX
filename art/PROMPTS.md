@@ -12,9 +12,13 @@ straight into the Godot version. Read **How it works** once, then copy the promp
   upright and relaxed, exactly as in the character sheet). The importer measures it to get
   the scale right (a crouched fighting stance would otherwise come out too big) and then
   drops it.
-- **Big figures:** each figure at least **500 px tall** (ask for a wide 21:9 image with the
-  figures filling its height). Small figures lose detail, and below about 240 px the
-  importer flags them as too small.
+- **Big figures, few per image:** Nano Banana makes images about 1024 px wide, so the
+  more figures in a row, the smaller each gets. Put **at most 4 figures per image** (the
+  reference plus 3 frames) and ask for a **16:9 image** with the figures filling its
+  height: that gives about 500 px per figure. For longer animations, split the frames over
+  several images named `_a`, `_b`, `_c` (e.g. `bro_run_a.png` = reference + frames 1-3,
+  `bro_run_b.png` = reference + frames 4-6); the importer joins them in order. Below about
+  240 px per figure the importer flags the strip as too small.
 - **Idle animations are not generated.** AI idle strips redraw the whole figure every
   frame, so they shimmer. `tools/breathe.py` builds the breathing loop from one approved
   guard frame instead.

@@ -1,4 +1,67 @@
 {
+ "bro_hook": {
+  "frames": 4,
+  "source_heights": [
+   223,
+   225,
+   241,
+   233
+  ],
+  "standing_ref_px": 241,
+  "scale": 0.498,
+  "baseline_spread_px": 3,
+  "warning": "",
+  "height_spread_pct": 7.7,
+  "palette": 48,
+  "clipped_frames": []
+ },
+ "bro_hurt": {
+  "frames": 2,
+  "source_heights": [
+   246,
+   209
+  ],
+  "standing_ref_px": 239,
+  "scale": 0.502,
+  "baseline_spread_px": 2,
+  "warning": "source too small: figures must be at least 240 px tall (2x the game height)",
+  "height_spread_pct": 15.5,
+  "palette": 48,
+  "clipped_frames": []
+ },
+ "bro_kick": {
+  "frames": 3,
+  "source_heights": [
+   238,
+   236,
+   226
+  ],
+  "standing_ref_px": 242,
+  "scale": 0.496,
+  "baseline_spread_px": 2,
+  "warning": "",
+  "height_spread_pct": 5.1,
+  "palette": 48,
+  "clipped_frames": []
+ },
+ "bro_knockdown": {
+  "frames": 6,
+  "source_heights": [
+   86,
+   64,
+   113,
+   116,
+   113,
+   119
+  ],
+  "standing_ref_px": 117,
+  "scale": 1.026,
+  "baseline_spread_px": 22,
+  "warning": "source too small: figures must be at least 240 px tall (2x the game height)",
+  "height_spread_pct": 48.0,
+  "palette": 48,
+  "clipped_frames": []
+ },
  "bro_punch": {
   "frames": 6,
   "source_heights": [
@@ -14,6 +77,26 @@
   "baseline_spread_px": 7,
   "warning": "",
   "height_spread_pct": 3.1,
+  "palette": 48,
+  "clipped_frames": []
+ },
+ "bro_run": {
+  "frames": 8,
+  "source_heights": [
+   114,
+   99,
+   106,
+   114,
+   113,
+   107,
+   113,
+   106
+  ],
+  "standing_ref_px": 118,
+  "scale": 1.017,
+  "baseline_spread_px": 15,
+  "warning": "source too small: figures must be at least 240 px tall (2x the game height)",
+  "height_spread_pct": 13.4,
   "palette": 48,
   "clipped_frames": []
  },

@@ -158,7 +158,9 @@ def outline_fix(f):
 def anchor(f):
     """Feet anchor: x = center of the opaque pixels in the bottom 30% (the legs), y = bottom."""
     a = f[..., 3] > 0
-    h = a.shape[0]
+    h, w = a.shape
+    if w > h * 1.1:  # lying down or flying sideways: center the body itself
+        return w / 2, h
     low = a[int(h * 0.7):]
     ys, xs = np.nonzero(low)
     ax = xs.mean() if len(xs) else a.shape[1] / 2
@@ -190,6 +192,9 @@ def import_strip(path, target_h, report, all_frames):
     else:
         ref = med
     scale = target_h / ref
+    drop = set(cfg.get('drop', []))
+    boxes = [b for i, b in enumerate(boxes) if i not in drop]
+    heights = [h for i, h in enumerate(heights) if i not in drop]
     frames = []
     for x0, x1, y0, y1, m in boxes:
         frames.append(mode_downsample(rgb[y0:y1, x0:x1], m[y0:y1, x0:x1], scale))
@@ -204,16 +209,22 @@ def import_strip(path, target_h, report, all_frames):
 
 
 def write_strip(name, frames):
-    cells = Image.new('RGBA', (CELL_W * len(frames), CELL_H), (0, 0, 0, 0))
-    meta = {'frames': len(frames), 'cell': [CELL_W, CELL_H], 'anchor': [CELL_W // 2, CELL_H - 4], 'clipped': []}
+    # cells are at least CELL_W wide, wider (in steps of 32) when a pose needs it
+    need = CELL_W
+    for f in frames:
+        ax, _ = anchor(f)
+        need = max(need, int(2 * max(ax, f.shape[1] - ax)) + 8)
+    cw = ((need + 31) // 32) * 32
+    cells = Image.new('RGBA', (cw * len(frames), CELL_H), (0, 0, 0, 0))
+    meta = {'frames': len(frames), 'cell': [cw, CELL_H], 'anchor': [cw // 2, CELL_H - 4], 'clipped': []}
     for i, f in enumerate(frames):
         ax, ay = anchor(f)
-        ox = int(round(CELL_W / 2 - ax)) + i * CELL_W
+        ox = int(round(cw / 2 - ax)) + i * cw
         oy = int((CELL_H - 4) - ay)
-        if ox < i * CELL_W or ox + f.shape[1] > (i + 1) * CELL_W or oy < 0:
+        if ox < i * cw or ox + f.shape[1] > (i + 1) * cw or oy < 0:
             meta['clipped'].append(i)
-        cells.alpha_composite(Image.fromarray(f, 'RGBA'), (max(i * CELL_W, ox), max(0, oy)),
-                              (max(0, i * CELL_W - ox), max(0, -oy)))
+        cells.alpha_composite(Image.fromarray(f, 'RGBA'), (max(i * cw, ox), max(0, oy)),
+                              (max(0, i * cw - ox), max(0, -oy)))
     cells.save(os.path.join(OUT, name + '.png'))
     with open(os.path.join(OUT, name + '.json'), 'w') as fh:
         json.dump(meta, fh)
@@ -270,6 +281,18 @@ def main():
             import_background(path, report)
         else:
             import_strip(path, args.height, report, chars)
+    # multi-part strips (bro_run_a, bro_run_b, ...): join them in order into one animation
+    import re as _re
+    for part in sorted([n for n in chars if _re.search(r'_[a-z]$', n)]):
+        base = part[:-2]
+        chars.setdefault(base, [])
+        chars[base] += chars.pop(part)
+        rep = report.pop(part)
+        r = report.setdefault(base, dict(rep, frames=0, parts=[]))
+        r['frames'] += rep['frames']
+        r['parts'].append(part)
+        if rep.get('warning'):
+            r['warning'] = rep['warning']
     # one palette per character
     by_char = {}
     for name, frames in chars.items():
