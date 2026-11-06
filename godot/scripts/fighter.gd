@@ -8,7 +8,7 @@ const STRIPS := ["bro_sheet", "bro_idle", "bro_walk", "bro_run", "bro_punch", "b
 ## Animations: [strip, frame, ticks] steps; an attack's active step is marked "hit".
 const ANIMS := {
 	"idle": [["bro_idle", 0, 18], ["bro_idle", 1, 12], ["bro_idle", 2, 22], ["bro_idle", 3, 12]],
-	"walk": [["bro_walk", 0, 7], ["bro_walk", 1, 7], ["bro_walk", 2, 7], ["bro_walk", 3, 7], ["bro_walk", 4, 7], ["bro_walk", 5, 7]],
+	"walk": [["bro_walk", 0, 6], ["bro_walk", 1, 6], ["bro_walk", 2, 6], ["bro_walk", 3, 6], ["bro_walk", 4, 6], ["bro_walk", 5, 6], ["bro_walk", 6, 6], ["bro_walk", 7, 6]],
 	"run": [["bro_run", 0, 4], ["bro_run", 1, 4], ["bro_run", 2, 4], ["bro_run", 3, 4], ["bro_run", 4, 4], ["bro_run", 5, 4], ["bro_run", 6, 4], ["bro_run", 7, 4]],
 	"jump": [["bro_run", 2, 999]],
 	"jab_a": [["bro_punch", 0, 2], ["bro_punch", 1, 7, "hit"], ["bro_punch", 2, 6]],
