@@ -64,3 +64,19 @@ attached. Images cap at ~1024 px wide. The user finds the process slow and tedio
 ## Working with the user
 Wants honest assessments (say when art or results are bad), concise answers, playable
 test builds to judge, and screenshots/mock-ups before claiming visual results.
+
+## 3D -> pixel art route (Dead Cells style; chosen next step for character animation)
+Blender is used through the user's local Blender MCP, so this work runs in a Claude session
+on the user's computer (cloud sessions cannot reach it; download.blender.org is allowed in
+the "HOTFIX game dev" cloud environment, but installing Blender there needs explicit OK).
+Per character: model from the approved character sheet (image-to-3D or Blender MCP), rig
+and animate (Mixamo auto-rig + its walk/run/idle/punch/kick/hit/knockdown clips, or
+Blender), then render each clip: orthographic camera, pure side view facing +x (right),
+toon/flat shading + dark outline (Freestyle or inverted hull), no anti-aliasing, flat
+magenta #FF00FF background (or transparent PNG), character ~480 px tall (4x the game's
+120), same camera and scale for every clip, one PNG strip per clip in time order (or one
+PNG per frame), first figure a standing reference. Save as art/raw/<char>_<anim>.png and
+run tools/import_art.py; copy results to godot/assets/sprites/ and update ANIMS in
+godot/scripts/fighter.gd. Start with a Code Bro pilot: walk, run, idle, one punch.
+Meanwhile game work (enemies, stage 1 end to end, a boss, sound) continues in Godot with
+the current sprites as placeholders; art drops into the same slots later.
