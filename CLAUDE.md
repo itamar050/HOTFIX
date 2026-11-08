@@ -1,5 +1,11 @@
 # Notes for Claude: HOTFIX! Nexus Meltdown
 
+**Current direction (Nov 2026): 8-bit (Shovel Knight style) platformer + arena fights, art drawn
+in code. Read `docs/DESIGN.md` (story: climb the corporate ladder, bosses Team Leader ->
+Group Leader -> Director -> VP -> CEO; enemies bugs, JIRA tickets, PMs; cash + upgrades) and
+`tools/pixel8/README.md`. The user liked the v2 walk/jump; the 16-bit Godot slice and the
+Gemini/3D art notes below are superseded (kept for reference).**
+
 A 16-bit beat 'em up / platformer (Streets of Rage 2 look). Owner: itamar050. Work on `main`.
 Separate projects always get their own repo (never `itamar050/frost`, which is firmware).
 
