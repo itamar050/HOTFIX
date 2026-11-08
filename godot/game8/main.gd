@@ -1,5 +1,5 @@
 ## HOTFIX! 8-bit stage 1: Nexus HQ dev floor at night. Platforming, an arena, the Team
-## Leader boss, cash pickups and the vending machine upgrade shop. Built in code.
+## Leader boss, cash, weapon pickups, a pause menu and the skill tree (Tab). Built in code.
 extends Node2D
 
 const F8 = preload("res://game8/font8.gd")
@@ -34,15 +34,19 @@ const ARENA := {"x0": 880.0, "waves": [
 	[["pm", 1075, 150], ["jira", 890, 100], ["bug", 1270, 208], ["bug", 900, 208]],
 ]}
 const BOSS_X0 := 2440.0
-const SHOP := [
-	["coffee", "COFFEE", "+2 MAX HEALTH", 60, 3],
-	["keyboard", "MECH KEYBOARD", "+1 PUNCH POWER", 80, 2],
-	["sneakers", "NEW SNEAKERS", "DOUBLE JUMP", 100, 1],
-	["magnet", "CASH MAGNET", "PULLS IN COINS", 50, 1],
+## Skill tree: 4 branches x 3 tiers, each tier needs the one above it. [id, name, effect, price]
+const SKILLS := [
+	[["coffee1", "COFFEE", "+2 MAX HEALTH", 40], ["coffee2", "DOUBLE SHOT", "+2 MAX HEALTH", 80], ["energy", "ENERGY DRINK", "HEAL 1 EVERY 15 SEC", 150]],
+	[["kb1", "MECH KEYBOARD", "+1 PUNCH POWER", 50], ["kb2", "RGB KEYBOARD", "+1 PUNCH POWER", 100], ["ragequit", "RAGE QUIT", "HOLD X, RELEASE: BIG PUNCH", 150]],
+	[["sneakers", "SNEAKERS", "RUN 25% FASTER", 40], ["dash", "SPRINT DASH", "C: DASH, DODGES HITS", 90], ["triple", "JETPACK", "TRIPLE JUMP", 140]],
+	[["magnet", "CASH MAGNET", "PULLS IN COINS", 50], ["bounty", "BUG BOUNTY", "+50% CASH DROPS", 100], ["parachute", "GOLDEN PARACHUTE", "SURVIVE 1 FATAL HIT", 150]],
 ]
+const BRANCHES := ["HEALTH", "POWER", "MOBILITY", "LOOT"]
+## weapon pickups: [type, x, y]
+const ITEMS := [["keyboard", 150, 180], ["ooo", 560, 140], ["keyboard", 1000, 208], ["ooo", 1545, 104], ["keyboard", 2075, 160], ["ooo", 2250, 208]]
 
 var tick := 0
-var mode := "title"  ## title, play, clear, shop, over
+var mode := "title"  ## title, play, clear, skills, pause, over
 var mode_t := 0
 var demo := false
 var player
@@ -64,8 +68,16 @@ var boss_state := 0  ## 0 before, 1 fight, 2 beaten
 var go_t := 0
 var cash := 0
 var shown_cash := 0
-var upgrades := {"coffee": 0, "keyboard": 0, "sneakers": 0, "magnet": 0}
-var shop_sel := 0
+var skills := {}
+var parachute_used := false
+var items: Array = []
+var ooos: Array = []
+var sk_col := 0
+var sk_row := 0
+var skills_end := false  ## the skill tree after the boss has a NEXT SHIFT button
+var pause_sel := 0
+var back_mode := "play"
+var item_tex := {}
 var shake := 0.0
 var hitstop := 0
 var cam: Camera2D
@@ -92,6 +104,7 @@ func _ready() -> void:
 	coin_tex = load("res://game8/art/coin.png")
 	note_tex = load("res://game8/art/note.png")
 	vending_tex = load("res://game8/art/prop_vending.png")
+	item_tex = {"keyboard": load("res://game8/art/prop_keyboard.png"), "ooo": load("res://game8/art/prop_ooo.png")}
 	_build_background()
 	world = Node2D.new()
 	add_child(world)
@@ -128,10 +141,12 @@ func _ready() -> void:
 func _setup_input() -> void:
 	var keys := {
 		"left": [KEY_LEFT, KEY_A], "right": [KEY_RIGHT, KEY_D], "up": [KEY_UP, KEY_W], "down": [KEY_DOWN, KEY_S],
-		"jump": [KEY_Z, KEY_SPACE, KEY_K], "punch": [KEY_X, KEY_J], "start": [KEY_ENTER, KEY_KP_ENTER, KEY_ESCAPE],
+		"jump": [KEY_Z, KEY_SPACE, KEY_K], "punch": [KEY_X, KEY_J], "start": [KEY_ENTER, KEY_KP_ENTER],
+		"dash": [KEY_C, KEY_L, KEY_SHIFT], "pause": [KEY_ESCAPE, KEY_P], "skills": [KEY_TAB, KEY_I],
 	}
 	var pads := {"left": [JOY_BUTTON_DPAD_LEFT], "right": [JOY_BUTTON_DPAD_RIGHT], "up": [JOY_BUTTON_DPAD_UP],
-		"down": [JOY_BUTTON_DPAD_DOWN], "jump": [JOY_BUTTON_A], "punch": [JOY_BUTTON_X, JOY_BUTTON_B], "start": [JOY_BUTTON_START]}
+		"down": [JOY_BUTTON_DPAD_DOWN], "jump": [JOY_BUTTON_A], "punch": [JOY_BUTTON_X, JOY_BUTTON_B], "start": [JOY_BUTTON_START],
+		"dash": [JOY_BUTTON_RIGHT_SHOULDER, JOY_BUTTON_LEFT_SHOULDER], "pause": [JOY_BUTTON_START], "skills": [JOY_BUTTON_BACK, JOY_BUTTON_Y]}
 	for a in keys:
 		if not InputMap.has_action(a):
 			InputMap.add_action(a, 0.4)
@@ -152,7 +167,7 @@ func _setup_input() -> void:
 
 func _read_input() -> void:
 	_prev = _held.duplicate()
-	for a in ["left", "right", "up", "down", "jump", "punch", "start"]:
+	for a in ["left", "right", "up", "down", "jump", "punch", "start", "dash", "pause", "skills"]:
 		_held[a] = _auto.get(a, false) if demo else Input.is_action_pressed(a)
 
 
@@ -267,11 +282,16 @@ func _build_stage() -> void:
 		for e in enemies:
 			e.queue_free()
 		enemies = []
-	player.max_hp = 8 + 2 * upgrades["coffee"]
+	player.max_hp = max_hp()
 	player.hp = player.max_hp
 	world.add_child(player)
 	for e in ENEMIES:
 		_spawn(e[0], Vector2(e[1], e[2]))
+	items = []
+	ooos = []
+	parachute_used = false
+	for it in ITEMS:
+		add_item(it[0], Vector2(it[1], it[2]))
 	for c in COINS:
 		coins.append({"p": Vector2(c[0], c[1]), "v": Vector2.ZERO, "t": randi() % 40, "rest": true, "life": -1})
 	cam_x = 200
@@ -334,8 +354,16 @@ func _physics_process(_d: float) -> void:
 				hitstop -= 1
 			else:
 				_play_step()
-		"shop":
-			_shop_step()
+			if mode == "play" and player.state != "dead":
+				if pressed("pause") and not pressed("start"):
+					_open("pause")
+				elif pressed("skills"):
+					skills_end = false
+					_open("skills")
+		"skills":
+			_skills_step()
+		"pause":
+			_pause_step()
 		"over":
 			if mode_t > 60 and (pressed("start") or pressed("jump") or pressed("punch")):
 				cash = cash / 2
@@ -359,7 +387,7 @@ func _physics_process(_d: float) -> void:
 			if absf(e.position.x - player.position.x) < 300:
 				lst.append("%s@%d,%d hp%d st=%s" % [e.kind, e.position.x, e.position.y, e.hp, e.st])
 		print("  near: ", ", ".join(lst))
-	if demo and (tick >= 9000 or (mode == "shop" and mode_t > 120)):
+	if demo and (tick >= 9000 or (mode == "skills" and skills_end and mode_t > 200)):
 		print("demo end mode=%s cash=%d" % [mode, cash])
 		get_tree().quit()
 
@@ -375,6 +403,7 @@ func _play_step() -> void:
 			e.queue_free()
 	_step_notes()
 	_step_coins()
+	_step_items()
 	_step_arena()
 	if go_t > 0:
 		go_t -= 1
@@ -386,9 +415,8 @@ func _play_step() -> void:
 			sfx("heal")
 			say(hv + Vector2(-10, -16), "+COFFEE")
 	if mode == "clear" and mode_t > 240:
-		mode = "shop"
-		mode_t = 0
-		shop_sel = 0
+		skills_end = true
+		_open("skills")
 		_music("title")
 	if player.state == "dead" and player.st_t > 90 and mode == "play":
 		mode = "over"
@@ -525,7 +553,7 @@ func drop_coins(at: Vector2, n: int) -> void:
 
 func _step_coins() -> void:
 	var pc: Vector2 = player.position + Vector2(0, -14)
-	var magnet: bool = upgrades["magnet"] > 0
+	var magnet: bool = has("magnet")
 	for c in coins.duplicate():
 		c["t"] += 1
 		if c["life"] > 0:
@@ -607,6 +635,23 @@ func _draw_fx() -> void:
 		fx.draw_rect(Rect2(hv.x - 3, y + 1, 6, 6), Color8(240, 240, 240))
 		fx.draw_rect(Rect2(hv.x - 2, y + 2, 4, 2), Color8(120, 72, 40))
 		fx.draw_rect(Rect2(hv.x + 3, y + 3, 2, 3), Color8(14, 10, 24))
+	for it in items:
+		var tex: Texture2D = item_tex[it["type"]]
+		var ip: Vector2 = it["p"]
+		var bob := -3 - ((int(it["t"]) / 15) % 2)
+		fx.draw_texture(tex, (ip + Vector2(-tex.get_width() / 2.0, -tex.get_height() + bob)).round())
+		if (int(it["t"]) / 20) % 3 == 0:
+			fx.draw_rect(Rect2(ip + Vector2(tex.get_width() / 2.0, -tex.get_height() + bob - 2), Vector2(1, 1)), Color.WHITE)
+	if player.weapon != "" and player.state != "dead" and player.spr.visible:
+		var wt: Texture2D = item_tex[player.weapon]
+		var pp: Vector2 = player.position
+		var f: int = player.face
+		var swing: bool = player.state == "punch" and player.st_t >= 3 and player.st_t < 9
+		var hp_: Vector2 = pp + Vector2(f * (14 if swing else 6), -22 if swing else -16)
+		fx.draw_texture(wt, (hp_ - Vector2(wt.get_width() / 2.0, wt.get_height() / 2.0)).round())
+	for o in ooos:
+		var tex: Texture2D = item_tex["ooo"]
+		fx.draw_texture(tex, ((o["p"] as Vector2) - Vector2(7, 4)).round())
 	for n in notes:
 		var p: Vector2 = (n["p"] as Vector2).round()
 		fx.draw_texture_rect_region(note_tex, Rect2(p - Vector2(3, 3), Vector2(7, 7)), Rect2((tick / 4) % 2 * 7, 0, 7, 7))
@@ -631,6 +676,9 @@ func _draw_fx() -> void:
 		fx.draw_rect(Rect2(x - 5, FLOOR_Y - hh, 10, hh), Color8(14, 10, 24))
 		fx.draw_rect(Rect2(x - 4, FLOOR_Y - hh + 1, 8, hh - 1), Color8(250, 210, 90))
 		fx.draw_rect(Rect2(x - 2, FLOOR_Y - hh + 2, 4, hh - 2), Color8(255, 250, 220))
+	for e in enemies:
+		if e.frozen > 0 and (tick / 20) % 2 == 0:
+			F8.text(fx, e.position + Vector2(-6, -e.h - 8), "OOO", Color8(200, 170, 255))
 	for p_ in pops.duplicate():
 		var k: int = p_["t"]
 		p_["t"] = k + 1
@@ -678,8 +726,8 @@ func _draw_hud() -> void:
 		F8.centered(hud, 200, 116, "CLIMB THE CORPORATE LADDER. CLOSE THE TICKETS. RETIRE RICH.", white)
 		if (tick / 30) % 2 == 0:
 			F8.centered(hud, 200, 150, "PRESS ENTER", gold, 2)
-		F8.centered(hud, 200, 190, "ARROWS/WASD MOVE   Z/SPACE JUMP   X PUNCH", white)
-		F8.centered(hud, 200, 200, "GAMEPAD WORKS TOO", Color8(160, 160, 190))
+		F8.centered(hud, 200, 186, "ARROWS/WASD MOVE   Z/SPACE JUMP (TWICE = DOUBLE JUMP)   X PUNCH", white)
+		F8.centered(hud, 200, 196, "TAB SKILL TREE   ESC PAUSE   GAMEPAD WORKS TOO", Color8(160, 160, 190))
 		F8.centered(hud, 200, 226, "8-BIT TEST BUILD", Color8(120, 110, 160))
 		return
 	hud.draw_rect(Rect2(0, 0, 400, 16), K)
@@ -690,6 +738,10 @@ func _draw_hud() -> void:
 	F8.text(hud, Vector2(px, 9), "$%04d" % shown_cash, gold, 1, false)
 	F8.text(hud, Vector2(px + 44, 2), "STAGE 1", white, 1, false)
 	F8.text(hud, Vector2(px + 44, 9), "NEXUS HQ", Color8(160, 200, 252), 1, false)
+	if player.weapon != "":
+		var wt: Texture2D = item_tex[player.weapon]
+		hud.draw_texture(wt, Vector2(px + 84, 4))
+		F8.text(hud, Vector2(px + 84 + wt.get_width() + 3, 5), "X%d" % player.w_uses, white, 1, false)
 	if boss_state == 1 and boss:
 		F8.text(hud, Vector2(322, 2), "-TEAM LEAD-", white, 1, false)
 		var full := int(ceil(boss.hp * 8.0 / boss.max_hp))
@@ -714,58 +766,200 @@ func _draw_hud() -> void:
 			F8.centered(hud, 200, 130, "YOU LOSE HALF YOUR CASH.", white)
 			if mode_t > 60 and (tick / 30) % 2 == 0:
 				F8.centered(hud, 200, 150, "PRESS ENTER TO TRY AGAIN", gold)
-		"shop":
-			_draw_shop()
+		"skills":
+			_draw_skills()
+		"pause":
+			_draw_pause()
 
 
-func _draw_shop() -> void:
+func _draw_skills() -> void:
 	var white := Color8(252, 252, 252)
 	var gold := Color8(252, 200, 60)
-	hud.draw_rect(Rect2(0, 16, 400, 224), Color8(20, 14, 36))
-	F8.centered(hud, 200, 24, "BREAK ROOM VENDING MACHINE", gold, 2)
-	hud.draw_texture_rect(vending_tex, Rect2(24, 56, 80, 128), false)
-	for i in SHOP.size():
-		var it: Array = SHOP[i]
-		var y := 58 + i * 30
-		var owned: int = upgrades[it[0]]
-		var maxed: bool = owned >= it[4]
-		var col := white if i == shop_sel else Color8(150, 150, 180)
-		if i == shop_sel:
-			hud.draw_rect(Rect2(124, y - 4, 256, 26), Color8(60, 40, 100))
-			F8.text(hud, Vector2(128, y + 4), ">", gold, 2)
-		F8.text(hud, Vector2(142, y), it[1], col, 2)
-		F8.text(hud, Vector2(142, y + 13), it[2] + ("  (%d/%d)" % [owned, it[4]] if it[4] > 1 else ""), Color8(160, 200, 252))
-		F8.text(hud, Vector2(330, y + 2), "SOLD" if maxed else "$%d" % it[3], Color8(120, 120, 140) if maxed else gold, 2)
-	var y2 := 58 + SHOP.size() * 30
-	if shop_sel == SHOP.size():
-		hud.draw_rect(Rect2(124, y2 - 4, 256, 18), Color8(60, 40, 100))
-		F8.text(hud, Vector2(128, y2), ">", gold, 2)
-	F8.text(hud, Vector2(142, y2), "NEXT SHIFT >>", white, 2)
-	F8.centered(hud, 200, 214, "UP/DOWN CHOOSE   X/ENTER BUY   CASH $%d" % cash, white)
-	F8.centered(hud, 200, 226, "(STAGE 2 IS COMING: NEXT SHIFT REPLAYS STAGE 1)", Color8(120, 110, 160))
+	var dim := Color8(110, 104, 140)
+	var K := Color8(14, 10, 24)
+	hud.draw_rect(Rect2(0, 16, 400, 224), Color8(20, 14, 36, 245))
+	F8.centered(hud, 200, 22, "SKILL TREE", gold, 2)
+	F8.centered(hud, 200, 36, "CASH $%d" % cash, gold)
+	for c in 4:
+		var x := 8 + c * 98
+		F8.centered(hud, x + 43, 50, BRANCHES[c], Color8(160, 200, 252))
+		for r in 3:
+			var sk: Array = SKILLS[c][r]
+			var y := 60 + r * 46
+			var owned := has(sk[0])
+			var open := r == 0 or has(SKILLS[c][r - 1][0])
+			if r > 0:
+				hud.draw_rect(Rect2(x + 42, y - 12, 3, 12), gold if owned else dim)
+			var sel := c == sk_col and r == sk_row
+			hud.draw_rect(Rect2(x, y, 86, 34), white if sel else K)
+			var bg := Color8(40, 110, 60) if owned else (Color8(70, 44, 120) if open else Color8(36, 30, 52))
+			hud.draw_rect(Rect2(x + 1, y + 1, 84, 32), bg)
+			var nm: String = sk[1]
+			F8.centered(hud, x + 43, y + 5, nm, white if open or owned else dim)
+			var price := "OWNED" if owned else ("$%d" % sk[3] if open else "LOCKED")
+			F8.centered(hud, x + 43, y + 21, price, (Color8(150, 255, 150) if owned else (gold if cash >= sk[3] else Color8(250, 120, 110))) if open or owned else dim)
+	if sk_row < 3:
+		var cur: Array = SKILLS[sk_col][sk_row]
+		F8.centered(hud, 200, 202, "%s: %s" % [cur[1], cur[2]], white)
+	var bsel := sk_row == 3
+	var label := "NEXT SHIFT >>" if skills_end else "BACK TO WORK"
+	hud.draw_rect(Rect2(140, 212, 120, 13), white if bsel else K)
+	hud.draw_rect(Rect2(141, 213, 118, 11), Color8(150, 30, 40) if bsel else Color8(50, 36, 70))
+	F8.centered(hud, 200, 216, label, white)
+	F8.centered(hud, 200, 230, "ARROWS CHOOSE  X BUY" + ("" if skills_end else "  TAB CLOSE"), dim)
 
 
-func _shop_step() -> void:
-	if pressed("down"):
-		shop_sel = (shop_sel + 1) % (SHOP.size() + 1)
+func _skills_step() -> void:
+	if pressed("left"):
+		sk_col = (sk_col + 3) % 4
+		sfx("menu")
+	if pressed("right"):
+		sk_col = (sk_col + 1) % 4
 		sfx("menu")
 	if pressed("up"):
-		shop_sel = (shop_sel + SHOP.size()) % (SHOP.size() + 1)
+		sk_row = maxi(0, sk_row - 1)
 		sfx("menu")
+	if pressed("down"):
+		sk_row = mini(3, sk_row + 1)
+		sfx("menu")
+	if (pressed("skills") or pressed("pause")) and not skills_end:
+		_close()
+		return
 	if pressed("punch") or pressed("start") or pressed("jump"):
-		if shop_sel == SHOP.size():
-			_build_stage()
-			mode = "play"
-			_music("stage1")
+		if sk_row == 3:
+			if skills_end:
+				_build_stage()
+				mode = "play"
+				mode_t = 0
+				_music("stage1")
+			else:
+				_close()
 			sfx("select")
 			return
-		var it: Array = SHOP[shop_sel]
-		if upgrades[it[0]] < it[4] and cash >= it[3]:
-			cash -= it[3]
-			upgrades[it[0]] += 1
+		var sk: Array = SKILLS[sk_col][sk_row]
+		var open := sk_row == 0 or has(SKILLS[sk_col][sk_row - 1][0])
+		if open and not has(sk[0]) and cash >= sk[3]:
+			cash -= sk[3]
+			skills[sk[0]] = true
+			var old_max: int = player.max_hp
+			player.max_hp = max_hp()
+			player.hp += player.max_hp - old_max
 			sfx("combo")
 		else:
 			sfx("block")
+
+
+const PAUSE_ITEMS := ["RESUME", "SKILL TREE", "RESTART STAGE", "QUIT TO TITLE"]
+
+
+func _draw_pause() -> void:
+	var white := Color8(252, 252, 252)
+	var gold := Color8(252, 200, 60)
+	hud.draw_rect(Rect2(0, 16, 400, 224), Color(0.02, 0.01, 0.06, 0.75))
+	F8.centered(hud, 200, 52, "PAUSED", gold, 4)
+	F8.centered(hud, 200, 80, "(COFFEE BREAK)", Color8(160, 200, 252))
+	for i in PAUSE_ITEMS.size():
+		var y := 104 + i * 18
+		if i == pause_sel:
+			hud.draw_rect(Rect2(120, y - 3, 160, 14), Color8(60, 40, 100))
+			F8.text(hud, Vector2(126, y), ">", gold, 2)
+		F8.centered(hud, 200, y, PAUSE_ITEMS[i], white if i == pause_sel else Color8(150, 150, 180), 2)
+	F8.centered(hud, 200, 190, "MOVE ARROWS/WASD  JUMP Z/SPACE  PUNCH X", Color8(150, 150, 180))
+	F8.centered(hud, 200, 200, "DASH C (SKILL)  SKILLS TAB  PAUSE ESC", Color8(150, 150, 180))
+
+
+func _pause_step() -> void:
+	if pressed("down"):
+		pause_sel = (pause_sel + 1) % PAUSE_ITEMS.size()
+		sfx("menu")
+	if pressed("up"):
+		pause_sel = (pause_sel + PAUSE_ITEMS.size() - 1) % PAUSE_ITEMS.size()
+		sfx("menu")
+	if pressed("pause"):
+		_close()
+		return
+	if pressed("punch") or pressed("start") or pressed("jump"):
+		sfx("select")
+		match pause_sel:
+			0:
+				_close()
+			1:
+				skills_end = false
+				_open("skills")
+			2:
+				_build_stage()
+				mode = "play"
+				_music("stage1")
+				music.volume_db = -6
+			3:
+				_build_stage()
+				mode = "title"
+				_music("title")
+				music.volume_db = -6
+
+
+func _open(m: String) -> void:
+	if mode == "play":
+		back_mode = "play"
+		music.volume_db = -16
+	mode = m
+	mode_t = 0
+	sk_row = mini(sk_row, 2)
+	pause_sel = 0
+	sfx("pause")
+
+
+func _close() -> void:
+	mode = back_mode
+	music.volume_db = -6
+	sfx("pause")
+
+
+func has(id: String) -> bool:
+	return skills.get(id, false)
+
+
+func max_hp() -> int:
+	return 8 + 2 * int(has("coffee1")) + 2 * int(has("coffee2"))
+
+
+# ---- weapon pickups ----------------------------------------------------------------------------
+
+func add_item(type: String, at: Vector2) -> void:
+	items.append({"type": type, "p": at, "t": randi() % 60})
+
+
+func _step_items() -> void:
+	for it in items.duplicate():
+		it["t"] += 1
+		var p: Vector2 = it["p"]
+		if player.state != "dead" and player.rect().grow(4).has_point(p + Vector2(0, -6)):
+			items.erase(it)
+			player.weapon = it["type"]
+			player.w_uses = 10 if it["type"] == "keyboard" else 6
+			sfx("pickup")
+			say(p + Vector2(-26, -22), "KEYBOARD! (10 HITS)" if it["type"] == "keyboard" else "OOO NOTES X6")
+	for o in ooos.duplicate():
+		o["p"] += Vector2(o["d"] * 4.0, 0)
+		o["t"] += 1
+		var p: Vector2 = o["p"]
+		var hit := false
+		for e in enemies:
+			if not e.dead and e.rect().grow(2).has_point(p):
+				e.hurt(2, o["d"])
+				if e.kind != "tl" and not e.dead:
+					e.frozen = 180
+					say(e.position + Vector2(-26, -e.h - 12), "OUT OF OFFICE")
+				hit = true
+				break
+		if hit or o["t"] > 60 or p.x < lock.x or p.x > lock.y:
+			ooos.erase(o)
+			pops.append({"p": p, "t": 0, "big": false})
+
+
+func throw_ooo(from: Vector2, dir: int) -> void:
+	ooos.append({"p": from, "d": dir, "t": 0})
+	sfx("throw")
 
 
 # ---- audio ---------------------------------------------------------------------------------
@@ -793,11 +987,17 @@ var _last_x := 0.0
 
 func _autopilot() -> void:
 	_auto = {}
-	if mode == "shop":
-		if mode_t == 20 or mode_t == 40:
-			_auto["punch"] = true
-		if mode_t > 60:
-			_auto["up"] = mode_t % 4 < 2
+	if "--menutest" in OS.get_cmdline_user_args():  # opens pause, then the skill tree
+		var press := {400: "pause", 460: "down", 480: "punch", 560: "right", 600: "skills"}
+		if press.has(tick):
+			_auto[press[tick]] = true
+			return
+		if mode != "play":
+			return
+	if mode == "skills":
+		var script_ := {20: "punch", 40: "right", 60: "punch", 80: "down", 100: "punch", 120: "down", 140: "down", 160: "down"}
+		if script_.has(mode_t):
+			_auto[script_[mode_t]] = true
 		return
 	if mode != "play" or player.state == "dead":
 		_auto["start"] = mode_t % 20 < 10

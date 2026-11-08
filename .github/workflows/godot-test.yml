@@ -49,10 +49,10 @@ jobs:
           files: HOTFIX-test-*.zip
           body: |
             8-bit test build: stage 1 (Nexus HQ dev floor) with bugs, JIRA tickets, PMs throwing tasks, an arena,
-            the Team Leader boss, cash and the vending machine upgrade shop. The full web game is in the latest regular release.
+            the Team Leader boss, weapon pickups (keyboard, OOO notes), cash and a skill tree. The full web game is in the latest regular release.
 
             - **Windows:** unzip, run `HOTFIX.exe`. If SmartScreen says "Windows protected your PC", click *More info* > *Run anyway*.
             - **Mac:** unzip, right-click `HOTFIX.app` > *Open* > *Open* (not notarized).
             - **Linux:** unzip, run `./HOTFIX.x86_64`.
 
-            Arrows/WASD move, Z/Space jump (hold for higher), X punch (also in the air), Enter start. Gamepads work too.
+            Arrows/WASD move, Z/Space jump (press again in the air to double jump), X punch (also in the air), Tab skill tree, Esc pause. Gamepads work too.

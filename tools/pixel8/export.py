@@ -156,7 +156,17 @@ def lamp():
 def door():   # the boss room door (glass, NEXUS logo)
     im,d=canvas(40,72); R(d,0,0,40,72,KK);R(d,2,2,36,70,(70,52,110));R(d,5,5,30,40,(120,170,230));R(d,6,6,10,30,(180,215,250))
     R(d,30,46,4,8,(250,210,80)); return im
-props=dict(desk=desk(),monitor=monitor(),cab48=cabinet(48),cab24=cabinet(24),shelf=shelf(84),books=books(),rack90=rack(90),rack68=rack(68),
+def item_keyboard():
+    im,d=canvas(18,7); R(d,0,0,18,7,KK);R(d,1,1,16,5,(70,74,96));R(d,1,1,16,1,(120,126,150))
+    for r_ in range(2):
+        for c_ in range(7): R(d,2+c_*2,2+r_*2,1,1,(220,224,240))
+    R(d,5,5,8,1,(220,224,240)); return im
+def item_ooo():
+    im,d=canvas(15,9); R(d,0,0,15,9,KK);R(d,1,1,13,7,(190,150,250));R(d,1,1,13,1,(225,200,255))
+    for k in range(3):
+        x=2+k*4; R(d,x,3,3,3,KK); R(d,x+1,4,1,1,(190,150,250))
+    return im
+props=dict(keyboard=item_keyboard(),ooo=item_ooo(),desk=desk(),monitor=monitor(),cab48=cabinet(48),cab24=cabinet(24),shelf=shelf(84),books=books(),rack90=rack(90),rack68=rack(68),
            cooler=cooler(),plant=plant(),vending=vending(),lamp=lamp(),door=door())
 for k,v in props.items(): v.save(f'{OUT}/prop_{k}.png')
 # ---------- background layers

@@ -33,12 +33,25 @@ Beaten ranks come back as regular (tougher) enemies on later floors.
   arc. A hit = "NEW TASK!" and damage.
 - **Team Leaders, Group Leaders, Directors, VPs:** as regular enemies after their boss stage.
 
-## Money and upgrades
-Enemies and JIRA tickets drop **cash ($)**. Spend it between stages (break room vending
-machine / HR) on upgrades, e.g.:
-- Max HP (coffee), attack power (mechanical keyboard), double jump (new sneakers), dash,
-  charged punch, armor vs. tasks (noise-cancelling headphones), coin magnet.
-Health pickups in levels: coffee, pizza.
+## Money, skill tree and weapons
+Enemies and JIRA tickets drop **cash ($)**. **Tab** opens the skill tree any time (the game
+pauses); it also opens after each boss with a NEXT SHIFT button. 4 branches x 3 tiers, each
+tier needs the one above it:
+
+| HEALTH | POWER | MOBILITY | LOOT |
+|---|---|---|---|
+| Coffee: +2 max HP ($40) | Mech keyboard: +1 punch ($50) | Sneakers: run 25% faster ($40) | Cash magnet ($50) |
+| Double shot: +2 max HP ($80) | RGB keyboard: +1 punch ($100) | Sprint dash: C, dodges hits ($90) | Bug bounty: +50% cash ($100) |
+| Energy drink: heal 1 / 15 s ($150) | Rage quit: hold X, release = big punch ($150) | Jetpack: triple jump ($140) | Golden parachute: survive 1 fatal hit ($150) |
+
+Double jump is standard (needed to clear the Team Leader's SPRINT charge).
+
+**Weapon pickups** (walk over them; one at a time, shown in the HUD):
+- **Keyboard:** longer reach, +2 damage, breaks after 10 hits.
+- **OOO notes** (Out Of Office): X throws one (6 per pickup), 2 damage and the enemy freezes
+  for 3 s ("OOO"). PMs sometimes drop them.
+
+Esc pauses (resume, skill tree, restart stage, quit to title). Health pickups: coffee cups.
 
 ## Boss template (all bosses)
 - About **2x Code Bro's height** (~64 px), drawn at the same pixel scale (bigger rig: longer

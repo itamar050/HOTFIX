@@ -13,6 +13,7 @@ var knock := 0
 var home := Vector2.ZERO
 var phase := 0.0
 var throws := 0
+var frozen := 0  ## hit by an OOO note: out of office, does nothing
 var move_i := 0  ## boss: index into PATTERN
 var hops := 0
 const PATTERN := ["review", "standup", "sprint"]
@@ -56,6 +57,11 @@ func step() -> void:
 	if inv > 0:
 		inv -= 1
 	blink_flash()
+	if frozen > 0:
+		frozen -= 1
+		if flash == 0:
+			spr.modulate = Color(0.65, 0.6, 1.3)
+		return
 	st_t += 1
 	var pl = main.player
 	var ppos: Vector2 = pl.position
@@ -239,7 +245,7 @@ func _next_move() -> void:
 
 ## Contact damage: not while dizzy (the punish window) or before the fight starts.
 func harmful() -> bool:
-	if dead:
+	if dead or frozen > 0:
 		return false
 	if kind == "tl":
 		return st in ["walk", "standup", "sprint", "review"]
@@ -273,6 +279,10 @@ func die() -> void:
 	var c := position + Vector2(0, -h / 2)
 	main.pop(c, kind == "tl")
 	var n: int = {"bug": 3, "jira": 4, "pm": 6, "tl": 30}[kind]
+	if main.has("bounty"):
+		n = int(ceil(n * 1.5))
+	if kind == "pm" and randf() < 0.5:
+		main.add_item("ooo", c)
 	main.drop_coins(c, n)
 	if kind == "jira":
 		main.say(c + Vector2(-14, -12), "CLOSED!")
