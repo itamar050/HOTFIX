@@ -23,9 +23,11 @@ def draw_mask(im,m,col,hi=None,lo=None):
         for nx,ny in((x+1,y),(x-1,y),(x,y+1),(x,y-1)):
             if (nx,ny) not in m and 0<=nx<W and 0<=ny<H: im.putpixel((nx,ny),KC+(255,))
 def pt(o,a,l): return (o[0]+l*math.sin(math.radians(a)),o[1]+l*math.cos(math.radians(a)))
+GEO=dict(hip=(15.5,24.5),sb=(18,17.5),sf=(14.5,17.5),torso=(9,15),head=(10,3),leg=(5.5,5.0,4.2),arm=(4.6,4.2,3.6),fist=3.4)
 def leg(im,hip,thigh,knee,front,lift=0):
-    k=pt(hip,thigh,5.5);an=pt(k,thigh-knee,5.0)
-    m=seg_mask([hip,k,an],4.2)
+    L1,L2,w=GEO['leg']
+    k=pt(hip,thigh,L1);an=pt(k,thigh-knee,L2)
+    m=seg_mask([hip,k,an],w,*im.size)
     draw_mask(im,m,P['B'] if front else P['b'],P['n'] if front else None,P['b'] if front else None)
     # shoe: flat-ish, toes forward, tilts with the shin when lifted
     tilt=max(-1,min(1,round((thigh-knee)/30)))
@@ -36,10 +38,11 @@ def leg(im,hip,thigh,knee,front,lift=0):
             sm.add((ax+i,ay+j+(1 if i>=2 and tilt<0 else 0)-(1 if i>=3 and tilt>0 else 0)))
     draw_mask(im,sm,P['W'] if front else P['w'],None,None)
 def arm(im,sh,up,fore,front,fist=True):
-    e=pt(sh,up,4.6);h=pt(e,up+fore,4.2)
-    m=seg_mask([sh,e,h],3.6)
+    L1,L2,w=GEO['arm']
+    e=pt(sh,up,L1);h=pt(e,up+fore,L2)
+    m=seg_mask([sh,e,h],w,*im.size)
     draw_mask(im,m,P['R'] if front else P['r'],P['Q'] if front else None,None)
-    hm=seg_mask([h,h],3.4)
+    hm=seg_mask([h,h],GEO['fist'],*im.size)
     draw_mask(im,hm,P['S'] if front else P['s'])
 def paste(im,g,x,y,alt=None):
     for j,r in enumerate(g):
@@ -48,12 +51,12 @@ def paste(im,g,x,y,alt=None):
 def pose(lb,lf,ab,af,bob=0,lean=0,W=36,H=38):
     """lb/lf: (thigh,knee) back/front leg; ab/af: (upper,fore) arms; angles in degrees, + = forward"""
     im=Image.new('RGBA',(W,H),(0,0,0,0))
-    hip=(15.5+lean*0.5,24.5+bob)
-    arm(im,(18+lean,17.5+bob),*ab,False)
+    g=GEO;hx,hy=g['hip'];hip=(hx+lean*0.5,hy+bob)
+    arm(im,(g['sb'][0]+lean,g['sb'][1]+bob),*ab,False)
     leg(im,(hip[0]-1,hip[1]),*lb,False)
     leg(im,(hip[0]+1,hip[1]),*lf,True)
-    paste(im,TORSO,9+lean,15+bob); paste(im,HEAD,10+lean,3+bob)
-    arm(im,(14.5+lean,17.5+bob),*af,True)
+    paste(im,TORSO,g['torso'][0]+lean,g['torso'][1]+bob); paste(im,HEAD,g['head'][0]+lean,g['head'][1]+bob)
+    arm(im,(g['sf'][0]+lean,g['sf'][1]+bob),*af,True)
     return im
 # walk: 8 frames, legs half a cycle apart, arms opposite to the legs
 F={}
@@ -61,7 +64,7 @@ N=8
 for i in range(N):
     p=2*math.pi*i/N
     def legang(p):
-        th=24*math.sin(p)
+        th=30*math.sin(p)
         kn=50*max(0,math.cos(p))**1.5+6   # knee bends while the leg swings forward
         return (th,kn)
     bob=0 if abs(math.sin(p))>0.7 else -1

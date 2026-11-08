@@ -6,6 +6,14 @@ Group Leader -> Director -> VP -> CEO; enemies bugs, JIRA tickets, PMs; cash + u
 `tools/pixel8/README.md`. The user liked the v2 walk/jump; the 16-bit Godot slice and the
 Gemini/3D art notes below are superseded (kept for reference).**
 
+**8-bit Godot game: `godot/game8/` (main scene), 400x240.** `python3 tools/pixel8/export.py`
+(run in tools/pixel8) writes the PNGs to `godot/game8/art/` and `game8/sprite_data.gd`. Scripts:
+`main.gd` (level data PROPS/ENEMIES/COINS/ARENA, physics helpers `ground()`/solids, arena + boss
+room, cash, shop, HUD, title, demo autopilot), `player.gd`, `enemy.gd` (bug, jira, pm, tl boss),
+`actor.gd`, `font8.gd` (3x5 pixel font). Test: `godot --headless --path godot --fixed-fps 60
+-- --demo` (invincible autopilot plays the whole stage + shop, prints state each second,
+quits in the shop). Load textures used in draw callbacks as members (locals get freed -> white).
+
 A 16-bit beat 'em up / platformer (Streets of Rage 2 look). Owner: itamar050. Work on `main`.
 Separate projects always get their own repo (never `itamar050/frost`, which is firmware).
 
