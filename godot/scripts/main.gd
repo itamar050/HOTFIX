@@ -45,6 +45,7 @@ func _ready() -> void:
 	cam.position_smoothing_speed = 7.0
 	player.add_child(cam)
 	_build_hud()
+	_build_audio()
 
 
 # ---- input: keyboard and gamepad ------------------------------------------------------
@@ -179,6 +180,42 @@ func _build_hud() -> void:
 	clone_bar = _bar(512, 20, 120, Color(1, 0.55, 0.12), hud)
 	ko_label = _label("KOs 0", 300, 4, hud, 10)
 	_label("TEST BUILD  -  ARROWS/WASD MOVE   SHIFT RUN   Z JUMP   X ATTACK (x4 COMBO)   F2 HITBOXES", 8, 344, hud, 8, Color(0.75, 0.78, 0.9))
+
+
+# ---- audio (recorded from the web version's synth by tools/record_audio.js) ---------------
+var music: AudioStreamPlayer
+var sfx_players: Array[AudioStreamPlayer] = []
+var sfx_streams := {}
+const SFX := ["punch", "heavy", "whiff", "hurt", "jump", "land", "enemyDie", "glitch", "combo", "go"]
+
+
+func _build_audio() -> void:
+	music = AudioStreamPlayer.new()
+	var song: AudioStreamOggVorbis = load("res://assets/audio/music_stage1.ogg")
+	song.loop = true
+	music.stream = song
+	music.volume_db = -6.0
+	add_child(music)
+	music.play()
+	for n in SFX:
+		sfx_streams[n] = load("res://assets/audio/sfx_%s.wav" % n)
+	for i in 8:
+		var p := AudioStreamPlayer.new()
+		p.volume_db = -2.0
+		add_child(p)
+		sfx_players.append(p)
+
+
+## Play a sound effect on a free player (8 can overlap).
+func sfx(name: String) -> void:
+	if not sfx_streams.has(name):
+		return
+	for p in sfx_players:
+		if not p.playing:
+			p.stream = sfx_streams[name]
+			p.pitch_scale = randf_range(0.95, 1.05)
+			p.play()
+			return
 
 
 # ---- game loop -------------------------------------------------------------------------

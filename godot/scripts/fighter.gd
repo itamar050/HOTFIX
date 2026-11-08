@@ -164,6 +164,7 @@ func _physics_process(_delta: float) -> void:
 		set_state("idle")
 	if state == "fly" and on_ground and t > 4:
 		set_state("down")
+		main.sfx("enemyDie" if dead and not is_player else "land")
 		main.shake = maxf(main.shake, 2.0)
 	_update_anim()
 	if state == "attack" and on_active_step() and not hit_done:
@@ -229,6 +230,7 @@ func _player_control() -> void:
 	if main.pressed("jump") and state != "jump":
 		vel.y = JUMP_V
 		set_state("jump")
+		main.sfx("jump")
 	if main.pressed("attack") and state == "idle":
 		_start_attack("jab_a")
 
@@ -242,6 +244,7 @@ func _start_attack(name: String) -> void:
 	anim = ""
 	play(name)
 	vel.x = face * (1.6 if name == "kick" else 1.0)
+	main.sfx("whiff")
 
 
 func _try_hit() -> void:
@@ -255,6 +258,7 @@ func _try_hit() -> void:
 		connected = true
 		var heavy: bool = a.get("heavy", false)
 		var dmg: int = a["dmg"] if is_player else a["dmg"] + 3
+		main.sfx("heavy" if heavy else "punch")
 		target.take_hit(dmg, face, a["kb"], a.get("knockdown", false), attack == "hook")
 		var c: Vector2 = box.intersection(target.world_box(HURT_BOX)).get_center()
 		main.hit_effect(c, heavy)
@@ -262,6 +266,8 @@ func _try_hit() -> void:
 
 func take_hit(dmg: int, dir: int, kb: float, knockdown: bool, high: bool) -> void:
 	hp -= dmg
+	if is_player:
+		main.sfx("hurt")
 	flash = 6
 	face = -dir
 	sprite.flip_h = face < 0
@@ -299,6 +305,7 @@ func _knockdown_tick() -> void:
 
 func _respawn() -> void:
 	dead = false
+	main.sfx("glitch")
 	hp = max_hp
 	sprite.self_modulate.a = 1.0
 	set_state("idle")
