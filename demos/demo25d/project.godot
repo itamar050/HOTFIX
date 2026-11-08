@@ -1,0 +1,26 @@
+; HOTFIX demo, option 1: 2.5D brawler (3D characters, side-view lane). Built in code.
+config_version=5
+
+[application]
+
+config/name="HOTFIX demo - 2.5D"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.4", "GL Compatibility")
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+
+[physics]
+
+common/physics_ticks_per_second=60
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+anti_aliasing/quality/msaa_3d=2
+textures/vram_compression/import_etc2_astc=true

@@ -1,0 +1,57 @@
+# Builds the two style demos (demos/demo25d and demos/vector2d) for Windows, Mac and Linux
+# on every push that changes them, and publishes the zips as a pre-release "Style demos N".
+name: demos
+
+on:
+  push:
+    branches: [main]
+    paths: ['demos/**', '.github/workflows/demos.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  GODOT: 4.4.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Godot and export templates
+        run: |
+          base=https://github.com/godotengine/godot/releases/download/${GODOT}-stable
+          curl -sSL -o godot.zip "$base/Godot_v${GODOT}-stable_linux.x86_64.zip"
+          unzip -q godot.zip && mv "Godot_v${GODOT}-stable_linux.x86_64" godot-bin
+          curl -sSL -o tpl.tpz "$base/Godot_v${GODOT}-stable_export_templates.tpz"
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT}.stable
+          unzip -q tpl.tpz && mv templates/* ~/.local/share/godot/export_templates/${GODOT}.stable/
+      - name: Export
+        run: |
+          for d in demo25d vector2d; do
+            mkdir -p dist/$d/windows dist/$d/linux dist/$d/mac
+            ./godot-bin --headless --path demos/$d --import || true
+            ./godot-bin --headless --path demos/$d --export-release Windows ../../dist/$d/windows/HOTFIX.exe
+            ./godot-bin --headless --path demos/$d --export-release Linux ../../dist/$d/linux/HOTFIX.x86_64
+            ./godot-bin --headless --path demos/$d --export-release macOS ../../dist/$d/mac/HOTFIX.zip
+            test -s dist/$d/windows/HOTFIX.exe && test -s dist/$d/linux/HOTFIX.x86_64 && test -s dist/$d/mac/HOTFIX.zip
+            (cd dist/$d/windows && zip -q ../../../HOTFIX-$d-Windows.zip HOTFIX.exe)
+            (cd dist/$d/linux && chmod +x HOTFIX.x86_64 && zip -q ../../../HOTFIX-$d-Linux.zip HOTFIX.x86_64)
+            cp dist/$d/mac/HOTFIX.zip HOTFIX-$d-Mac.zip
+          done
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: demos-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: Style demos ${{ github.run_number }}
+          prerelease: true
+          files: HOTFIX-*-*.zip
+          body: |
+            Two short style demos to compare (not the game):
+            - **demo25d**: option 1, 2.5D (3D toon-shaded characters, side-view lane).
+            - **vector2d**: option 2, 2D vector cartoon with skeletal animation.
+
+            Arrows/WASD move (up/down = depth), X or Space punch (press again on a hit: jab, cross, kick).
+            Windows: run `HOTFIX.exe` (SmartScreen: More info > Run anyway). Mac: right-click `HOTFIX.app` > Open.
+            Linux: run `./HOTFIX.x86_64`.
