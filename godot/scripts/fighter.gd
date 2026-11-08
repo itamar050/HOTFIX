@@ -59,6 +59,9 @@ var buffered := false
 var atk_cd := 60
 var running := false
 var dead := false
+var respawns := true  ## false: wave enemies stay down and are removed
+var gone := false
+var hit_list: Array = []
 
 
 func setup(m, player: bool, pos: Vector2) -> void:
@@ -159,7 +162,10 @@ func _physics_process(_delta: float) -> void:
 	if on_ground:
 		position.y = main.GROUND_Y
 		vel.y = 0.0
-	position.x = clampf(position.x, 30.0, main.LEVEL_W - 30.0)
+	if is_player:
+		position.x = clampf(position.x, main.lock.x, main.lock.y)
+	else:
+		position.x = clampf(position.x, -200.0, main.LEVEL_W + 200.0)
 	if state == "jump" and on_ground and t > 3:
 		set_state("idle")
 	if state == "fly" and on_ground and t > 4:
@@ -240,6 +246,7 @@ func _start_attack(name: String) -> void:
 	attack = name
 	buffered = false
 	hit_done = false
+	hit_list = []
 	connected = false if name == "jab_a" else connected
 	anim = ""
 	play(name)
@@ -248,13 +255,21 @@ func _start_attack(name: String) -> void:
 
 
 func _try_hit() -> void:
-	var target = main.clone if is_player else main.player
-	if target.state in ["fly", "down", "getup"] or target.inv > 0:
+	# the player's attacks can hit every enemy in reach; an enemy's only the player
+	var targets: Array = main.enemies if is_player else [main.player]
+	for target in targets:
+		_hit_one(target)
+
+
+func _hit_one(target) -> void:
+	if target in hit_list or target.dead or target.state in ["fly", "down", "getup"] or target.inv > 0:
 		return
 	var a: Dictionary = ATTACKS[attack]
 	var box := world_box(a["box"])
 	if box.intersects(target.world_box(HURT_BOX)):
-		hit_done = true
+		hit_list.append(target)
+		if not is_player:
+			hit_done = true
 		connected = true
 		var heavy: bool = a.get("heavy", false)
 		var dmg: int = a["dmg"] if is_player else a["dmg"] + 3
@@ -268,6 +283,9 @@ func take_hit(dmg: int, dir: int, kb: float, knockdown: bool, high: bool) -> voi
 	hp -= dmg
 	if is_player:
 		main.sfx("hurt")
+	else:
+		main.last_enemy = self
+		main.last_enemy_t = 120
 	flash = 6
 	face = -dir
 	sprite.flip_h = face < 0
@@ -298,7 +316,10 @@ func _knockdown_tick() -> void:
 		if dead and t > 50:
 			sprite.self_modulate.a = 1.0 - (t - 50) / 30.0
 			if t > 80:
-				_respawn()
+				if respawns:
+					_respawn()
+				else:
+					gone = true
 		elif not dead and t > 40:
 			set_state("getup")
 
@@ -327,13 +348,20 @@ func _clone_ai() -> void:
 			_start_attack("jab_a")
 		return
 	face = 1 if dx > 0 else -1
-	if absf(dx) > 62:
-		vel.x = move_toward(vel.x, face * 2.0, 0.2)
-	elif absf(dx) < 40:
+	# crowd spacing: allies closer to the player on my side make me hang back
+	var ahead := 0
+	for e in main.enemies:
+		if e != self and not e.dead and signf(e.position.x - p.position.x) == signf(position.x - p.position.x) \
+				and absf(e.position.x - p.position.x) < absf(dx):
+			ahead += 1
+	var want := 52.0 + 50.0 * ahead
+	if absf(dx) > want + 10.0:
+		vel.x = move_toward(vel.x, face * (2.4 if ahead == 0 else 1.6), 0.2)
+	elif absf(dx) < want - 12.0:
 		vel.x = move_toward(vel.x, -face * 1.2, 0.2)
 	else:
 		vel.x = move_toward(vel.x, 0, 0.3)
-		if atk_cd <= 0 and p.state in ["idle", "jump", "attack"]:
+		if ahead == 0 and atk_cd <= 0 and p.state in ["idle", "jump", "attack"] and main.can_attack(self):
 			set_state("windup")
 			atk_cd = randi_range(70, 120)
 

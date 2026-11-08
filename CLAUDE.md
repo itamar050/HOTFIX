@@ -13,8 +13,10 @@ Separate projects always get their own repo (never `itamar050/frost`, which is f
 2. **Godot port (in progress):** `godot/`, Godot 4.4.1, 640x360, GL Compatibility, pixel
    snapping, integer scaling. Currently a stage 1 test slice: parallax far/wall/floor layers,
    Code Bro (`scripts/fighter.gd`: idle, walk, run on Shift, jab-jab-hook-kick chain that
-   continues only on hit, face/gut hurt, knockdown fly/down/getup), a purple glitch clone
-   sparring AI, hit sparks/hitstop/shake, HP bars, F2 hitboxes. Every push touching `godot/`
+   continues only on hit, face/gut hurt, knockdown fly/down/getup), purple glitch clone
+   enemies in 2 camera-locked arenas (`ARENAS` in main.gd: waves 2+3, 3+4; one attacker at a
+   time via `can_attack`), GO! arrow, STAGE CLEAR, music + sfx (`tools/record_audio.js`
+   records the web synth to `godot/assets/audio/`), hit sparks/hitstop/shake, F2 hitboxes. Every push touching `godot/`
    runs `.github/workflows/godot-test.yml` -> pre-release `godot-test-N` (Win/Mac/Linux).
 
 ## Environment gotchas
@@ -24,8 +26,8 @@ Separate projects always get their own repo (never `itamar050/frost`, which is f
   `..._export_templates.tpz` (to `~/.local/share/godot/export_templates/4.4.1.stable/`) from
   the godotengine GitHub release.
 - Test the slice: `godot --headless --path godot --import`, then
-  `godot --headless --path godot -- --demo` (scripted input, prints state every 10 ticks,
-  quits at tick 420). Frames: `xvfb-run -a godot --path godot --rendering-driver opengl3
+  `godot --headless --path godot -- --demo` (autopilot fights through the stage, prints state
+  every 30 ticks, quits when cleared, ~tick 4050). Frames: `xvfb-run -a godot --path godot --rendering-driver opengl3
   --write-movie out.png --fixed-fps 60 -- --demo`.
 - GDScript: give explicit types when a value comes from the untyped `main`/`target` refs.
 - Exports read `assets/sprites/*.json` at runtime: presets have `include_filter` for them;

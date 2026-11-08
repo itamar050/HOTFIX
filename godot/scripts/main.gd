@@ -1,14 +1,25 @@
 extends Node2D
 ## HOTFIX! Godot test slice: stage 1 with the new background art, Code Bro drawn with the
-## imported sprite strips, and a glitched clone to spar with. Everything is built in code
-## so main.tscn stays a single node.
+## imported sprite strips, and arenas where waves of glitched clones attack (the camera
+## locks until they are down). Everything is built in code so main.tscn stays one node.
 
 const GROUND_Y := 300.0
 const LEVEL_W := 2400.0
 const Fighter := preload("res://scripts/fighter.gd")
 
 var player: Fighter
-var clone: Fighter
+var enemies: Array = []
+## Arenas: the camera locks one screen wide from x0 while each wave (enemy count) attacks.
+const ARENAS := [{"x0": 560.0, "waves": [2, 3]}, {"x0": 1440.0, "waves": [3, 4]}]
+var arena := -1  ## index of the locked arena, -1 = none
+var arenas_done := 0
+var wave := 0
+var wave_gap := 0
+var lock := Vector2(30.0, LEVEL_W - 30.0)  ## x range the player can move in
+var go_t := 0
+var cleared := false
+var last_enemy = null
+var last_enemy_t := 0
 var cam: Camera2D
 var fx: Node2D
 var hitstop := 0
@@ -21,6 +32,8 @@ var show_boxes := false
 var hp_bar: ColorRect
 var clone_bar: ColorRect
 var ko_label: Label
+var enemy_label: Label
+var big_label: Label
 
 
 func _ready() -> void:
@@ -30,9 +43,6 @@ func _ready() -> void:
 	player = Fighter.new()
 	player.setup(self, true, Vector2(220, GROUND_Y))
 	add_child(player)
-	clone = Fighter.new()
-	clone.setup(self, false, Vector2(520, GROUND_Y))
-	add_child(clone)
 	fx = Node2D.new()
 	fx.z_index = 20
 	add_child(fx)
@@ -43,6 +53,7 @@ func _ready() -> void:
 	cam.limit_bottom = 360
 	cam.position_smoothing_enabled = true
 	cam.position_smoothing_speed = 7.0
+	cam.limit_smoothed = true
 	player.add_child(cam)
 	_build_hud()
 	_build_audio()
@@ -88,16 +99,19 @@ func pressed(action: String) -> bool:
 
 
 func _demo(action: String, edge: bool) -> bool:
-	var t := tick
+	# a simple autopilot for automated test runs: fight what is near, otherwise walk right
+	var near = null
+	for e in enemies:
+		if not e.dead and (near == null or absf(e.position.x - player.position.x) < absf(near.position.x - player.position.x)):
+			near = e
+	var close: bool = near != null and absf(near.position.x - player.position.x) < 75.0
 	match action:
 		"right":
-			return (t > 20 and t < 75) or (t > 330 and t < 360)
-		"run":
-			return t > 20 and t < 60
+			return (not close and (near == null or near.position.x > player.position.x)) or (close and near.position.x > player.position.x and player.face < 0)
+		"left":
+			return (not close and near != null and near.position.x < player.position.x) or (close and near.position.x < player.position.x and player.face > 0)
 		"attack":
-			return edge and t > 90 and t < 300 and t % 10 == 0
-		"jump":
-			return edge and (t == 365)
+			return edge and close and tick % 9 == 0
 	return false
 
 
@@ -176,8 +190,11 @@ func _build_hud() -> void:
 	add_child(hud)
 	_label("CODE BRO", 8, 4, hud, 10, Color(1, 0.88, 0.3))
 	hp_bar = _bar(8, 20, 120, Color(0.29, 0.88, 0.35), hud)
-	_label("GLITCH CLONE", 512, 4, hud, 10, Color(0.8, 0.6, 1))
+	enemy_label = _label("", 512, 4, hud, 10, Color(0.8, 0.6, 1))
 	clone_bar = _bar(512, 20, 120, Color(1, 0.55, 0.12), hud)
+	big_label = _label("", 0, 150, hud, 24, Color(1, 0.88, 0.3))
+	big_label.size = Vector2(640, 40)
+	big_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ko_label = _label("KOs 0", 300, 4, hud, 10)
 	_label("TEST BUILD  -  ARROWS/WASD MOVE   SHIFT RUN   Z JUMP   X ATTACK (x4 COMBO)   F2 HITBOXES", 8, 344, hud, 8, Color(0.75, 0.78, 0.9))
 
@@ -225,22 +242,107 @@ func _physics_process(_delta: float) -> void:
 		show_boxes = not show_boxes
 	if hitstop > 0:
 		hitstop -= 1
+	_update_arenas()
 	# fighters cannot walk through each other
-	if player.state != "ko" and clone.state != "ko":
-		var dx: float = clone.position.x - player.position.x
-		if absf(dx) < 34.0 and absf(clone.position.y - player.position.y) < 60.0:
-			var push := (34.0 - absf(dx)) * 0.5 * (1.0 if dx >= 0.0 else -1.0)
-			clone.position.x += push
-			player.position.x -= push
+	var bodies: Array = [player]
+	for e in enemies:
+		if not e.dead:
+			bodies.append(e)
+	for i in bodies.size():
+		for j in range(i + 1, bodies.size()):
+			var p1 = bodies[i]
+			var p2 = bodies[j]
+			var dx: float = p2.position.x - p1.position.x
+			if absf(dx) < 34.0 and absf(p2.position.y - p1.position.y) < 60.0:
+				var push := (34.0 - absf(dx)) * 0.5 * (1.0 if dx >= 0.0 else -1.0)
+				p2.position.x += push
+				p1.position.x -= push
+	for e in enemies.duplicate():
+		if e.gone:
+			enemies.erase(e)
+			e.queue_free()
 	shake = maxf(0.0, shake - 0.5)
 	cam.offset = Vector2(randf_range(-shake, shake), randf_range(-shake, shake))
 	hp_bar.size.x = 120.0 * player.hp / player.max_hp
-	clone_bar.size.x = 120.0 * clone.hp / clone.max_hp
+	if last_enemy_t > 0:
+		last_enemy_t -= 1
+	var show_enemy: bool = last_enemy_t > 0 and is_instance_valid(last_enemy)
+	enemy_label.text = "GLITCH CLONE" if show_enemy else ""
+	clone_bar.visible = show_enemy
+	if show_enemy:
+		clone_bar.size.x = 120.0 * last_enemy.hp / last_enemy.max_hp
 	ko_label.text = "KOs %d" % kos
-	if demo and tick % 10 == 0:
-		print("demo t=%d bro=%s/%s clone=%s hp=%d" % [tick, player.state, player.anim, clone.state, clone.hp])
-	if demo and tick == 420:
+	if go_t > 0:
+		go_t -= 1
+	if cleared:
+		big_label.text = "STAGE CLEAR!"
+	elif go_t > 0:
+		big_label.text = "GO! >>" if (go_t / 12) % 2 == 0 else ""
+	else:
+		big_label.text = ""
+	if demo and tick % 30 == 0:
+		print("demo t=%d x=%d hp=%d arena=%d wave=%d enemies=%d kos=%d cleared=%s" % [tick, player.position.x, player.hp, arena, wave, enemies.size(), kos, cleared])
+	if demo and (tick == 7000 or (cleared and tick % 30 == 0)):
 		get_tree().quit()
+
+
+## Only one enemy attacks at a time (the others wait their turn), Streets of Rage style.
+func can_attack(who) -> bool:
+	for e in enemies:
+		if e != who and not e.dead and e.state in ["windup", "attack"]:
+			return false
+	return true
+
+
+func _update_arenas() -> void:
+	if arena < 0:
+		if arenas_done < ARENAS.size() and player.position.x > ARENAS[arenas_done]["x0"] + 300.0:
+			arena = arenas_done
+			var x0: float = ARENAS[arena]["x0"]
+			lock = Vector2(x0 + 20.0, x0 + 620.0)
+			cam.limit_left = int(x0)
+			cam.limit_right = int(x0 + 640.0)
+			wave = 0
+			_spawn_wave()
+		elif not cleared and arenas_done == ARENAS.size() and player.position.x > LEVEL_W - 200.0:
+			cleared = true
+			music.stream = load("res://assets/audio/music_clear.ogg")
+			music.play()
+		return
+	for e in enemies:
+		if not e.dead:
+			return
+	wave_gap += 1
+	if wave_gap < 45:
+		return
+	wave_gap = 0
+	wave += 1
+	if wave < ARENAS[arena]["waves"].size():
+		_spawn_wave()
+		return
+	# arena cleared: unlock the camera and send the player on
+	arena = -1
+	arenas_done += 1
+	lock = Vector2(30.0, LEVEL_W - 30.0)
+	cam.limit_left = 0
+	cam.limit_right = int(LEVEL_W)
+	go_t = 150
+	sfx("go")
+
+
+func _spawn_wave() -> void:
+	var x0: float = ARENAS[arena]["x0"]
+	var n: int = ARENAS[arena]["waves"][wave]
+	for i in n:
+		var right := i % 2 == 0
+		var x := x0 + 640.0 + 30.0 + i * 20.0 if right else x0 - 30.0 - i * 20.0
+		var e := Fighter.new()
+		e.setup(self, false, Vector2(x, GROUND_Y))
+		e.respawns = false
+		e.atk_cd = 40 + i * 25
+		add_child(e)
+		enemies.append(e)
+	sfx("glitch")
 
 
 func hit_effect(pos: Vector2, heavy: bool) -> void:
