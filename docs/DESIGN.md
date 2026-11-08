@@ -39,3 +39,15 @@ machine / HR) on upgrades, e.g.:
 - Max HP (coffee), attack power (mechanical keyboard), double jump (new sneakers), dash,
   charged punch, armor vs. tasks (noise-cancelling headphones), coin magnet.
 Health pickups in levels: coffee, pizza.
+
+## Boss template (all bosses)
+- About **2x Code Bro's height** (~64 px), drawn at the same pixel scale (bigger rig: longer
+  limbs, 22 px head and 26 px torso grids), not scaled-up pixels.
+- A **fixed, learnable loop of 3 named attacks**. Each starts with a big red callout banner
+  naming the attack, a unique wind-up pose and a red pulse (the tell; a hit flash is white).
+- One attack ends in a **punish window** (stunned, no contact damage, hits do double damage).
+- **Below half health:** the same loop, faster (shorter tells, more repetitions).
+
+Team Leader (stage 1): CODE REVIEW! (arm up -> fan of 5 tasks on fixed arcs), STANDUP!
+(crouch -> 2 leaps, landing shockwaves to jump over; 3 when mad), SPRINT! (lean back -> charge
+into the wall -> BONK, dizzy = punish window). Test: `godot --path godot -- --demo --boss`.

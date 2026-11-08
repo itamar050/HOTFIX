@@ -25,49 +25,74 @@ strip('bro',bro,40,40,15.5)
 # ---------- PM
 pm=pm_frames(); as_char((PM_HEAD,PM_TORSO,PM_PAL)); pm['hurt']=pose((-20,30),(10,40),(-60,40),(-50,40),lean=-1); as_char(BRO)
 strip('pm',pm,40,40,15.5)
-# ---------- Team Leader (bigger: longer limbs, wider torso, beard + hoodie)
-TL_HEAD=["...KKKKKKK...",
-"..KHHHHHHHKK.",
-".KHHHHHHHHHHK",
-"KHHhHHHHHHHHK",
-"KHhHHSSSSSSSK",
-"KhHSSSSSSSSSK",
-"KhgSSSKSSSKSK",
-"KhgsSSSSSSSSK",
-"KhgDDSSSSSSDK",
-".KgDDDDKKKKDK",
-".KgDDDDDDDDDK",
-"..KKDDDDDDDK.",
-"....KKKKKKK.."]
-TL_TORSO=["..KKRRKSSKRK..",
-".KRRRRRSSRRRK.",
-"KRRRQRRRRRRRRK",
-"KRRQRRTTRRRRRK",
-"KRRQRRTTRRRRrK",
-"KRRQRRRRRRRRrK",
-"KRRRRRRRRRRRrK",
-"KRRRKKKKKKRRrK",
-"KRRRrrrrrrRRrK",
-"KrrrrrrrrrrrrK",
-".KKKKKKKKKKKK."]
-TL_PAL=dict(P,H=(60,40,30),h=(36,24,18),j=(90,62,44),g=(40,40,48),D=(80,52,36),
- R=(84,88,108),r=(52,54,70),Q=(132,138,160),T=(232,160,40),t=(150,90,20),
- B=(44,52,96),b=(28,32,64),n=(80,92,150),W=(220,44,44),w=(140,28,28))
-GEO.update(hip=(17.5,30.5),sb=(20.5,21.5),sf=(15.5,21.5),torso=(10,19),head=(11,7),leg=(7.0,6.5,5.2),arm=(5.6,5.2,4.4),fist=4.4)
+# ---------- Team Leader boss: about twice Code Bro's height, same pixel scale
+TL_HEAD=[".......KKKKKKKK.......",
+".....KKHHHHHHHHKK.....",
+"....KHHHHjjHHHHHHK....",
+"...KHHHjjHHHHHHHHHK...",
+"..KHHHHHHHHHHHHHHHHK..",
+"..KHhHHHHHHHHHHHHHHHK.",
+".KHhHHHHHHHHHHHHHHHHK.",
+".KHhHHHHSSSSSSSSSSSHK.",
+".KhHHHSSSSSSSSSSSSSSK.",
+".KhgHSSSSSSSSSSSSSSSK.",
+".KggsSSSSSSKKKSSSKKKK.",
+"KgGgsSSSSSSSKSSSSSKSSK",
+"KgGgssSSSSSSSSSSSSSSSK",
+"KgGgsSSSSSSSSSSSSSssSK",
+".KhgDDSSSSSSSSSSSSSSK.",
+"..KgDDDSSSSSSSSSSSDDK.",
+"..KDgDDDDDDDKKKKKDDDK.",
+"..KDDgggggDDDDDDDDDDK.",
+"...KDDDDDDDDDDDDDDDK..",
+"....KDDDDDDDDDDDDDK...",
+".....KKDDDDDDDDDKK....",
+".......KKKKKKKKK......"]
+TL_TORSO=[".......KKKKSSSSKKKK.......",
+".....KKRRRRKSSKRRRRKK.....",
+"...KKRRRRRRRKKRRRRRRRKK...",
+"..KRRRQRRRRRRRRRRRRRRRRK..",
+".KRRRQRRRRRRvRRvRRRRRRRRK.",
+".KRRQRRRRRRRvRRvRRRRRRRRK.",
+"KRRRQRRRRRRRvRRvRRRRRRRrRK",
+"KRRQRRRRRTTTTTTTTRRRRRRrRK",
+"KRRQRRRRRTttTTttTRRRRRRrRK",
+"KRRQRRRRRTTTTTTTTRRRRRRrRK",
+"KRRQRRRRRRRRRRRRRRRRRRRrRK",
+"KRRRRRRRRRRRRRRRRRRRRRrrRK",
+"KRRRRRKKKKKKKKKKKKRRRRrrRK",
+"KRRRRRKrrrrrrrrrrKRRRRrrRK",
+"KRRRRRKrrrrrrrrrrKRRRRrrRK",
+"KrRRRRRKKKKKKKKKKRRRRrrrRK",
+"KrrRRRRRRRRRRRRRRRRRRrrrrK",
+"KrrrrrrrrrrrrrrrrrrrrrrrrK",
+".KrrrrrrrrrrrrrrrrrrrrrrK.",
+"..KKKKKKKKKKKKKKKKKKKKKK.."]
+TL_PAL=dict(P,H=(60,40,30),h=(36,24,18),j=(96,66,46),g=(40,40,48),G=(90,90,104),D=(84,54,36),
+ R=(92,96,118),r=(56,58,76),Q=(140,146,170),T=(232,160,40),t=(150,90,20),w=(230,230,240),
+ B=(44,52,96),b=(28,32,64),n=(80,92,150),W=(220,44,44))
+TL_PAL['v']=(230,230,240); TL_PAL['w']=(140,28,28)
+SAVE_GEO=dict(GEO)
+GEO.update(hip=(30.5,38.5),sb=(34,24),sf=(26,24),torso=(17,20),head=(21,0),leg=(11.0,10.0,8.4),arm=(9.0,8.5,7.0),fist=7.4,shoe=(13,4))
 as_char((TL_HEAD,TL_TORSO,TL_PAL))
-TP=lambda *a,**k: pose(*a,W=40,H=48,**k)
+# legs/shoes: the shoe colour letters W/w are shared with the hoodie strings, so shoes use W only
+TP=lambda *a,**k: pose(*a,W=64,H=74,**k)
 tl={'idle0':TP((-10,8),(12,12),(15,40),(10,30)),'idle1':TP((-10,12),(12,16),(15,40),(10,30),bob=1)}
 for i in range(8):
-    p=2*math.pi*i/8; lg=lambda p:(26*math.sin(p),45*max(0,math.cos(p))**1.5+6)
+    p=2*math.pi*i/8; lg=lambda p:(24*math.sin(p),40*max(0,math.cos(p))**1.5+6)
     tl['walk%d'%i]=TP(lg(p+math.pi),lg(p),(16*math.sin(p),30),(-18*math.sin(p),30),0 if abs(math.sin(p))>0.7 else -1)
-tl['throw0']=TP((-12,8),(16,12),(15,40),(-120,-30),lean=-1)
-tl['throw1']=TP((-16,6),(20,10),(15,40),(110,-10),lean=1)
-tl['crouch']=TP((20,75),(40,90),(30,100),(20,100),bob=4)
-tl['air']=TP((-10,30),(60,90),(150,10),(160,10),bob=-1)
-tl['land']=TP((25,80),(45,95),(-60,20),(-50,20),bob=4)
-tl['hurt']=TP((-25,30),(10,40),(-60,40),(-50,40),lean=-1)
-strip('tl',tl,48,48,17.5)
-as_char(BRO); GEO.update(hip=(15.5,24.5),sb=(18,17.5),sf=(14.5,17.5),torso=(9,15),head=(10,3),leg=(5.5,5.0,4.2),arm=(4.6,4.2,3.6),fist=3.4)
+tl['throw0']=TP((-12,8),(16,12),(15,40),(-150,10),lean=-2)
+tl['throw1']=TP((-16,6),(20,10),(15,40),(100,-10),lean=2)
+tl['crouch']=TP((30,80),(50,95),(30,100),(20,100),bob=7)
+tl['air']=TP((-10,30),(60,90),(150,10),(160,10),bob=-2)
+tl['land']=TP((30,85),(50,100),(-60,20),(-50,20),bob=7)
+tl['dash0']=TP((-30,20),(40,30),(-80,10),(-70,10),lean=3)
+tl['dash1']=TP((-10,50),(20,10),(-80,10),(-70,10),lean=3)
+tl['dizzy0']=TP((-12,20),(14,24),(-10,10),(-5,10),bob=3,lean=-1)
+tl['dizzy1']=TP((-12,20),(14,24),(-10,10),(-5,10),bob=3,lean=1)
+tl['hurt']=TP((-25,30),(10,40),(-60,40),(-50,40),lean=-3)
+strip('tl',tl,72,74,30.5)
+as_char(BRO); GEO.clear(); GEO.update(SAVE_GEO)
 # ---------- small sprites
 def save_frames(name,grids,pal):
     ims=[grid(g,pal) for g in grids]; w=max(i.width for i in ims); h=max(i.height for i in ims)

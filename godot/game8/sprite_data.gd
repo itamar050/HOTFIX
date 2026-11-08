@@ -4,7 +4,7 @@ extends RefCounted
 const SHEETS := {
 	"bro": {"w": 40, "h": 40, "foot": 40, "frames": ["idle0", "idle1", "walk0", "walk1", "walk2", "walk3", "walk4", "walk5", "walk6", "walk7", "punch0", "punch1", "punch2", "crouch", "rise", "fall", "land", "hurt", "airpunch"]},
 	"pm": {"w": 40, "h": 40, "foot": 40, "frames": ["idle0", "idle1", "throw0", "throw1", "walk0", "walk1", "walk2", "walk3", "walk4", "walk5", "walk6", "walk7", "hurt"]},
-	"tl": {"w": 48, "h": 48, "foot": 47, "frames": ["idle0", "idle1", "walk0", "walk1", "walk2", "walk3", "walk4", "walk5", "walk6", "walk7", "throw0", "throw1", "crouch", "air", "land", "hurt"]},
+	"tl": {"w": 72, "h": 74, "foot": 64, "frames": ["idle0", "idle1", "walk0", "walk1", "walk2", "walk3", "walk4", "walk5", "walk6", "walk7", "throw0", "throw1", "crouch", "air", "land", "dash0", "dash1", "dizzy0", "dizzy1", "hurt"]},
 	"bug": {"w": 18, "h": 13, "foot": 13, "frames": ["0", "1"]},
 	"jira": {"w": 22, "h": 16, "foot": 16, "frames": ["0"]},
 	"note": {"w": 7, "h": 7, "foot": 7, "frames": ["0", "1"]},

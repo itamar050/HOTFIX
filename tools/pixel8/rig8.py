@@ -33,9 +33,10 @@ def leg(im,hip,thigh,knee,front,lift=0):
     tilt=max(-1,min(1,round((thigh-knee)/30)))
     sm=set()
     ax,ay=int(an[0]),int(an[1])
-    for i in range(-2,5):
-        for j in range(0,2):
-            sm.add((ax+i,ay+j+(1 if i>=2 and tilt<0 else 0)-(1 if i>=3 and tilt>0 else 0)))
+    sw,sh=GEO.get('shoe',(7,2))
+    for i in range(-2,sw-2):
+        for j in range(0,sh):
+            sm.add((ax+i,ay+j+(1 if i>=sw//3 and tilt<0 else 0)-(1 if i>=sw//2 and tilt>0 else 0)))
     draw_mask(im,sm,P['W'] if front else P['w'],None,None)
 def arm(im,sh,up,fore,front,fist=True):
     L1,L2,w=GEO['arm']

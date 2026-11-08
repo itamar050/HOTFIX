@@ -13,6 +13,10 @@ var knock := 0
 var home := Vector2.ZERO
 var phase := 0.0
 var throws := 0
+var move_i := 0  ## boss: index into PATTERN
+var hops := 0
+const PATTERN := ["review", "standup", "sprint"]
+const CALLS := {"review": "CODE REVIEW!", "standup": "STANDUP!", "sprint": "SPRINT!"}
 
 
 func setup(m, k: String, p: Vector2) -> void:
@@ -39,9 +43,9 @@ func setup(m, k: String, p: Vector2) -> void:
 			hp = 3
 			make_sprite("pm")
 		"tl":
-			w = 18
-			h = 40
-			hp = 24
+			w = 34
+			h = 60
+			hp = 30
 			face = -1
 			st = "intro"
 			make_sprite("tl")
@@ -112,75 +116,142 @@ func step() -> void:
 			_boss_step(ppos)
 
 
+## Team Leader: a fixed, learnable loop. Every attack is announced by name and has its own
+## wind-up pose (the tell), then the attack, then a short recovery:
+##   CODE REVIEW!  arm raised -> a fan of 5 tasks along fixed arcs (same gaps every time)
+##   STANDUP!      crouch -> 2 leaps at you, each landing sends shockwaves along the floor
+##   SPRINT!       lean back -> charge across the room into the wall -> dizzy (punish window)
+## Below half health the same loop runs faster (shorter tells, 3 leaps, a second fan).
 func _boss_step(ppos: Vector2) -> void:
 	var mad := hp <= max_hp / 2
+	var tell := 28 if mad else 42
 	vel.y = minf(vel.y + 0.22, 6)
 	match st:
 		"intro":
 			face = -1
 			vel.x = -0.8
-			anim("walk%d" % ((main.tick / 4) % 8))
-			if position.x < main.lock.y - 70:
+			anim("walk%d" % ((main.tick / 5) % 8))
+			if position.x < main.lock.y - 90:
 				st = "taunt"
 				st_t = 0
-				main.say(position + Vector2(-30, -58), "QUICK SYNC?")
+				main.say(position + Vector2(-30, -78), "QUICK SYNC?")
 		"taunt":
 			vel.x = 0
 			anim("idle%d" % ((main.tick / 30) % 2))
-			if st_t > 70:
-				st = "chase"
-				st_t = 0
-		"chase":
+			if st_t > 80:
+				_next_move()
+		"walk":
 			face = 1 if ppos.x > position.x else -1
-			vel.x = face * (1.0 if mad else 0.7)
-			anim("walk%d" % ((main.tick / 4) % 8))
-			if st_t > (70 if mad else 100):
-				st = "leap" if throws >= 1 else "throw"
+			vel.x = face * (0.9 if mad else 0.6)
+			anim("walk%d" % ((main.tick / 5) % 8))
+			if st_t > (30 if mad else 50):
+				st = PATTERN[move_i]
+				move_i = (move_i + 1) % PATTERN.size()
 				st_t = 0
-		"throw":
+				hops = 0
+				throws = 0
+				main.callout(CALLS[st], tell)
+				main.sfx("warn")
+		"review":
 			vel.x = 0
-			face = 1 if ppos.x > position.x else -1
-			var k := st_t % 30
-			anim("throw0" if k < 12 else "throw1")
-			if k == 12:
-				for i in 3:
-					main.throw_note(position + Vector2(face * 10, -34), ppos + Vector2(face * (i - 1) * 34, -10))
-			if st_t >= (90 if mad else 60):
-				throws += 1
-				st = "chase"
-				st_t = 0
-		"leap":
-			if st_t < 18:
+			if st_t < tell:
+				face = 1 if ppos.x > position.x else -1
+				anim("throw0")
+				_tell_glow()
+			else:
+				var k := (st_t - tell) % 40
+				anim("throw1" if k < 14 else "throw0")
+				if k == 0:
+					for i in 5:
+						main.throw_fan(position + Vector2(face * 22, -56), face, i)
+					main.sfx("throw")
+					throws += 1
+				if k == 39 and throws >= (2 if mad else 1):
+					_next_move()
+		"standup":
+			if st_t < tell and hops == 0:
 				vel.x = 0
 				anim("crouch")
-			elif st_t == 18:
-				vel.y = -5.6
-				vel.x = clampf((ppos.x - position.x) / 48.0, -2.6, 2.6)
+				_tell_glow()
+			elif st_t == tell or (hops > 0 and st_t == 1):
+				face = 1 if ppos.x > position.x else -1
+				vel.y = -6.2
+				vel.x = clampf((ppos.x - position.x) / 54.0, -3.0, 3.0)
 				main.sfx("jump")
-			elif on_ground and st_t > 22:
-				st = "land"
-				st_t = 0
+			elif on_ground and st_t > 4:
 				vel.x = 0
-				main.shockwave(position, mad)
-				main.sfx("stomp")
-				main.shake = 6
+				anim("land")
+				if st_t < 1000:
+					hops += 1
+					main.shockwave(position, mad)
+					main.sfx("stomp")
+					main.shake = 7
+					st_t = 1000
+				elif st_t > 1000 + (14 if mad else 22):
+					if hops < (3 if mad else 2):
+						st_t = 0
+					else:
+						_next_move()
 			else:
 				anim("air")
-		"land":
-			vel.x = 0
-			anim("land")
-			if st_t > (30 if mad else 45):
-				throws = 0
-				st = "chase"
-				st_t = 0
+		"sprint":
+			if st_t < tell:
+				vel.x = 0
+				face = 1 if ppos.x > position.x else -1
+				anim("dash0")
+				_tell_glow()
+				if st_t % 6 == 0:
+					main.dust(position + Vector2(-face * 16, 0))
+			else:
+				vel.x = face * (4.2 if mad else 3.4)
+				anim("dash%d" % ((main.tick / 4) % 2))
+				if main.tick % 4 == 0:
+					main.dust(position + Vector2(-face * 16, 0))
+				if (face < 0 and position.x <= main.lock.x + 20) or (face > 0 and position.x >= main.lock.y - 20):
+					st = "dizzy"
+					st_t = 0
+					vel.x = -face * 1.5
+					vel.y = -2.5
+					main.shake = 10
+					main.sfx("explode")
+					main.say(position + Vector2(-12, -76), "BONK!")
+		"dizzy":
+			vel.x = move_toward(vel.x, 0, 0.08)
+			anim("dizzy%d" % ((main.tick / 12) % 2))
+			main.stars(position + Vector2(0, -64))
+			if st_t > (80 if mad else 120):
+				_next_move()
 	move_body()
-	position.x = clampf(position.x, main.lock.x + 12, main.lock.y - 12)
+	position.x = clampf(position.x, main.lock.x + 20, main.lock.y - 20)
 	spr.flip_h = face < 0
+
+
+## Wind-up tell: pulse red (a hit flash is white, so the two never look alike).
+func _tell_glow() -> void:
+	if flash == 0:
+		spr.modulate = Color(1.7, 0.6, 0.55) if (st_t / 5) % 2 == 0 else Color.WHITE
+
+
+func _next_move() -> void:
+	st = "walk"
+	st_t = 0
+
+
+## Contact damage: not while dizzy (the punish window) or before the fight starts.
+func harmful() -> bool:
+	if dead:
+		return false
+	if kind == "tl":
+		return st in ["walk", "standup", "sprint", "review"]
+	return true
 
 
 func hurt(dmg: int, dir: int) -> void:
 	if inv > 0 or dead:
 		return
+	if kind == "tl" and st == "dizzy":
+		dmg *= 2  # the punish window: learning the pattern pays off
+		main.say(position + Vector2(-14, -70 - (main.tick % 3) * 4), "CRIT X2")
 	hp -= dmg
 	flash = 8
 	inv = 10 if kind == "tl" else 6
@@ -207,6 +278,8 @@ func die() -> void:
 		main.say(c + Vector2(-14, -12), "CLOSED!")
 	elif kind == "pm":
 		main.say(c + Vector2(-20, -24), "OUT OF OFFICE")
+	elif kind == "tl":
+		main.say(c + Vector2(-40, -40), "FINE, I'LL APPROVE IT")
 	main.sfx("enemyDie")
 	if kind == "tl":
 		main.boss_defeated()

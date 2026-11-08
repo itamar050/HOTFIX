@@ -245,6 +245,8 @@ func _build_stage() -> void:
 	coins = []
 	notes = []
 	waves_fx = []
+	dusts = []
+	call_t = 0
 	texts = []
 	pops = []
 	heals = [Vector2(2150, 180), Vector2(1560, 104)]
@@ -258,6 +260,13 @@ func _build_stage() -> void:
 	player = Player8.new()
 	player.setup(self, Vector2(40, FLOOR_Y))
 	player.god = demo
+	if demo and "--boss" in OS.get_cmdline_user_args():
+		player.position = Vector2(BOSS_X0 + 30, FLOOR_Y)
+		arena_state = 2
+		cam_x = BOSS_X0 + 200
+		for e in enemies:
+			e.queue_free()
+		enemies = []
 	player.max_hp = 8 + 2 * upgrades["coffee"]
 	player.hp = player.max_hp
 	world.add_child(player)
@@ -359,7 +368,7 @@ func _play_step() -> void:
 	player.step()
 	for e in enemies.duplicate():
 		e.step()
-		if not e.dead and player.state != "dead" and e.rect().grow(-1).intersects(player.rect()):
+		if e.harmful() and player.state != "dead" and e.rect().grow(-2).intersects(player.rect()):
 			player.hurt(1, e.position.x)
 		if e.gone:
 			enemies.erase(e)
@@ -414,7 +423,11 @@ func _step_arena() -> void:
 	if boss_state == 0 and px > BOSS_X0 + 40:
 		boss_state = 1
 		lock = Vector2(BOSS_X0, LEVEL_W)
-		boss = _spawn("tl", Vector2(LEVEL_W - 10, FLOOR_Y))
+		for e in enemies:
+			if not e.dead:
+				e.gone = true
+				pop(e.position + Vector2(0, -6), false)
+		boss = _spawn("tl", Vector2(LEVEL_W - 30, FLOOR_Y))
 		_music("boss")
 		sfx("warn")
 
@@ -472,6 +485,32 @@ func _step_notes() -> void:
 			player.hurt(1, w["x"] - w["d"] * 10)
 		if w["t"] > 140 or w["x"] < lock.x or w["x"] > lock.y:
 			waves_fx.erase(w)
+
+
+## CODE REVIEW fan: task i of 5 always flies along the same arc (learnable gaps).
+func throw_fan(from: Vector2, dir: int, i: int) -> void:
+	notes.append({"p": from, "v": Vector2(dir * (0.7 + i * 0.55), -3.2 + i * 0.25), "g": 0.1})
+
+
+var call_text := ""
+var call_t := 0
+var dusts: Array = []
+var star_at := Vector2.ZERO
+var star_t := 0
+
+
+func callout(s: String, frames: int) -> void:
+	call_text = s
+	call_t = frames + 30
+
+
+func dust(at: Vector2) -> void:
+	dusts.append({"p": at, "t": 0})
+
+
+func stars(at: Vector2) -> void:
+	star_at = at
+	star_t = 2
 
 
 func shockwave(at: Vector2, mad: bool) -> void:
@@ -571,9 +610,24 @@ func _draw_fx() -> void:
 	for n in notes:
 		var p: Vector2 = (n["p"] as Vector2).round()
 		fx.draw_texture_rect_region(note_tex, Rect2(p - Vector2(3, 3), Vector2(7, 7)), Rect2((tick / 4) % 2 * 7, 0, 7, 7))
+	for d_ in dusts.duplicate():
+		var k: int = d_["t"]
+		d_["t"] = k + 1
+		var dp: Vector2 = d_["p"]
+		var r := 2 + k / 3
+		fx.draw_rect(Rect2(dp.x - r, dp.y - r - k / 2, r * 2, r), Color8(200, 190, 220, 200 - k * 12))
+		if k > 14:
+			dusts.erase(d_)
+	if star_t > 0:
+		star_t -= 1
+		for i in 3:
+			var ang := tick * 0.12 + i * TAU / 3
+			var sp := (star_at + Vector2(cos(ang) * 14, sin(ang) * 4)).round()
+			fx.draw_rect(Rect2(sp + Vector2(-1, 0), Vector2(3, 1)), Color8(255, 230, 80))
+			fx.draw_rect(Rect2(sp + Vector2(0, -1), Vector2(1, 3)), Color8(255, 230, 80))
 	for w in waves_fx:
 		var x: float = roundf(w["x"])
-		var hh := 8 + (int(w["t"]) / 3) % 3
+		var hh := 11 + (int(w["t"]) / 3) % 3
 		fx.draw_rect(Rect2(x - 5, FLOOR_Y - hh, 10, hh), Color8(14, 10, 24))
 		fx.draw_rect(Rect2(x - 4, FLOOR_Y - hh + 1, 8, hh - 1), Color8(250, 210, 90))
 		fx.draw_rect(Rect2(x - 2, FLOOR_Y - hh + 2, 4, hh - 2), Color8(255, 250, 220))
@@ -638,14 +692,21 @@ func _draw_hud() -> void:
 	F8.text(hud, Vector2(px + 44, 9), "NEXUS HQ", Color8(160, 200, 252), 1, false)
 	if boss_state == 1 and boss:
 		F8.text(hud, Vector2(322, 2), "-TEAM LEAD-", white, 1, false)
-		var full := int(ceil(boss.hp / 3.0))
+		var full := int(ceil(boss.hp * 8.0 / boss.max_hp))
 		_pips(340, 8, 8, full, Color8(232, 160, 40))
+	if call_t > 0:
+		call_t -= 1
+		if call_t > 30 or (call_t / 4) % 2 == 0:
+			var cw := F8.width(call_text, 3) + 16
+			hud.draw_rect(Rect2(200 - cw / 2, 30, cw, 25), Color8(14, 10, 24))
+			hud.draw_rect(Rect2(200 - cw / 2 + 1, 31, cw - 2, 23), Color8(150, 30, 40))
+			F8.centered(hud, 200, 35, call_text, Color8(255, 240, 200), 3)
 	if go_t > 0 and (go_t / 12) % 2 == 0:
 		F8.text(hud, Vector2(320, 110), "GO! >>", gold, 3)
 	match mode:
 		"clear":
 			F8.centered(hud, 200, 70, "TEAM LEADER DEFEATED!", gold, 2)
-			F8.centered(hud, 200, 94, "\"FINE... I'LL APPROVE YOUR PR.\"", white)
+			F8.centered(hud, 200, 94, "YOUR PR IS APPROVED.", white)
 			F8.centered(hud, 200, 110, "CASH $%d" % shown_cash, gold, 2)
 		"over":
 			hud.draw_rect(Rect2(0, 16, 400, 224), Color(0, 0, 0, minf(0.7, mode_t / 60.0)))
@@ -743,6 +804,27 @@ func _autopilot() -> void:
 		return
 	var px: float = player.position.x
 	var py: float = player.position.y
+	if boss and "--boss" in OS.get_cmdline_user_args():
+		var bx: float = boss.position.x
+		var dizzy: bool = boss.st == "dizzy"
+		var want2 := bx - 26.0 if bx > px else bx + 26.0
+		if not dizzy:
+			want2 = bx - 110.0 if bx > lock.x + 150 else bx + 110.0
+		if absf(px - want2) > 4:
+			_auto["right" if want2 > px else "left"] = true
+		elif dizzy:
+			if player.face != (1 if bx > px else -1):
+				_auto["right" if bx > px else "left"] = true
+			elif tick % 8 == 0:
+				_auto["punch"] = true
+		for w in waves_fx:
+			if absf(w["x"] - px) < 34 and player.on_ground:
+				_auto["jump"] = true
+		if boss.st == "sprint" and absf(bx - px) < 70 and player.on_ground:
+			_auto["jump"] = true
+		if not player.on_ground and player.vel.y < 0:
+			_auto["jump"] = true
+		return
 	var near = null
 	var best_d := 1e9
 	for e in enemies:
