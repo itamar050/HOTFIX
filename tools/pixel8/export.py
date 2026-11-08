@@ -93,6 +93,69 @@ tl['dizzy1']=TP((-12,20),(14,24),(-10,10),(-5,10),bob=3,lean=1)
 tl['hurt']=TP((-25,30),(10,40),(-60,40),(-50,40),lean=-3)
 strip('tl',tl,72,74,30.5)
 as_char(BRO); GEO.clear(); GEO.update(SAVE_GEO)
+# ---------- Group Leader boss (stage 2): grey slicked hair, glasses, vest and tie
+GL_HEAD=[".......KKKKKKKK.......",
+".....KKjjjjjjHHKK.....",
+"....KjjjjHHHHHHHHK....",
+"...KjHHHHHHHHHHHHHK...",
+"..KHHHHHHHHHHHHHHHHK..",
+"..KHhHHHHHHHHHHHHHHHK.",
+".KHhHHHHHHHHHHHHSSSHK.",
+".KHhHHHSSSSSSSSSSSSSK.",
+".KhHHSSSSSSSSSSSSSSSK.",
+".KhHSSSSSSSSSSSSSSSSK.",
+".KhsSSSSKKKKKKKKKKKKKK",
+".KhssSSSKLLLlKKLLLlKSK",
+".KhssSSSKLLLLKKLLLLKSK",
+".KhsSSSSKKKKKKSKKKKKSK",
+".KhsSSSSSSSSSSSSSSsSSK",
+"..KsSSSSSSSSSSSSSSSSK.",
+"..KsSSSSSSSSSKKKKKSSK.",
+"..KsSSSSSSSSSSSSSKSSK.",
+"...KsSSSSSSSSSSSSSSK..",
+"....KssSSSSSSSSSSSK...",
+".....KKsSSSSSSSSKK....",
+".......KKKKKKKKK......"]
+_gt=[".......KKKKSSSSKKKK.......",
+".....KKRRRKQSSQKRRRKK.....",
+"...KKRRRRRKQQQQKRRRRRKK...",
+"..KRRRRRRRKQTTQKRRRRRRRK..",
+".KRRRRRRRRKQTTQKRRRRRRRRK.",
+".KRRRRRRRRRKTTKRRRRRRRRRK.",
+"KRRRRRRRRRRKTTKRRRRRRRRrRK",
+"KRRRRRRRRRRKTTKRRRRRRRRrRK",
+"KRRRRRRRRRRRKKRRRRRRRRRrRK",
+"KRRRRRRRRRRRRRRRRRRRRRRrRK",
+"KRRRRRRRRRRRvvRRRRRRRRRrRK",
+"KRRRRRRRRRRRRRRRRRRRRRrrRK",
+"KRRRRRRRRRRRvvRRRRRRRRrrRK",
+"KRRRRRRRRRRRRRRRRRRRRRrrRK",
+"KrRRRRRRRRRRvvRRRRRRRrrrRK",
+"KrrRRRRRRRRRRRRRRRRRRrrrrK",
+"KQQQQQQQQQQQQQQQQQQQQQQQQK",
+"KQQQQQQQQQQQQQQQQQQQQQQQQK",
+".KKKKKKKKKKKKKKKKKKKKKKKK.",
+"..KKKKKKKKKKKKKKKKKKKKKK.."]
+GL_TORSO=[r.translate(str.maketrans('RrQv','VURY')) for r in _gt]
+GL_PAL=dict(P,H=(150,150,162),h=(100,100,114),j=(204,204,214),V=(60,64,86),U=(40,42,60),R=(176,160,222),Q=(212,200,242),r=(128,114,180),
+ T=(170,30,50),t=(120,20,36),Y=(222,200,120),L=(160,220,252),l=(255,255,255),B=(92,94,108),b=(62,64,74),n=(132,134,148),W=(34,32,40),w=(22,20,26))
+GEO.clear(); GEO.update(SAVE_GEO); GEO.update(hip=(30.5,38.5),sb=(34,24),sf=(26,24),torso=(17,20),head=(21,0),leg=(11.0,10.0,8.4),arm=(9.0,8.5,7.0),fist=7.4,shoe=(13,4))
+as_char((GL_HEAD,GL_TORSO,GL_PAL))
+gl={'idle0':TP((-10,8),(12,12),(15,40),(10,30)),'idle1':TP((-10,12),(12,16),(15,40),(10,30),bob=1)}
+for i in range(8):
+    p=2*math.pi*i/8; lg=lambda p:(22*math.sin(p),36*max(0,math.cos(p))**1.5+6)
+    gl['walk%d'%i]=TP(lg(p+math.pi),lg(p),(14*math.sin(p),30),(-16*math.sin(p),30),0 if abs(math.sin(p))>0.7 else -1)
+gl['cast']=TP((-12,8),(14,12),(165,10),(160,15),bob=-1)
+gl['throw0']=TP((-12,8),(16,12),(15,40),(-150,10),lean=-2)
+gl['throw1']=TP((-16,6),(20,10),(15,40),(100,-10),lean=2)
+gl['crouch']=TP((30,80),(50,95),(30,100),(20,100),bob=7)
+gl['air']=TP((-10,30),(60,90),(150,10),(160,10),bob=-2)
+gl['land']=TP((30,85),(50,100),(-60,20),(-50,20),bob=7)
+gl['stuck0']=TP((40,100),(50,105),(-90,10),(90,10),bob=9,lean=-1)
+gl['stuck1']=TP((40,100),(50,105),(-80,10),(80,10),bob=9,lean=1)
+gl['hurt']=TP((-25,30),(10,40),(-60,40),(-50,40),lean=-3)
+strip('gl',gl,72,74,30.5)
+as_char(BRO); GEO.clear(); GEO.update(SAVE_GEO)
 # ---------- small sprites
 def save_frames(name,grids,pal):
     ims=[grid(g,pal) for g in grids]; w=max(i.width for i in ims); h=max(i.height for i in ims)
@@ -101,6 +164,7 @@ def save_frames(name,grids,pal):
     out.save(f'{OUT}/{name}.png'); data.append((name,w,h,h,[str(i) for i in range(len(ims))]))
 save_frames('bug',BUG,BUGP)
 save_frames('jira',[JIRA],JP)
+save_frames('blocker',[JIRA],dict(JP,B=(204,36,40),L=(255,110,100),d=(120,10,20)))
 save_frames('note',NOTE,NP)
 save_frames('coin',COIN,CP)
 # ---------- props (drawn with rectangles, black outline)
@@ -166,7 +230,26 @@ def item_ooo():
     for k in range(3):
         x=2+k*4; R(d,x,3,3,3,KK); R(d,x+1,4,1,1,(190,150,250))
     return im
-props=dict(keyboard=item_keyboard(),ooo=item_ooo(),desk=desk(),monitor=monitor(),cab48=cabinet(48),cab24=cabinet(24),shelf=shelf(84),books=books(),rack90=rack(90),rack68=rack(68),
+def table():
+    im,d=canvas(96,32); R(d,0,0,96,6,KK);R(d,1,1,94,4,(222,226,236));R(d,1,1,94,1,(250,252,255));R(d,1,4,94,1,(150,156,176))
+    for lx in [4,46,88]: R(d,lx,6,4,26,KK);R(d,lx+1,6,2,26,(110,116,140))
+    return im
+def whiteboard():
+    im,d=canvas(64,42); R(d,0,0,64,40,KK);R(d,2,2,60,36,(240,242,248));R(d,2,38,60,4,(150,156,176))
+    for i,(c,h_) in enumerate([((60,120,220),18),((220,60,60),26),((60,170,90),12),((60,120,220),22)]): R(d,8+i*8,34-h_,5,h_,c)
+    R(d,42,8,16,1,(220,60,60));R(d,42,12,12,1,(60,60,70));R(d,42,16,14,1,(60,60,70));R(d,42,20,10,1,(60,60,70))
+    return im
+def beanbag():
+    im,d=canvas(30,18); d.ellipse([0,2,29,17],fill=KK); d.ellipse([1,3,28,16],fill=(140,60,170)); d.ellipse([5,5,16,10],fill=(190,110,220)); return im
+def foosball():
+    im,d=canvas(48,24); R(d,0,0,48,24,KK);R(d,1,1,46,8,(40,150,70));R(d,1,1,46,1,(110,220,120));R(d,1,9,46,14,(150,96,50));R(d,3,12,42,8,(120,74,36))
+    for rx in [10,20,30,40]: R(d,rx,0,1,9,(200,200,210))
+    return im
+def coffeemachine():
+    im,d=canvas(22,30); R(d,0,0,22,30,KK);R(d,1,1,20,28,(60,60,70));R(d,3,3,16,8,(190,196,210));R(d,8,14,6,6,(20,20,24));R(d,15,4,2,2,(250,60,60)); return im
+def lamp2():
+    im,d=canvas(16,20); R(d,7,0,2,12,KK);R(d,2,12,12,6,KK);R(d,3,13,10,4,(60,180,140));R(d,4,17,8,2,(250,250,200)); return im
+props=dict(table=table(),whiteboard=whiteboard(),beanbag=beanbag(),foosball=foosball(),coffee=coffeemachine(),lamp2=lamp2(),keyboard=item_keyboard(),ooo=item_ooo(),desk=desk(),monitor=monitor(),cab48=cabinet(48),cab24=cabinet(24),shelf=shelf(84),books=books(),rack90=rack(90),rack68=rack(68),
            cooler=cooler(),plant=plant(),vending=vending(),lamp=lamp(),door=door())
 for k,v in props.items(): v.save(f'{OUT}/prop_{k}.png')
 # ---------- background layers
@@ -208,6 +291,45 @@ def floor():
     return im
 def floor2():
     im=floor(); d=ImageDraw.Draw(im); R(d,0,0,16,1,(100,84,148)); return im
+def far2():
+    im,d=canvas(400,240)
+    sky=[(52,28,86),(98,42,106),(160,62,110),(218,96,92),(244,150,90)]
+    for i,c in enumerate(sky): R(d,0,i*36,400,36 if i<4 else 100,c)
+    d.ellipse([150,128,230,208],fill=(255,214,120))
+    def city(col,win,base,hmin,hmax,wmin,wmax,seed):
+        r=random.Random(seed);x=0
+        while x<400:
+            w=min(r.randint(wmin,wmax),400-x);h=r.randint(hmin,hmax);top=base-h
+            R(d,x,top,w,base-top+40,col)
+            for yy in range(top+4,base-4,7):
+                for xx in range(x+3,x+w-3,6):
+                    if r.random()<.15: R(d,xx,yy,2,3,win)
+            x+=w+r.randint(0,3)
+    city((94,40,90),(250,190,110),185,40,100,20,36,5)
+    city((56,24,64),(250,200,120),185,20,60,26,46,6)
+    return im
+def wall2():
+    im,d=canvas(124,240)
+    WALL=(32,84,96);WD=(20,56,66);WL=(70,140,150)
+    R(d,0,0,124,30,(26,30,40)); R(d,0,0,124,16,KK)
+    for x in range(0,124,12): R(d,x,28,10,2,(46,52,66))
+    R(d,0,30,22,148,WALL);R(d,0,30,2,148,WL);R(d,20,30,2,148,WD)
+    R(d,22,30,102,4,KK);R(d,22,174,102,4,KK);R(d,72,30,3,148,KK)
+    for (x0,x1) in [(22,72),(75,124)]:
+        g=Image.new('RGBA',(x1-x0,140),(150,220,235,46)); im.alpha_composite(g,(x0,34))
+        for k in range(0,30,1):
+            if x0+12+k<x1: d.point((x0+12+k,40+k),fill=(220,245,250,90))
+    R(d,0,178,124,30,(110,80,58));R(d,0,178,124,2,(160,120,86))
+    for x in range(0,124,31): R(d,x,180,2,28,(80,56,40))
+    R(d,0,208,124,32,(30,22,30))
+    return im
+def floor_s2(top=True):
+    im,d=canvas(16,16); FT=(70,84,104)
+    R(d,0,0,16,16,FT);R(d,0,0,16,1,(120,140,164) if top else (84,100,122))
+    for (x,y) in [(3,4),(11,9),(6,12),(13,3),(8,7)]: d.point((x,y),fill=(90,106,128))
+    R(d,15,0,1,16,(52,62,80));R(d,0,15,16,1,(52,62,80))
+    return im
+far2().save(f'{OUT}/bg_far_s2.png'); wall2().save(f'{OUT}/bg_wall_s2.png'); floor_s2().save(f'{OUT}/tile_floor_s2.png'); floor_s2(False).save(f'{OUT}/tile_floor2_s2.png')
 far().save(f'{OUT}/bg_far.png'); wall().save(f'{OUT}/bg_wall.png'); floor().save(f'{OUT}/tile_floor.png'); floor2().save(f'{OUT}/tile_floor2.png')
 # ---------- GDScript sprite table
 with open('../../godot/game8/sprite_data.gd','w') as f:

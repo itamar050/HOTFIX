@@ -1,51 +1,96 @@
-## HOTFIX! 8-bit stage 1: Nexus HQ dev floor at night. Platforming, an arena, the Team
-## Leader boss, cash, weapon pickups, a pause menu and the skill tree (Tab). Built in code.
+## HOTFIX! 8-bit game: stages (data in STAGES) with platforming, an arena and a boss each, cash, weapon pickups, a pause menu and the skill tree (Tab). Built in code.
 extends Node2D
 
 const F8 = preload("res://game8/font8.gd")
 const Player8 = preload("res://game8/player.gd")
 const Enemy8 = preload("res://game8/enemy.gd")
 
-const LEVEL_W := 2840.0
 const FLOOR_Y := 208.0
-const PITS := [Vector2(1680, 1728)]
-## props: [type, x, top]; desks/shelves are one-way platforms, cabinets are solid
-const PROPS := [
-	["rack90", 4, 118], ["rack68", 32, 140], ["desk", 112, 180], ["monitor", 124, 160], ["plant", 200, 178],
-	["cab48", 232, 160], ["cab24", 262, 184], ["shelf", 300, 132], ["books", 312, 120], ["cooler", 374, 170],
-	["desk", 450, 180], ["monitor", 500, 160], ["shelf", 520, 140], ["desk", 600, 180], ["cab48", 700, 160],
-	["cab24", 730, 184], ["plant", 790, 178],
-	["desk", 940, 180], ["monitor", 990, 160], ["cab48", 1060, 160], ["desk", 1140, 180], ["monitor", 1150, 160],
-	["rack90", 1240, 118],
-	["cab24", 1320, 184], ["cab48", 1350, 160], ["shelf", 1400, 126], ["books", 1440, 114], ["shelf", 1520, 104],
-	["desk", 1580, 180], ["monitor", 1630, 160],
-	["desk", 1760, 180], ["shelf", 1880, 150], ["cab48", 2000, 160], ["cab24", 2030, 184], ["desk", 2120, 180],
-	["monitor", 2130, 160], ["plant", 2210, 178], ["rack90", 2290, 118], ["rack68", 2318, 140], ["door", 2380, 136],
-	["vending", 2790, 144],
+## One dictionary per stage: look, layout (props are [type, x, top]; desks, tables and shelves
+## are one-way platforms, cabinets and foosball tables are solid), enemies, arena, items, boss.
+const STAGES := [
+	{
+		"name": "NEXUS HQ", "sub": "THE DEV FLOOR, 11 PM", "w": 2840.0, "art": "", "rain": true, "lamp": "lamp", "music": "stage1",
+		"boss": "tl", "boss_x0": 2440.0, "boss_name": "-TEAM LEAD-", "boss_full": "TEAM LEADER", "clear_line": "YOUR PR IS APPROVED.",
+		"pits": [Vector2(1680, 1728)],
+		"props": [
+			["rack90", 4, 118], ["rack68", 32, 140], ["desk", 112, 180], ["monitor", 124, 160], ["plant", 200, 178],
+			["cab48", 232, 160], ["cab24", 262, 184], ["shelf", 300, 132], ["books", 312, 120], ["cooler", 374, 170],
+			["desk", 450, 180], ["monitor", 500, 160], ["shelf", 520, 140], ["desk", 600, 180], ["cab48", 700, 160],
+			["cab24", 730, 184], ["plant", 790, 178],
+			["desk", 940, 180], ["monitor", 990, 160], ["cab48", 1060, 160], ["desk", 1140, 180], ["monitor", 1150, 160],
+			["rack90", 1240, 118],
+			["cab24", 1320, 184], ["cab48", 1350, 160], ["shelf", 1400, 126], ["books", 1440, 114], ["shelf", 1520, 104],
+			["desk", 1580, 180], ["monitor", 1630, 160],
+			["desk", 1760, 180], ["shelf", 1880, 150], ["cab48", 2000, 160], ["cab24", 2030, 184], ["desk", 2120, 180],
+			["monitor", 2130, 160], ["plant", 2210, 178], ["rack90", 2290, 118], ["rack68", 2318, 140], ["door", 2380, 136],
+			["vending", 2790, 144],
+		],
+		"enemies": [
+			["bug", 180, 208], ["jira", 320, 150], ["bug", 470, 208], ["bug", 640, 180], ["pm", 715, 160], ["jira", 820, 110],
+			["bug", 1440, 126], ["jira", 1500, 84], ["jira", 1630, 140], ["bug", 1600, 208],
+			["bug", 1800, 180], ["pm", 1922, 150], ["jira", 2060, 110], ["bug", 2160, 208], ["bug", 2250, 208],
+		],
+		"coins": [[320, 128], [330, 128], [340, 128], [1540, 100], [1550, 100], [1560, 100], [1570, 100], [560, 136], [570, 136]],
+		"arena": {"x0": 880.0, "waves": [
+			[["bug", 1270, 208], ["bug", 890, 208], ["jira", 1270, 110]],
+			[["pm", 1075, 150], ["jira", 890, 100], ["bug", 1270, 208], ["bug", 900, 208]],
+		]},
+		"items": [["keyboard", 150, 180], ["ooo", 560, 140], ["keyboard", 1000, 208], ["ooo", 1545, 104], ["keyboard", 2075, 160]],
+		"heals": [Vector2(2150, 180), Vector2(1560, 104)],
+	},
+	{
+		"name": "TEAM ROOMS", "sub": "MEETING FLOOR, GOLDEN HOUR", "w": 3000.0, "art": "_s2", "rain": false, "lamp": "lamp2", "music": "stage2",
+		"boss": "gl", "boss_x0": 2600.0, "boss_name": "-GROUP LEAD-", "boss_full": "GROUP LEADER", "clear_line": "MEETING ADJOURNED.",
+		"pits": [Vector2(520, 568), Vector2(1760, 1808)],
+		"props": [
+			["table", 100, 176], ["whiteboard", 180, 104], ["shelf", 260, 140], ["books", 280, 128], ["plant", 370, 178],
+			["foosball", 420, 184], ["table", 600, 176], ["shelf", 700, 136], ["shelf", 820, 104], ["books", 840, 92],
+			["cab48", 920, 160], ["beanbag", 980, 190],
+			["table", 1100, 176], ["whiteboard", 1180, 96], ["foosball", 1300, 184], ["coffee", 1400, 178],
+			["shelf", 1480, 150], ["shelf", 1580, 120], ["shelf", 1680, 90], ["table", 1830, 176], ["beanbag", 1940, 190],
+			["foosball", 1990, 184], ["table", 2080, 176], ["whiteboard", 2150, 96], ["cab48", 2220, 160], ["cab24", 2250, 184],
+			["shelf", 2320, 130], ["coffee", 2440, 178], ["plant", 2480, 178], ["door", 2540, 136],
+			["whiteboard", 2760, 96], ["beanbag", 2900, 190],
+		],
+		"enemies": [
+			["bug", 200, 208], ["jira", 300, 120], ["pm", 340, 140], ["bug", 640, 176], ["blocker", 760, 110], ["bug", 880, 208],
+			["pm", 935, 160], ["bug", 1500, 208], ["blocker", 1640, 140], ["jira", 1600, 70], ["pm", 1720, 90], ["bug", 1880, 176],
+			["bug", 2070, 208], ["bug", 2120, 176], ["pm", 2235, 160], ["jira", 2350, 100], ["bug", 2400, 208], ["blocker", 2460, 110],
+		],
+		"coins": [[130, 172], [140, 172], [840, 100], [850, 100], [860, 100], [1700, 86], [1710, 86], [1720, 86], [2340, 126], [2350, 126]],
+		"arena": {"x0": 1040.0, "waves": [
+			[["bug", 1430, 208], ["bug", 1050, 208], ["jira", 1430, 110]],
+			[["pm", 1140, 176], ["blocker", 1050, 100], ["bug", 1430, 208]],
+			[["jira", 1050, 90], ["jira", 1430, 90], ["bug", 1430, 208], ["bug", 1050, 208]],
+		]},
+		"items": [["keyboard", 640, 176], ["ooo", 1180, 208], ["keyboard", 2014, 184], ["ooo", 2470, 208]],
+		"heals": [Vector2(1850, 176), Vector2(2350, 130)],
+	},
 ]
-const ENEMIES := [
-	["bug", 180, 208], ["jira", 320, 150], ["bug", 470, 208], ["bug", 640, 180], ["pm", 715, 160], ["jira", 820, 110],
-	["bug", 1440, 126], ["jira", 1500, 84], ["jira", 1630, 140], ["bug", 1600, 208],
-	["bug", 1800, 180], ["pm", 1922, 150], ["jira", 2060, 110], ["bug", 2160, 208], ["bug", 2250, 208],
-]
-const COINS := [[320, 128], [330, 128], [340, 128], [1540, 100], [1550, 100], [1560, 100], [1570, 100], [560, 136], [570, 136]]
-const ARENA := {"x0": 880.0, "waves": [
-	[["bug", 1270, 208], ["bug", 890, 208], ["jira", 1270, 110]],
-	[["pm", 1075, 150], ["jira", 890, 100], ["bug", 1270, 208], ["bug", 900, 208]],
-]}
-const BOSS_X0 := 2440.0
+const NEXT_UP := "STAGE 3: THE DIRECTOR'S FLOOR"
 ## Skill tree: 4 branches x 3 tiers, each tier needs the one above it. [id, name, effect, price]
 const SKILLS := [
-	[["coffee1", "COFFEE", "+2 MAX HEALTH", 40], ["coffee2", "DOUBLE SHOT", "+2 MAX HEALTH", 80], ["energy", "ENERGY DRINK", "HEAL 1 EVERY 15 SEC", 150]],
-	[["kb1", "MECH KEYBOARD", "+1 PUNCH POWER", 50], ["kb2", "RGB KEYBOARD", "+1 PUNCH POWER", 100], ["ragequit", "RAGE QUIT", "HOLD X, RELEASE: BIG PUNCH", 150]],
-	[["sneakers", "SNEAKERS", "RUN 25% FASTER", 40], ["dash", "SPRINT DASH", "C: DASH, DODGES HITS", 90], ["triple", "JETPACK", "TRIPLE JUMP", 140]],
-	[["magnet", "CASH MAGNET", "PULLS IN COINS", 50], ["bounty", "BUG BOUNTY", "+50% CASH DROPS", 100], ["parachute", "GOLDEN PARACHUTE", "SURVIVE 1 FATAL HIT", 150]],
+	[["coffee1", "COFFEE", "+2 MAX HEALTH", 50], ["coffee2", "DOUBLE SHOT", "+2 MAX HEALTH", 100], ["energy", "ENERGY DRINK", "HEAL 1 EVERY 15 SEC", 180]],
+	[["kb1", "MECH KEYBOARD", "+1 PUNCH POWER", 60], ["kb2", "RGB KEYBOARD", "+1 PUNCH POWER", 120], ["ragequit", "RAGE QUIT", "HOLD X, RELEASE: BIG PUNCH", 180]],
+	[["sneakers", "SNEAKERS", "RUN 25% FASTER", 50], ["dash", "SPRINT DASH", "C: DASH, DODGES HITS", 110], ["triple", "JETPACK", "TRIPLE JUMP", 170]],
+	[["magnet", "CASH MAGNET", "PULLS IN COINS", 60], ["bounty", "BUG BOUNTY", "+50% CASH DROPS", 120], ["parachute", "GOLDEN PARACHUTE", "SURVIVE 1 FATAL HIT", 180]],
 ]
 const BRANCHES := ["HEALTH", "POWER", "MOBILITY", "LOOT"]
-## weapon pickups: [type, x, y]
-const ITEMS := [["keyboard", 150, 180], ["ooo", 560, 140], ["keyboard", 1000, 208], ["ooo", 1545, 104], ["keyboard", 2075, 160], ["ooo", 2250, 208]]
 
 var tick := 0
+var stage := 0
+var L: Dictionary = STAGES[0]
+var level_w := 2840.0
+var pits: Array = []
+var arena: Dictionary = {}
+var boss_x0 := 2440.0
+var built_stage := -1
+var level_root: Node2D
+var intro_t := 0
+var slides: Array = []
+var tiles: Array = []
+var land_mark := Vector2(-1, 0)  ## x, frames left: where the Group Leader will crash down
 var mode := "title"  ## title, play, clear, skills, pause, over
 var mode_t := 0
 var demo := false
@@ -59,7 +104,7 @@ var waves_fx: Array = []
 var texts: Array = []
 var pops: Array = []
 var heals: Array = []
-var lock := Vector2(0, LEVEL_W)
+var lock := Vector2(0, 2840)
 var arena_state := 0  ## 0 before, 1 fighting, 2 done
 var wave := 0
 var wave_gap := 0
@@ -105,7 +150,6 @@ func _ready() -> void:
 	note_tex = load("res://game8/art/note.png")
 	vending_tex = load("res://game8/art/prop_vending.png")
 	item_tex = {"keyboard": load("res://game8/art/prop_keyboard.png"), "ooo": load("res://game8/art/prop_ooo.png")}
-	_build_background()
 	world = Node2D.new()
 	add_child(world)
 	fx = Node2D.new()
@@ -129,11 +173,13 @@ func _ready() -> void:
 		var p := AudioStreamPlayer.new()
 		add_child(p)
 		sfx_pool.append(p)
+	if demo and "--stage2" in OS.get_cmdline_user_args():
+		stage = 1
 	_build_stage()
 	_music("title")
 	if demo:
 		mode = "play"
-		_music("stage1")
+		_music(L["music"])
 
 
 # ---- input -----------------------------------------------------------------------------
@@ -182,71 +228,84 @@ func pressed(a: String) -> bool:
 # ---- building ----------------------------------------------------------------------------
 
 func _build_background() -> void:
+	if level_root:
+		level_root.queue_free()
+	level_root = Node2D.new()
+	add_child(level_root)
+	move_child(level_root, 0)
+	solids = []
+	platforms = []
+	var art: String = L["art"]
 	var far := Parallax2D.new()
 	far.scroll_scale = Vector2(0.25, 0)
 	far.repeat_size = Vector2(400, 0)
 	far.repeat_times = 3
 	far.z_index = -20
-	add_child(far)
+	level_root.add_child(far)
 	var s := Sprite2D.new()
-	s.texture = load("res://game8/art/bg_far.png")
+	s.texture = load("res://game8/art/bg_far%s.png" % art)
 	s.centered = false
 	far.add_child(s)
-	rain = Node2D.new()
-	rain.draw.connect(_draw_rain)
-	far.add_child(rain)
-	var wall := Parallax2D.new()
-	wall.scroll_scale = Vector2(1, 0)
-	wall.repeat_size = Vector2(124, 0)
-	wall.repeat_times = 6
-	wall.z_index = -10
-	add_child(wall)
-	var ws := Sprite2D.new()
-	ws.texture = load("res://game8/art/bg_wall.png")
-	ws.centered = false
-	wall.add_child(ws)
+	rain = null
+	if L["rain"]:
+		rain = Node2D.new()
+		rain.draw.connect(_draw_rain)
+		far.add_child(rain)
+	# the wall moves with the world, so plain sprites along the level (no parallax repeat gaps)
+	var wall_tex: Texture2D = load("res://game8/art/bg_wall%s.png" % art)
+	for i in range(-1, int(level_w / 124.0) + 2):
+		var ws := Sprite2D.new()
+		ws.texture = wall_tex
+		ws.centered = false
+		ws.position = Vector2(i * 124, 0)
+		ws.z_index = -10
+		level_root.add_child(ws)
+	floor_t1 = load("res://game8/art/tile_floor%s.png" % art)
+	floor_t2 = load("res://game8/art/tile_floor2%s.png" % art)
 	var floor_node := Node2D.new()
 	floor_node.z_index = -5
 	floor_node.draw.connect(_draw_floor.bind(floor_node))
-	add_child(floor_node)
-	for p in PROPS:
+	level_root.add_child(floor_node)
+	for p in L["props"]:
 		var sp := Sprite2D.new()
 		sp.texture = load("res://game8/art/prop_%s.png" % p[0])
 		sp.centered = false
 		sp.position = Vector2(p[1], p[2])
 		sp.z_index = -4
-		add_child(sp)
+		level_root.add_child(sp)
 		var r := Rect2(p[1], p[2], sp.texture.get_width(), FLOOR_Y - p[2])
 		match p[0]:
-			"cab48", "cab24":
+			"cab48", "cab24", "foosball":
 				solids.append(r)
 			"desk":
 				platforms.append(Rect2(p[1], p[2], 72, 6))
+			"table":
+				platforms.append(Rect2(p[1], p[2], 96, 6))
 			"shelf":
 				platforms.append(Rect2(p[1], p[2], 84, 8))
-	for i in range(0, int(LEVEL_W), 248):
+	for i in range(0, int(level_w), 248):
 		var lamp := Sprite2D.new()
-		lamp.texture = load("res://game8/art/prop_lamp.png")
+		lamp.texture = load("res://game8/art/prop_%s.png" % L["lamp"])
 		lamp.centered = false
 		lamp.position = Vector2(i + 90, 28)
 		lamp.z_index = -9
-		add_child(lamp)
+		level_root.add_child(lamp)
 
 
-var floor_t1: Texture2D = preload("res://game8/art/tile_floor.png")
-var floor_t2: Texture2D = preload("res://game8/art/tile_floor2.png")
+var floor_t1: Texture2D
+var floor_t2: Texture2D
 
 
 func _draw_floor(n: Node2D) -> void:
 	var t1 := floor_t1
 	var t2 := floor_t2
-	for x in range(0, int(LEVEL_W), 16):
+	for x in range(0, int(level_w), 16):
 		if _in_pit(x + 8):
 			continue
 		n.draw_texture(t1, Vector2(x, FLOOR_Y))
 		n.draw_texture(t2, Vector2(x, FLOOR_Y + 16))
-	n.draw_rect(Rect2(0, FLOOR_Y - 1, LEVEL_W, 1), Color8(14, 10, 24))
-	for p in PITS:
+	n.draw_rect(Rect2(0, FLOOR_Y - 1, level_w, 1), Color8(14, 10, 24))
+	for p in pits:
 		n.draw_rect(Rect2(p.x, FLOOR_Y - 1, p.y - p.x, 40), Color8(6, 4, 12))
 		n.draw_rect(Rect2(p.x + 10, FLOOR_Y, 2, 40), Color8(60, 60, 70))
 		n.draw_rect(Rect2(p.y - 12, FLOOR_Y, 2, 40), Color8(60, 60, 70))
@@ -254,6 +313,18 @@ func _draw_floor(n: Node2D) -> void:
 
 
 func _build_stage() -> void:
+	L = STAGES[stage]
+	level_w = L["w"]
+	pits = L["pits"]
+	arena = L["arena"]
+	boss_x0 = L["boss_x0"]
+	if built_stage != stage:
+		_build_background()
+		built_stage = stage
+	intro_t = 170
+	slides = []
+	tiles = []
+	land_mark = Vector2(-1, 0)
 	for e in enemies:
 		e.queue_free()
 	enemies = []
@@ -264,8 +335,8 @@ func _build_stage() -> void:
 	call_t = 0
 	texts = []
 	pops = []
-	heals = [Vector2(2150, 180), Vector2(1560, 104)]
-	lock = Vector2(0, LEVEL_W)
+	heals = L["heals"].duplicate()
+	lock = Vector2(0, level_w)
 	arena_state = 0
 	wave = 0
 	boss = null
@@ -276,23 +347,23 @@ func _build_stage() -> void:
 	player.setup(self, Vector2(40, FLOOR_Y))
 	player.god = demo
 	if demo and "--boss" in OS.get_cmdline_user_args():
-		player.position = Vector2(BOSS_X0 + 30, FLOOR_Y)
+		player.position = Vector2(boss_x0 + 30, FLOOR_Y)
 		arena_state = 2
-		cam_x = BOSS_X0 + 200
+		cam_x = boss_x0 + 200
 		for e in enemies:
 			e.queue_free()
 		enemies = []
 	player.max_hp = max_hp()
 	player.hp = player.max_hp
 	world.add_child(player)
-	for e in ENEMIES:
+	for e in L["enemies"]:
 		_spawn(e[0], Vector2(e[1], e[2]))
 	items = []
 	ooos = []
 	parachute_used = false
-	for it in ITEMS:
+	for it in L["items"]:
 		add_item(it[0], Vector2(it[1], it[2]))
-	for c in COINS:
+	for c in L["coins"]:
 		coins.append({"p": Vector2(c[0], c[1]), "v": Vector2.ZERO, "t": randi() % 40, "rest": true, "life": -1})
 	cam_x = 200
 	mode_t = 0
@@ -309,14 +380,14 @@ func _spawn(k: String, p: Vector2):
 # ---- physics helpers ---------------------------------------------------------------------------
 
 func _in_pit(x: float) -> bool:
-	for p in PITS:
+	for p in pits:
 		if x > p.x and x < p.y:
 			return true
 	return false
 
 
 func is_safe(x: float) -> bool:
-	for p in PITS:
+	for p in pits:
 		if x > p.x - 24 and x < p.y + 24:
 			return false
 	return true
@@ -348,7 +419,7 @@ func _physics_process(_d: float) -> void:
 				mode = "play"
 				mode_t = 0
 				sfx("select")
-				_music("stage1")
+				_music(L["music"])
 		"play", "clear":
 			if hitstop > 0:
 				hitstop -= 1
@@ -364,12 +435,15 @@ func _physics_process(_d: float) -> void:
 			_skills_step()
 		"pause":
 			_pause_step()
+		"end":
+			if mode_t > 60 and (pressed("start") or pressed("jump") or pressed("punch")):
+				_new_run()
 		"over":
 			if mode_t > 60 and (pressed("start") or pressed("jump") or pressed("punch")):
 				cash = cash / 2
 				_build_stage()
 				mode = "play"
-				_music("stage1")
+				_music(L["music"])
 	if shown_cash < cash:
 		shown_cash += 1 if cash - shown_cash < 20 else 5
 	elif shown_cash > cash:
@@ -377,17 +451,21 @@ func _physics_process(_d: float) -> void:
 	_camera()
 	fx.queue_redraw()
 	hud.queue_redraw()
-	rain.queue_redraw()
+	if is_instance_valid(rain):
+		rain.queue_redraw()
 	if demo and tick % 60 == 0:
 		print("demo t=%d mode=%s x=%d y=%d hp=%d cash=%d enemies=%d arena=%d boss=%d bosshp=%d" % [tick, mode, player.position.x,
 			player.position.y, player.hp, cash, enemies.size(), arena_state, boss_state, boss.hp if boss else -1])
+	if demo and boss and tick % 30 == 0 and "--boss" in OS.get_cmdline_user_args():
+		print("  boss st=%s t=%d x=%d y=%d hp=%d" % [boss.st, boss.st_t, boss.position.x, boss.position.y, boss.hp])
 	if demo and tick % 600 == 0:
 		var lst := []
 		for e in enemies:
 			if absf(e.position.x - player.position.x) < 300:
 				lst.append("%s@%d,%d hp%d st=%s" % [e.kind, e.position.x, e.position.y, e.hp, e.st])
 		print("  near: ", ", ".join(lst))
-	if demo and (tick >= 9000 or (mode == "skills" and skills_end and mode_t > 200)):
+	var full := "--full" in OS.get_cmdline_user_args()
+	if demo and (tick >= (24000 if full else 9000) or (mode == "skills" and skills_end and mode_t > 200 and not full) or mode == "end"):
 		print("demo end mode=%s cash=%d" % [mode, cash])
 		get_tree().quit()
 
@@ -402,6 +480,7 @@ func _play_step() -> void:
 			enemies.erase(e)
 			e.queue_free()
 	_step_notes()
+	_step_boss_fx()
 	_step_coins()
 	_step_items()
 	_step_arena()
@@ -426,42 +505,42 @@ func _play_step() -> void:
 
 func _step_arena() -> void:
 	var px: float = player.position.x
-	if arena_state == 0 and px > ARENA["x0"] + 260:
+	if arena_state == 0 and px > arena["x0"] + 260:
 		arena_state = 1
-		lock = Vector2(ARENA["x0"], ARENA["x0"] + 400)
+		lock = Vector2(arena["x0"], arena["x0"] + 400)
 		wave = 0
 		_spawn_wave()
 	elif arena_state == 1:
 		var alive := 0
 		for e in enemies:
-			if not e.dead and e.position.x > ARENA["x0"] - 20 and e.position.x < ARENA["x0"] + 420:
+			if not e.dead and e.position.x > arena["x0"] - 20 and e.position.x < arena["x0"] + 420:
 				alive += 1
 		if alive == 0:
 			wave_gap += 1
 			if wave_gap > 40:
 				wave_gap = 0
 				wave += 1
-				if wave < ARENA["waves"].size():
+				if wave < arena["waves"].size():
 					_spawn_wave()
 				else:
 					arena_state = 2
-					lock = Vector2(0, LEVEL_W)
+					lock = Vector2(0, level_w)
 					go_t = 150
 					sfx("go")
-	if boss_state == 0 and px > BOSS_X0 + 40:
+	if boss_state == 0 and px > boss_x0 + 40:
 		boss_state = 1
-		lock = Vector2(BOSS_X0, LEVEL_W)
+		lock = Vector2(boss_x0, level_w)
 		for e in enemies:
 			if not e.dead:
 				e.gone = true
 				pop(e.position + Vector2(0, -6), false)
-		boss = _spawn("tl", Vector2(LEVEL_W - 30, FLOOR_Y))
+		boss = _spawn(L["boss"], Vector2(level_w - 30, FLOOR_Y))
 		_music("boss")
 		sfx("warn")
 
 
 func _spawn_wave() -> void:
-	for s in ARENA["waves"][wave]:
+	for s in arena["waves"][wave]:
 		_spawn(s[0], Vector2(s[1], s[2]))
 	sfx("glitch")
 
@@ -541,6 +620,60 @@ func stars(at: Vector2) -> void:
 	star_t = 2
 
 
+## Group Leader attacks ------------------------------------------------------------------
+func summon(n: int) -> void:
+	var alive := 0
+	for e in enemies:
+		if not e.dead and not e.is_boss():
+			alive += 1
+	for i in mini(n, 5 - alive):
+		if i % 3 == 2:
+			_spawn("jira", Vector2(lock.x + 30 + randf() * 340, 40))
+		else:
+			_spawn("bug", Vector2(lock.x + 14 if i % 2 == 0 else lock.y - 14, FLOOR_Y))
+	sfx("glitch")
+
+
+func slide(at: Vector2, d: int, mad: bool) -> void:
+	slides.append({"x": at.x, "d": d, "s": 2.6 if mad else 2.0, "t": 0})
+
+
+func drop_tile(x: float) -> void:
+	tiles.append({"x": clampf(x, lock.x + 10, lock.y - 10), "y": 18.0, "vy": 0.0, "t": 0})
+
+
+func mark_landing(x: float, frames: int) -> void:
+	land_mark = Vector2(x, frames)
+
+
+func _step_boss_fx() -> void:
+	for sl in slides.duplicate():
+		sl["x"] += sl["d"] * sl["s"]
+		sl["t"] += 1
+		var r := Rect2(sl["x"] - 9, FLOOR_Y - 14, 18, 14)
+		if player.state != "dead" and r.intersects(player.rect()):
+			player.hurt(1, sl["x"] - sl["d"] * 10)
+		if sl["x"] < lock.x or sl["x"] > lock.y or sl["t"] > 300:
+			slides.erase(sl)
+			pops.append({"p": Vector2(sl["x"], FLOOR_Y - 8), "t": 0, "big": false})
+	for tl in tiles.duplicate():
+		tl["t"] += 1
+		if tl["t"] > 40:
+			tl["vy"] += 0.35
+			tl["y"] += tl["vy"]
+			var r := Rect2(tl["x"] - 8, tl["y"] - 8, 16, 8)
+			if player.state != "dead" and r.intersects(player.rect()):
+				player.hurt(1, tl["x"])
+				tiles.erase(tl)
+				pops.append({"p": Vector2(tl["x"], tl["y"]), "t": 0, "big": false})
+			elif tl["y"] >= FLOOR_Y:
+				tiles.erase(tl)
+				pops.append({"p": Vector2(tl["x"], FLOOR_Y - 4), "t": 0, "big": false})
+				sfx("block")
+	if land_mark.y > 0:
+		land_mark.y -= 1
+
+
 func shockwave(at: Vector2, mad: bool) -> void:
 	for d in [-1, 1]:
 		waves_fx.append({"x": at.x + d * 10, "d": d, "t": 0, "s": 2.4 if mad else 1.9})
@@ -581,7 +714,7 @@ func _step_coins() -> void:
 				continue
 		if (c["p"] as Vector2).distance_to(pc) < 14 and player.state != "dead":
 			coins.erase(c)
-			cash += 5
+			cash += 2
 			sfx("pickup")
 
 
@@ -604,7 +737,7 @@ func _camera() -> void:
 	var hi := lock.y - 200
 	target = clampf(target, lo, hi)
 	cam_x = lerpf(cam_x, target, 0.12)
-	cam_x = clampf(cam_x, 200, LEVEL_W - 200)
+	cam_x = clampf(cam_x, 200, level_w - 200)
 	shake = maxf(0.0, shake - 0.4)
 	var sh := Vector2(randf_range(-shake, shake), randf_range(-shake, shake)) * 0.5
 	cam.position = Vector2(roundf(cam_x), 120) + sh.round()
@@ -670,6 +803,25 @@ func _draw_fx() -> void:
 			var sp := (star_at + Vector2(cos(ang) * 14, sin(ang) * 4)).round()
 			fx.draw_rect(Rect2(sp + Vector2(-1, 0), Vector2(3, 1)), Color8(255, 230, 80))
 			fx.draw_rect(Rect2(sp + Vector2(0, -1), Vector2(1, 3)), Color8(255, 230, 80))
+	for sl in slides:
+		var sx: float = roundf(sl["x"])
+		fx.draw_rect(Rect2(sx - 10, FLOOR_Y - 15, 20, 15), Color8(14, 10, 24))
+		fx.draw_rect(Rect2(sx - 9, FLOOR_Y - 14, 18, 13), Color8(240, 242, 250))
+		fx.draw_rect(Rect2(sx - 9, FLOOR_Y - 14, 18, 3), Color8(200, 60, 70))
+		for i in 3:
+			var bh: int = [5, 8, 3][i]
+			fx.draw_rect(Rect2(sx - 6 + i * 5, FLOOR_Y - 2 - bh, 3, bh), [Color8(60, 120, 220), Color8(220, 60, 60), Color8(60, 170, 90)][i])
+	for tl in tiles:
+		var tx: float = roundf(tl["x"])
+		if tl["t"] <= 40 and (int(tl["t"]) / 4) % 2 == 0:
+			fx.draw_rect(Rect2(tx - 8, FLOOR_Y - 2, 16, 2), Color8(250, 60, 60))
+		fx.draw_rect(Rect2(tx - 8, roundf(tl["y"]) - 8, 16, 8), Color8(14, 10, 24))
+		fx.draw_rect(Rect2(tx - 7, roundf(tl["y"]) - 7, 14, 6), Color8(170, 170, 184))
+		fx.draw_rect(Rect2(tx - 5, roundf(tl["y"]) - 5, 2, 2), Color8(120, 120, 136))
+	if land_mark.y > 0 and (int(land_mark.y) / 4) % 2 == 0:
+		var lx := roundf(land_mark.x)
+		fx.draw_rect(Rect2(lx - 20, FLOOR_Y - 3, 40, 3), Color8(250, 60, 60))
+		F8.text(fx, Vector2(lx - 18, FLOOR_Y - 14), "INCOMING", Color8(250, 90, 80))
 	for w in waves_fx:
 		var x: float = roundf(w["x"])
 		var hh := 11 + (int(w["t"]) / 3) % 3
@@ -736,14 +888,14 @@ func _draw_hud() -> void:
 	var px: int = 6 + player.max_hp * 7 + 12
 	F8.text(hud, Vector2(px, 2), "CASH", white, 1, false)
 	F8.text(hud, Vector2(px, 9), "$%04d" % shown_cash, gold, 1, false)
-	F8.text(hud, Vector2(px + 44, 2), "STAGE 1", white, 1, false)
-	F8.text(hud, Vector2(px + 44, 9), "NEXUS HQ", Color8(160, 200, 252), 1, false)
+	F8.text(hud, Vector2(px + 44, 2), "STAGE %d" % (stage + 1), white, 1, false)
+	F8.text(hud, Vector2(px + 44, 9), L["name"], Color8(160, 200, 252), 1, false)
 	if player.weapon != "":
 		var wt: Texture2D = item_tex[player.weapon]
 		hud.draw_texture(wt, Vector2(px + 84, 4))
 		F8.text(hud, Vector2(px + 84 + wt.get_width() + 3, 5), "X%d" % player.w_uses, white, 1, false)
 	if boss_state == 1 and boss:
-		F8.text(hud, Vector2(322, 2), "-TEAM LEAD-", white, 1, false)
+		F8.text(hud, Vector2(398 - F8.width(L["boss_name"]), 2), L["boss_name"], white, 1, false)
 		var full := int(ceil(boss.hp * 8.0 / boss.max_hp))
 		_pips(340, 8, 8, full, Color8(232, 160, 40))
 	if call_t > 0:
@@ -753,13 +905,29 @@ func _draw_hud() -> void:
 			hud.draw_rect(Rect2(200 - cw / 2, 30, cw, 25), Color8(14, 10, 24))
 			hud.draw_rect(Rect2(200 - cw / 2 + 1, 31, cw - 2, 23), Color8(150, 30, 40))
 			F8.centered(hud, 200, 35, call_text, Color8(255, 240, 200), 3)
+	if intro_t > 0 and mode == "play":
+		intro_t -= 1
+		if intro_t < 150:
+			hud.draw_rect(Rect2(90, 64, 220, 58), K)
+			hud.draw_rect(Rect2(91, 65, 218, 56), Color8(40, 26, 70))
+			F8.centered(hud, 200, 70, "STAGE %d" % (stage + 1), gold, 2)
+			F8.centered(hud, 200, 86, L["name"], white, 3)
+			F8.centered(hud, 200, 108, "BOSS: " + L["boss_full"], Color8(250, 120, 110))
 	if go_t > 0 and (go_t / 12) % 2 == 0:
 		F8.text(hud, Vector2(320, 110), "GO! >>", gold, 3)
 	match mode:
 		"clear":
-			F8.centered(hud, 200, 70, "TEAM LEADER DEFEATED!", gold, 2)
-			F8.centered(hud, 200, 94, "YOUR PR IS APPROVED.", white)
+			F8.centered(hud, 200, 70, "%s DEFEATED!" % L["boss_full"], gold, 2)
+			F8.centered(hud, 200, 94, L["clear_line"], white)
 			F8.centered(hud, 200, 110, "CASH $%d" % shown_cash, gold, 2)
+		"end":
+			hud.draw_rect(Rect2(0, 16, 400, 224), Color8(14, 10, 24))
+			F8.centered(hud, 200, 60, "TO BE CONTINUED...", gold, 3)
+			F8.centered(hud, 200, 100, NEXT_UP, white, 1)
+			F8.centered(hud, 200, 114, "THE CEO AND YOUR EARLY RETIREMENT ARE STILL UPSTAIRS.", Color8(160, 200, 252))
+			F8.centered(hud, 200, 140, "CASH $%d" % cash, gold, 2)
+			if (tick / 30) % 2 == 0:
+				F8.centered(hud, 200, 180, "PRESS ENTER", white, 2)
 		"over":
 			hud.draw_rect(Rect2(0, 16, 400, 224), Color(0, 0, 0, minf(0.7, mode_t / 60.0)))
 			F8.centered(hud, 200, 90, "BURNOUT!", Color8(250, 80, 70), 4)
@@ -828,10 +996,18 @@ func _skills_step() -> void:
 	if pressed("punch") or pressed("start") or pressed("jump"):
 		if sk_row == 3:
 			if skills_end:
+				stage += 1
+				if stage >= STAGES.size():
+					stage = STAGES.size() - 1
+					mode = "end"
+					mode_t = 0
+					_music("clear")
+					sfx("select")
+					return
 				_build_stage()
 				mode = "play"
 				mode_t = 0
-				_music("stage1")
+				_music(L["music"])
 			else:
 				_close()
 			sfx("select")
@@ -889,13 +1065,24 @@ func _pause_step() -> void:
 			2:
 				_build_stage()
 				mode = "play"
-				_music("stage1")
+				_music(L["music"])
 				music.volume_db = -6
 			3:
-				_build_stage()
-				mode = "title"
+				_new_run()
 				_music("title")
 				music.volume_db = -6
+
+
+func _new_run() -> void:
+	stage = 0
+	cash = 0
+	shown_cash = 0
+	skills = {}
+	_build_stage()
+	mode = "title"
+	mode_t = 0
+	_music("title")
+	music.volume_db = -6
 
 
 func _open(m: String) -> void:
@@ -925,7 +1112,12 @@ func max_hp() -> int:
 
 # ---- weapon pickups ----------------------------------------------------------------------------
 
-func add_item(type: String, at: Vector2) -> void:
+## drop: an enemy dropped it; skipped when any other pickup is nearby (no weapon piles).
+func add_item(type: String, at: Vector2, drop := false) -> void:
+	if drop:
+		for it in items:
+			if (it["p"] as Vector2).distance_to(at) < 260:
+				return
 	items.append({"type": type, "p": at, "t": randi() % 60})
 
 
@@ -945,9 +1137,10 @@ func _step_items() -> void:
 		var p: Vector2 = o["p"]
 		var hit := false
 		for e in enemies:
-			if not e.dead and e.rect().grow(2).has_point(p):
+			# the note's hitbox reaches down to the floor, so bugs get hit too
+			if not e.dead and e.rect().intersects(Rect2(p.x - 7, p.y - 6, 14, 28)):
 				e.hurt(2, o["d"])
-				if e.kind != "tl" and not e.dead:
+				if not e.is_boss() and not e.dead:
 					e.frozen = 180
 					say(e.position + Vector2(-26, -e.h - 12), "OUT OF OFFICE")
 				hit = true
@@ -995,7 +1188,7 @@ func _autopilot() -> void:
 		if mode != "play":
 			return
 	if mode == "skills":
-		var script_ := {20: "punch", 40: "right", 60: "punch", 80: "down", 100: "punch", 120: "down", 140: "down", 160: "down"}
+		var script_ := {20: "punch", 40: "right", 60: "punch", 80: "down", 100: "punch", 120: "down", 140: "down", 160: "down", 190: "punch"}
 		if script_.has(mode_t):
 			_auto[script_[mode_t]] = true
 		return
@@ -1006,7 +1199,7 @@ func _autopilot() -> void:
 	var py: float = player.position.y
 	if boss and "--boss" in OS.get_cmdline_user_args():
 		var bx: float = boss.position.x
-		var dizzy: bool = boss.st == "dizzy"
+		var dizzy: bool = boss.st in ["dizzy", "stuck"]
 		var want2 := bx - 26.0 if bx > px else bx + 26.0
 		if not dizzy:
 			want2 = bx - 110.0 if bx > lock.x + 150 else bx + 110.0
@@ -1022,6 +1215,9 @@ func _autopilot() -> void:
 				_auto["jump"] = true
 		if boss.st == "sprint" and absf(bx - px) < 70 and player.on_ground:
 			_auto["jump"] = true
+		for sl in slides:
+			if absf(sl["x"] - px) < 30 and player.on_ground:
+				_auto["jump"] = true
 		if not player.on_ground and player.vel.y < 0:
 			_auto["jump"] = true
 		return
@@ -1068,4 +1264,15 @@ func _autopilot() -> void:
 			_stuck = 0
 	elif player.vel.y < 0:
 		_auto["jump"] = true
+	# over a shaft: keep going right and double jump
+	if not player.on_ground and (_in_pit(px) or _in_pit(px + 20) or _in_pit(px - 10)):
+		_auto.erase("left")
+		_auto["right"] = true
+		if player.vel.y > -1.0:
+			_auto["jump"] = tick % 4 < 2
+	if player.on_ground and _in_pit(px + 40) and not _in_pit(px + 4):
+		_auto.erase("left")
+		_auto["right"] = true
+	if _auto.get("jump", false) and _held.get("jump", false) and player.on_ground:
+		_auto["jump"] = false  # release so the next frame is a fresh press
 	_last_x = px

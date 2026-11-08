@@ -13,7 +13,9 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.resolve(process.argv[2] || path.join(ROOT, 'godot', 'assets', 'audio'));
-const MUSIC = ['title', 'stage1', 'boss', 'clear', 'gameover'];
+const MUSIC = ['title', 'stage1', 'stage2', 'stage3', 'stage4', 'boss', 'clear', 'gameover'];
+// ONLY=stage2,stage3 records just those (music or effects)
+const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;
 const SFX = ['punch', 'heavy', 'whiff', 'hurt', 'jump', 'land', 'step', 'enemyDie', 'explode', 'block',
   'select', 'menu', 'pause', 'go', 'combo', 'glitch', 'pickup', 'heal', 'warn', 'roar', 'throw', 'stomp'];
 
@@ -65,7 +67,7 @@ function ffmpeg(args) {
   await page.evaluate(() => { G.Audio.init(); G.Audio.stopMusic(); G.Audio.setVol('music', 0.8); G.Audio.setVol('sfx', 0.9); });
   await page.waitForTimeout(500);
 
-  for (const id of MUSIC) {
+  for (const id of MUSIC.filter((m) => !ONLY || ONLY.includes(m))) {
     const info = await page.evaluate((id) => { const s = G.Songs.compile(id); return { secs: s.len * 60 / s.bpm / 4, loop: s.loop }; }, id);
     const b64 = await page.evaluate(async ([id, secs]) => {
       G.Audio.stopMusic();
@@ -81,7 +83,7 @@ function ffmpeg(args) {
     console.log('music', id, info.secs.toFixed(2) + 's', info.loop ? 'loop' : 'jingle');
   }
   await page.evaluate(() => G.Audio.stopMusic());
-  for (const name of SFX) {
+  for (const name of SFX.filter((m) => !ONLY || ONLY.includes(m))) {
     const b64 = await page.evaluate(async (name) => {
       await new Promise((r) => setTimeout(r, 200));
       return window.__record(1.4, () => G.Audio.sfx(name));

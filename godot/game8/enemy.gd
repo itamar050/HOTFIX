@@ -38,18 +38,23 @@ func setup(m, k: String, p: Vector2) -> void:
 			h = 14
 			hp = 2
 			make_sprite("jira")
+		"blocker":
+			w = 20
+			h = 14
+			hp = 4
+			make_sprite("blocker")
 		"pm":
 			w = 12
 			h = 30
 			hp = 3
 			make_sprite("pm")
-		"tl":
+		"tl", "gl":
 			w = 34
 			h = 60
-			hp = 30
+			hp = 30 if k == "tl" else 36
 			face = -1
 			st = "intro"
-			make_sprite("tl")
+			make_sprite(k)
 	max_hp = hp
 
 
@@ -79,7 +84,7 @@ func step() -> void:
 				face = -face
 			spr.flip_h = face < 0
 			spr.frame = (main.tick / 8) % 2
-		"jira":
+		"jira", "blocker":
 			phase += 0.08
 			var c := position + Vector2(0, -7)
 			var target := home
@@ -89,7 +94,8 @@ func step() -> void:
 				knock -= 1
 				vel *= 0.88
 			else:
-				vel = vel.lerp((target - c).normalized() * (0.55 if target != home else 0.3), 0.08)
+				var spd := (0.8 if kind == "blocker" else 0.55) if target != home else 0.3
+				vel = vel.lerp((target - c).normalized() * spd, 0.08)
 				if target == home and c.distance_to(home) < 3:
 					vel = Vector2.ZERO
 			position += vel + Vector2(0, sin(phase) * 0.3)
@@ -120,6 +126,8 @@ func step() -> void:
 					st_t = 0
 		"tl":
 			_boss_step(ppos)
+		"gl":
+			_gl_step(ppos)
 
 
 ## Team Leader: a fixed, learnable loop. Every attack is announced by name and has its own
@@ -238,6 +246,129 @@ func _tell_glow() -> void:
 		spr.modulate = Color(1.7, 0.6, 0.55) if (st_t / 5) % 2 == 0 else Color.WHITE
 
 
+## Group Leader: the same template, a fixed loop of three named attacks with tells:
+##   ALL HANDS!   arms up -> summons bugs and a JIRA ticket (capped)
+##   SLIDE DECK!  arm back -> 3 slides skid along the floor at you (jump them)
+##   REORG!       crouch -> jumps out of the screen, ceiling tiles fall (red marks first),
+##                then he crashes down where INCOMING flashes and gets STUCK (punish window)
+const GL_PATTERN := ["allhands", "slides", "reorg"]
+const GL_CALLS := {"allhands": "ALL HANDS!", "slides": "SLIDE DECK!", "reorg": "REORG!"}
+
+
+func _gl_step(ppos: Vector2) -> void:
+	var mad := hp <= max_hp / 2
+	var tell := 28 if mad else 42
+	var do_move := true
+	vel.y = minf(vel.y + 0.22, 7)
+	match st:
+		"intro":
+			face = -1
+			vel.x = -0.8
+			anim("walk%d" % ((main.tick / 5) % 8))
+			if position.x < main.lock.y - 90:
+				st = "taunt"
+				st_t = 0
+				main.say(position + Vector2(-40, -78), "LET'S CIRCLE BACK.")
+		"taunt":
+			vel.x = 0
+			anim("idle%d" % ((main.tick / 30) % 2))
+			if st_t > 80:
+				_next_move()
+		"walk":
+			face = 1 if ppos.x > position.x else -1
+			vel.x = face * (0.8 if mad else 0.55)
+			anim("walk%d" % ((main.tick / 5) % 8))
+			if st_t > (30 if mad else 50):
+				st = GL_PATTERN[move_i]
+				move_i = (move_i + 1) % GL_PATTERN.size()
+				st_t = 0
+				throws = 0
+				main.callout(GL_CALLS[st], tell)
+				main.sfx("warn")
+		"allhands":
+			vel.x = 0
+			anim("cast")
+			if st_t < tell:
+				_tell_glow()
+			elif st_t == tell:
+				main.summon(4 if mad else 3)
+				main.shake = 4
+			elif st_t > tell + 50:
+				_next_move()
+		"slides":
+			vel.x = 0
+			face = 1 if ppos.x > position.x else -1
+			if st_t < tell:
+				anim("throw0")
+				_tell_glow()
+			else:
+				var k := (st_t - tell) % 40
+				anim("throw1" if k < 14 else "throw0")
+				if k == 0:
+					main.slide(position + Vector2(face * 24, 0), face, mad)
+					main.sfx("throw")
+					throws += 1
+				if k == 39 and throws >= (4 if mad else 3):
+					_next_move()
+		"reorg":
+			vel.x = 0
+			if st_t < tell:
+				anim("crouch")
+				_tell_glow()
+			else:
+				vel.y = -9.0
+				st = "reorg_up"
+				st_t = 0
+				main.sfx("jump")
+		"reorg_up":
+			anim("air")
+			vel.y = -9.0  # straight up and out of the screen
+			if position.y < -30:
+				st = "reorg_wait"
+				st_t = 0
+		"reorg_wait":
+			do_move = false
+			position.y = -120
+			vel = Vector2.ZERO
+			var n := 6 if mad else 4
+			if st_t % 20 == 1 and st_t < n * 20:
+				main.drop_tile(ppos.x + randf_range(-30, 30))
+			if st_t > n * 20 + 20:
+				position.x = clampf(ppos.x, main.lock.x + 24, main.lock.y - 24)
+				main.mark_landing(position.x, 50)
+				st = "reorg_fall"
+				st_t = 0
+		"reorg_fall":
+			anim("air")
+			if st_t < 50:
+				do_move = false
+				position.y = -120
+				vel = Vector2.ZERO
+			else:
+				vel.y = 8.0
+			if on_ground:
+				st = "stuck"
+				st_t = 0
+				main.shockwave(position, mad)
+				main.shake = 9
+				main.sfx("stomp")
+				main.say(position + Vector2(-40, -76), "STUCK IN A MEETING!")
+		"stuck":
+			vel.x = 0
+			anim("stuck%d" % ((main.tick / 14) % 2))
+			main.stars(position + Vector2(0, -58))
+			if st_t > (80 if mad else 120):
+				_next_move()
+	if do_move:
+		move_body()
+	position.x = clampf(position.x, main.lock.x + 20, main.lock.y - 20)
+	spr.flip_h = face < 0
+
+
+func is_boss() -> bool:
+	return kind == "tl" or kind == "gl"
+
+
 func _next_move() -> void:
 	st = "walk"
 	st_t = 0
@@ -249,23 +380,25 @@ func harmful() -> bool:
 		return false
 	if kind == "tl":
 		return st in ["walk", "standup", "sprint", "review"]
+	if kind == "gl":
+		return position.y > 0 and st in ["walk", "allhands", "slides", "reorg", "reorg_fall"]
 	return true
 
 
 func hurt(dmg: int, dir: int) -> void:
 	if inv > 0 or dead:
 		return
-	if kind == "tl" and st == "dizzy":
+	if is_boss() and st in ["dizzy", "stuck"]:
 		dmg *= 2  # the punish window: learning the pattern pays off
 		main.say(position + Vector2(-14, -70 - (main.tick % 3) * 4), "CRIT X2")
 	hp -= dmg
 	flash = 8
-	inv = 10 if kind == "tl" else 6
+	inv = 10 if is_boss() else 6
 	main.sfx("punch")
-	if kind != "tl":
+	if not is_boss():
 		knock = 12
 		vel.x = dir * 2.2
-		if kind == "jira":
+		if kind == "jira" or kind == "blocker":
 			vel = Vector2(dir * 3.0, -0.5)
 		elif on_ground:
 			vel.y = -1.5
@@ -277,19 +410,23 @@ func die() -> void:
 	dead = true
 	gone = true
 	var c := position + Vector2(0, -h / 2)
-	main.pop(c, kind == "tl")
-	var n: int = {"bug": 3, "jira": 4, "pm": 6, "tl": 30}[kind]
+	main.pop(c, is_boss())
+	var n: int = {"bug": 3, "jira": 4, "blocker": 6, "pm": 6, "tl": 30, "gl": 36}[kind]
 	if main.has("bounty"):
 		n = int(ceil(n * 1.5))
-	if kind == "pm" and randf() < 0.5:
-		main.add_item("ooo", c)
+	if kind == "pm" and randf() < 0.35:
+		main.add_item("ooo", Vector2(c.x, position.y), true)
 	main.drop_coins(c, n)
 	if kind == "jira":
 		main.say(c + Vector2(-14, -12), "CLOSED!")
+	elif kind == "blocker":
+		main.say(c + Vector2(-28, -12), "BLOCKER RESOLVED!")
 	elif kind == "pm":
 		main.say(c + Vector2(-20, -24), "OUT OF OFFICE")
 	elif kind == "tl":
 		main.say(c + Vector2(-40, -40), "FINE, I'LL APPROVE IT")
+	elif kind == "gl":
+		main.say(c + Vector2(-40, -40), "LET'S TAKE IT OFFLINE...")
 	main.sfx("enemyDie")
-	if kind == "tl":
+	if is_boss():
 		main.boss_defeated()
