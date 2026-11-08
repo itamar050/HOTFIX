@@ -22,9 +22,9 @@ jobs:
       - name: Godot and export templates
         run: |
           base=https://github.com/godotengine/godot/releases/download/${GODOT}-stable
-          curl -sSL -o godot.zip "$base/Godot_v${GODOT}-stable_linux.x86_64.zip"
+          curl -fsSL --retry 5 --retry-delay 10 -o godot.zip "$base/Godot_v${GODOT}-stable_linux.x86_64.zip"
           unzip -q godot.zip && mv "Godot_v${GODOT}-stable_linux.x86_64" godot-bin
-          curl -sSL -o tpl.tpz "$base/Godot_v${GODOT}-stable_export_templates.tpz"
+          curl -fsSL --retry 5 --retry-delay 10 -o tpl.tpz "$base/Godot_v${GODOT}-stable_export_templates.tpz"
           mkdir -p ~/.local/share/godot/export_templates/${GODOT}.stable
           unzip -q tpl.tpz && mv templates/* ~/.local/share/godot/export_templates/${GODOT}.stable/
       - name: Export
