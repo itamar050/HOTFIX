@@ -1,11 +1,15 @@
 extends Node2D
-## HOTFIX! Godot test slice: stage 1 with the new background art, Code Bro drawn with the
-## imported sprite strips, and arenas where waves of glitched clones attack (the camera
-## locks until they are down). Everything is built in code so main.tscn stays one node.
+## HOTFIX! 16-bit brawler (upgrade in progress): a night street outside Nexus Dynamics,
+## Code Bro drawn with the imported sprite strips, and arenas where waves of glitched clones
+## attack (the camera locks until they are down). Built in code so main.tscn stays one node.
+## Step 1 of the upgrade: camera (scripts/brawl_camera.gd) and the layered street stage
+## (scripts/stage_street.gd, temporary placeholder art).
 
 const GROUND_Y := 300.0
 const LEVEL_W := 2400.0
 const Fighter := preload("res://scripts/fighter.gd")
+const BrawlCamera := preload("res://scripts/brawl_camera.gd")
+const StageStreet := preload("res://scripts/stage_street.gd")
 
 var player: Fighter
 var enemies: Array = []
@@ -20,7 +24,8 @@ var go_t := 0
 var cleared := false
 var last_enemy = null
 var last_enemy_t := 0
-var cam: Camera2D
+var cam: BrawlCamera
+var stage: Node2D
 var fx: Node2D
 var hitstop := 0
 var shake := 0.0
@@ -39,22 +44,20 @@ var big_label: Label
 func _ready() -> void:
 	demo = "--demo" in OS.get_cmdline_user_args()
 	_setup_input()
-	_build_background()
 	player = Fighter.new()
 	player.setup(self, true, Vector2(220, GROUND_Y))
 	add_child(player)
 	fx = Node2D.new()
 	fx.z_index = 20
 	add_child(fx)
-	cam = Camera2D.new()
-	cam.limit_left = 0
-	cam.limit_right = int(LEVEL_W)
-	cam.limit_top = 0
-	cam.limit_bottom = 360
-	cam.position_smoothing_enabled = true
-	cam.position_smoothing_speed = 7.0
-	cam.limit_smoothed = true
-	player.add_child(cam)
+	# the camera is its own node (not a child of the player), so knockback and hit
+	# reactions don't jerk the whole view around
+	cam = BrawlCamera.new()
+	add_child(cam)
+	cam.setup(player, 0.0, LEVEL_W)
+	stage = StageStreet.new()
+	add_child(stage)
+	stage.build(LEVEL_W, cam)
 	_build_hud()
 	_build_audio()
 
@@ -115,48 +118,6 @@ func _demo(action: String, edge: bool) -> bool:
 	return false
 
 
-# ---- the stage ---------------------------------------------------------------------------
-func _layer(path: String, scroll: float, y: float, z: int, tint := Color.WHITE) -> void:
-	_layer_tex(load(path), scroll, y, z, tint)
-
-
-func _layer_tex(tex: Texture2D, scroll: float, y: float, z: int, tint := Color.WHITE) -> void:
-	var p := Parallax2D.new()
-	var s := Sprite2D.new()
-	s.texture = tex
-	s.centered = false
-	s.position = Vector2(0, y)
-	s.modulate = tint
-	p.add_child(s)
-	p.scroll_scale = Vector2(scroll, 1.0)
-	p.repeat_size = Vector2(tex.get_width(), 0)
-	p.repeat_times = maxi(4, int(ceil(700.0 / tex.get_width())) + 2)
-	p.z_index = z
-	add_child(p)
-
-
-func _build_background() -> void:
-	# depth: the further back a layer is, the darker and cooler it is drawn
-	_layer("res://assets/sprites/stage1_far.png", 0.35, 0.0, -20, Color(0.72, 0.72, 0.88))
-	# the floor runs from just under the cubicles to below the screen; feet stand 100 px into it
-	var floor_top := GROUND_Y - 100.0
-	# the back wall: cubicles in front of big windows (transparent, the skyline shows through)
-	var wall_tex: Texture2D = load("res://assets/sprites/stage1_wall.png")
-	_layer("res://assets/sprites/stage1_wall.png", 0.75, floor_top + 4.0 - wall_tex.get_height(), -15, Color(0.86, 0.86, 0.96))
-	_layer("res://assets/sprites/stage1_floor.png", 1.0, floor_top, -10)
-	# a soft contact shadow where the wall meets the floor, so they read as one room
-	var grad := Gradient.new()
-	grad.set_color(0, Color(0, 0, 0.05, 0.6))
-	grad.set_color(1, Color(0, 0, 0.05, 0.0))
-	var shadow := GradientTexture2D.new()
-	shadow.gradient = grad
-	shadow.width = 64
-	shadow.height = 22
-	shadow.fill_from = Vector2(0, 0)
-	shadow.fill_to = Vector2(0, 1)
-	_layer_tex(shadow, 1.0, floor_top, -9)
-
-
 # ---- HUD -------------------------------------------------------------------------------
 func _bar(x: float, y: float, w: float, col: Color, parent: Node) -> ColorRect:
 	var back := ColorRect.new()
@@ -187,6 +148,7 @@ func _label(text: String, x: float, y: float, parent: Node, size := 10, col := C
 
 func _build_hud() -> void:
 	var hud := CanvasLayer.new()
+	hud.layer = 5  # above the vignette (layer 1)
 	add_child(hud)
 	_label("CODE BRO", 8, 4, hud, 10, Color(1, 0.88, 0.3))
 	hp_bar = _bar(8, 20, 120, Color(0.29, 0.88, 0.35), hud)
@@ -261,8 +223,10 @@ func _physics_process(_delta: float) -> void:
 		if e.gone:
 			enemies.erase(e)
 			e.queue_free()
-	shake = maxf(0.0, shake - 0.5)
-	cam.offset = Vector2(randf_range(-shake, shake), randf_range(-shake, shake))
+	# hits set `shake` (1.5 light .. 3 heavy); the camera turns it into decaying trauma
+	if shake > 0.0:
+		cam.add_trauma(shake * 0.08)
+		shake = 0.0
 	hp_bar.size.x = 120.0 * player.hp / player.max_hp
 	if last_enemy_t > 0:
 		last_enemy_t -= 1
@@ -300,8 +264,7 @@ func _update_arenas() -> void:
 			arena = arenas_done
 			var x0: float = ARENAS[arena]["x0"]
 			lock = Vector2(x0 + 20.0, x0 + 620.0)
-			cam.limit_left = int(x0)
-			cam.limit_right = int(x0 + 640.0)
+			cam.set_bounds(x0, x0 + 640.0)
 			wave = 0
 			_spawn_wave()
 		elif not cleared and arenas_done == ARENAS.size() and player.position.x > LEVEL_W - 200.0:
@@ -324,8 +287,7 @@ func _update_arenas() -> void:
 	arena = -1
 	arenas_done += 1
 	lock = Vector2(30.0, LEVEL_W - 30.0)
-	cam.limit_left = 0
-	cam.limit_right = int(LEVEL_W)
+	cam.set_bounds(0.0, LEVEL_W)
 	go_t = 150
 	sfx("go")
 

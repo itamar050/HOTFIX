@@ -1,19 +1,20 @@
 ; Engine configuration file.
-; HOTFIX! Nexus Meltdown: Godot build. Main scene = the 8-bit game (game8/). The old 16-bit slice is main.tscn.
+; HOTFIX! Nexus Meltdown: Godot build. Main scene = the 16-bit brawler (main.tscn, scripts/).
+; The paused 8-bit platformer is game8/ (run res://game8/main.tscn; it was made for 400x240).
 
 config_version=5
 
 [application]
 
 config/name="HOTFIX! Nexus Meltdown - test build"
-run/main_scene="res://game8/main.tscn"
+run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 
 [display]
 
-window/size/viewport_width=400
-window/size/viewport_height=240
-window/size/window_width_override=1200
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="viewport"
 window/stretch/aspect="keep"

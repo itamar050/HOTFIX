@@ -1,20 +1,19 @@
 # Notes for Claude: HOTFIX! Nexus Meltdown
 
-**Current direction (Nov 2026): 8-bit (Shovel Knight style) platformer + arena fights, art drawn
-in code. Read `docs/DESIGN.md` (story: climb the corporate ladder, bosses Team Leader ->
-Group Leader -> Director -> VP -> CEO; enemies bugs, JIRA tickets, PMs; cash + upgrades) and
-`tools/pixel8/README.md`. The user liked the v2 walk/jump; the 16-bit Godot slice and the
-Gemini/3D art notes below are superseded (kept for reference).**
+**Current direction (Nov 2026, changed again): the 16-bit side-view BRAWLER** (`godot/main.tscn`,
+`scripts/main.gd` + `fighter.gd`, 640x360, integer scaling). The user wants a polished 16-bit
+console brawler look: detailed 120 px characters, layered urban backgrounds, a shallow
+up/down fighting lane, no 8-bit look. Work in steps, keep it playable, list changed files and
+give Godot test steps each time, never pass placeholders off as final art.
+Upgrade plan: 1 camera/rendering/background (done: `scripts/brawl_camera.gd`,
+`scripts/stage_street.gd`, placeholder street from `tools/make_street_placeholders.py`,
+spec `docs/ART_SPEC.md`), 2 depth lane (y movement in the sidewalk band y 266..338, y-sort,
+shadows, attack depth tolerance), 3 combat feel, 4 enemies from different depths and types,
+5 art replacement, 6 HUD.
 
-**8-bit Godot game: `godot/game8/` (main scene), 400x240.** `python3 tools/pixel8/export.py`
-(run in tools/pixel8) writes the PNGs to `godot/game8/art/` and `game8/sprite_data.gd`. Scripts:
-`main.gd` (level data PROPS/ENEMIES/COINS/ARENA, physics helpers `ground()`/solids, arena + boss
-room, cash, skill tree (Tab, `SKILLS`, `has(id)`), pause menu (Esc), weapon pickups `ITEMS`
-(keyboard, OOO notes), HUD, title, demo autopilot; `--demo --boss` jumps to the boss,
-`--demo --menutest` opens the menus), `player.gd`, `enemy.gd` (bug, jira, pm, tl boss),
-`actor.gd`, `font8.gd` (3x5 pixel font). Test: `godot --headless --path godot --fixed-fps 60
--- --demo` (invincible autopilot plays the whole stage + shop, prints state each second,
-quits in the end-of-stage skill tree). Load textures used in draw callbacks as members (locals get freed -> white).
+The paused 8-bit platformer stays in `godot/game8/` (run `res://game8/main.tscn`; built for
+400x240, so it looks off at the brawler's 640x360). Its notes: `docs/DESIGN.md`,
+`tools/pixel8/README.md`; demo flags `--demo [--stage2] [--boss] [--full] [--menutest]`.
 
 A 16-bit beat 'em up / platformer (Streets of Rage 2 look). Owner: itamar050. Work on `main`.
 Separate projects always get their own repo (never `itamar050/frost`, which is firmware).
