@@ -67,12 +67,15 @@ Separate projects always get their own repo (never `itamar050/frost`, which is f
   0.42, floor top 100 px above the feet, contact shadow at the seam.
 
 ## Code Bro art status
-Approved: sheet, punch (jab-jab), hook, kick, hurt. Usable but small sources: run,
-knockdown. Walk: bad (both Gemini and the rig). Missing: jump, lowkick, sweep, uppercut,
+Walk: NEW (Nov 2026) 12 frames cut from the user's Gemini walking video (`art/raw/video/bro_walk`,
+`tools/video_sprites`), legs alternate; WALK_SPEED 2.1 to match the stride. Approved: sheet, punch (jab-jab), hook, kick, hurt. Usable but small sources: run,
+knockdown. Missing: jump, lowkick, sweep, uppercut,
 airkick, dash, grab, special, misc. Then Code Girl, enemies, bosses, stages 2-4
 (full list and prompts: `art/PROMPTS.md`).
 
 ## Gemini (Nano Banana) lessons
+Gemini VIDEO works for cycles: a generated clip of the character walking alternates legs properly
+(stills never did). Cut it out with `tools/video_sprites` (busy backgrounds: check every frame).
 Good at single poses/attacks. Fails at walk cycles (never alternates legs, also as edits)
 and idles (redraws = shimmer). Needs: PNG, <=4 figures per 16:9 image (~500 px figures),
 standing reference first, wide gaps, "no blur", fresh chat with the character sheet

@@ -8,7 +8,10 @@ const STRIPS := ["bro_sheet", "bro_idle", "bro_walk", "bro_run", "bro_punch", "b
 ## Animations: [strip, frame, ticks] steps; an attack's active step is marked "hit".
 const ANIMS := {
 	"idle": [["bro_idle", 0, 18], ["bro_idle", 1, 12], ["bro_idle", 2, 22], ["bro_idle", 3, 12]],
-	"walk": [["bro_walk", 0, 6], ["bro_walk", 1, 6], ["bro_walk", 2, 6], ["bro_walk", 3, 6], ["bro_walk", 4, 6], ["bro_walk", 5, 6], ["bro_walk", 6, 6], ["bro_walk", 7, 6]],
+	# walk: 12 frames cut from the user's walking video (tools/video_sprites), 3 ticks each;
+	# one loop = 36 ticks = about 75 px at WALK_SPEED, the stride in the video (no foot sliding)
+	"walk": [["bro_walk", 0, 3], ["bro_walk", 1, 3], ["bro_walk", 2, 3], ["bro_walk", 3, 3], ["bro_walk", 4, 3], ["bro_walk", 5, 3],
+		["bro_walk", 6, 3], ["bro_walk", 7, 3], ["bro_walk", 8, 3], ["bro_walk", 9, 3], ["bro_walk", 10, 3], ["bro_walk", 11, 3]],
 	"run": [["bro_run", 0, 4], ["bro_run", 1, 4], ["bro_run", 2, 4], ["bro_run", 3, 4], ["bro_run", 4, 4], ["bro_run", 5, 4], ["bro_run", 6, 4], ["bro_run", 7, 4]],
 	"jump": [["bro_run", 2, 999]],
 	"jab_a": [["bro_punch", 0, 2], ["bro_punch", 1, 7, "hit"], ["bro_punch", 2, 6]],
@@ -30,7 +33,7 @@ const ATTACKS := {
 	"hook": {"box": Rect2(24, -100, 42, 26), "dmg": 6, "kb": 3.0, "next": "kick", "heavy": true},
 	"kick": {"box": Rect2(20, -104, 46, 34), "dmg": 9, "kb": 5.0, "knockdown": true, "heavy": true},
 }
-const WALK_SPEED := 3.2
+const WALK_SPEED := 2.1
 const RUN_SPEED := 5.6
 const GRAVITY := 0.55
 const JUMP_V := -10.5
